@@ -1,6 +1,6 @@
 local map = vim.keymap.set
 local M = {}
-local U = require("utils")
+local u = require("utils")
 
 -- ── love section ──────────────────────────────────────────────────────
 -- LOVE: I love these mappings. **They are fun**
@@ -8,30 +8,60 @@ map("x", "/", "<Esc>/\\%V") --search within visual selection - this is magic
 -- Replace all instances of highlighted words
 map(
 	"v",
-	"<leader>r",
+	"<leader>ra",
 	'"hy:%s/<C-r>h//g<left><left>',
 	{ desc = "Replace all instances" }
 )
+map(
+	{ "n", "x" },
+	"<leader>rk",
+	":s/\\(.*\\)/\\1<left><left><left><left><left><left><left><left><left>",
+	{ desc = "Replace kierby word", silent = false }
+)
+map(
+	"n",
+	"<leader>re",
+	":%s/<C-r><C-w>/<C-r><C-w>/gcI<Left><Left><Left><Left>",
+	{ silent = false }
+)
+map("n", "dd", function()
+	---@diagnostic disable-next-line: param-type-mismatch
+	if vim.fn.getline(".") == "" then
+		return '"_dd'
+	end
+	return "dd"
+end, { expr = true })
+
+-- Ripgrep go to file by line number - this for search results
+map("n", "<localleader>rf", 'yiw?^[a-z]<CR>gf:<C-r>"<CR>')
 -- open grep directly and then open quickfix with the results
-map("n", "<localleader>g", U.grepandopen, { desc = "Grep and open quickfix" })
+map("n", "<localleader>g", u.grepandopen, { desc = "Grep and open quickfix" })
 -- motions -- I really didn't know about such amazing keymaps `:h omap-info`
 -- entire buffer (https://vi.stackexchange.com/a/2321)
 -- like you can do `daa` to delete entire buffer, `yaa` to yank entire buffer
-map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
-
-map("n", "<C-t>", U.swapBooleanInLine, { desc = "swap boolean" })
-map("n", "<up>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
-map("n", "<down>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
-
-map("n", "<C-c>", "<cmd>normal! ciw<cr>a")
+-- stylua: ignore start 
+map("n", "<BS>",           "<C-o>")
+map("o", "aa",             ":<c-u>normal! mzggVG<cr>`z")
+map("n", "<localleader>'", "<cmd>e #<cr>",                      { desc = "Switch to Other Buffer" })
+map("n", "<C-t>",          u.swapBooleanInLine,                 { desc = "swap boolean" })
+map("n", "<up>",           "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
+map("n", "<down>",         "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
+map("n", "<C-c>",          "<cmd>normal! ciw<cr>i")
+-- stylua: ignore end
 
 map(
 	"n",
 	"<localleader>m",
-	U.messages_to_quickfix,
+	u.messages_to_quickfix,
 	{ desc = ":Messages to quickfix" }
 )
 
+map(
+	"n",
+	"<Leader>tr",
+	':execute "!trans :ar " . expand("<cword>")<CR>',
+	{ desc = "Translate word" }
+)
 map("n", "<localleader>d", function()
 	return ":e " .. vim.fn.expand("%:p:h") .. "/"
 end, { expr = true }) -- NOTE: here ths **expr** is so important
@@ -49,15 +79,14 @@ map("i",   "<C-l>", "<C-x><C-l>")-- Complete line -- didn't work
 -- HACK: this is to insert the fukking hashtag sign in neovim in conjunction
 -- with this keymap in wezterm { key = "1", mods = "OPT", action = act.SendKey({ key = "1", mods = "ALT" }) }
 map("i", "<A-1>", "#")
-map("n", "<A-t>", "<cmd>split | terminal<cr>")
 
 -- ── Clear search with <esc> ───────────────────────────────────────────
 map("n", "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" }) -- Open the package manager lazy
 
 -- Keeping the cursor centered when cycling search results
--- map("n", "n", "nzzzv", { desc = "Next result" })
--- map("n", "N", "Nzzzv", { desc = "Previous result" })
+map("n", "n", "nzzzv", { desc = "Next result" })
+map("n", "N", "Nzzzv", { desc = "Previous result" })
 
 -- TODO: Change the the mappings of vim-visual-multi
 -- ── page shift ────────────────────────────────────────────────────────
@@ -69,10 +98,12 @@ map("v", "<", "<gv")
 map("v", ">", ">gv")
 
 -- ── Move to window using the <ctrl> hjkl keys ─────────────────────────
-map("n", "<C-h>", "<C-w>h", { desc = "Go to left window", remap = true })
-map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })
-map("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
-map("n", "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
+-- stylua: ignore start 
+map({ "n", "t" }, "<C-h>", "<C-w>h", { desc = "Go to left window",  remap = true })
+map({ "n", "t" }, "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })
+map({ "n", "t" }, "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
+map({ "n", "t" }, "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
+-- stylua: ignore end 
 
 -- ── Resize window using <ctrl> arrow keys ─────────────────────────────
 -- stylua: ignore start
@@ -123,27 +154,57 @@ map(
 map("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 map("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
+vim.keymap.set(
+	"n",
+	"<leader>fl",
+	"<cmd>lua require('utils').gxhandler()<cr>",
+	{ desc = "Follow link" }
+)
+vim.keymap.set(
+	"n",
+	"<leader>fd",
+	"<cmd>lua require('utils').gxdotfyle()<cr>",
+	{ desc = "Follow dotfyle" }
+)
 -- ┌                                                         ┐
 -- │ ── Mini Modules                                         │
 -- │ ──────────────────────────────────────────────────────  │
 -- └                                                         ┘
 -- stylua: ignore start
-map("n", "<leader>ff",      "<cmd>Pick frecency<cr>",                 { desc = "Find [F]iles" })
-map("n", "<leader><space>", "<cmd>Pick files<cr>",                    { desc = "Find [F]iles" })
-map("n", "<leader>fg",      "<cmd>Pick grep_live<cr>",                { desc = "Find [G]rep_live" })
-map("n", "<leader>fo",      "<cmd>Pick oldfiles<cr>",                 { desc = "Find [O]ld files" })
-map("n", "<leader>fr",      "<cmd>Pick resume<cr>",                   { desc = "Find [R]esume" })
-map("n", "<leader>fh",      "<cmd>Pick help<cr>",                     { desc = "Find [H]elp" })
-map("n", "<leader>fk",      "<cmd>Pick keymaps<cr>",                  { desc = "Find [K]eymaps" })
-map("n", "<leader>b",       "<cmd>Pick buffers<cr>",                  { desc = "Find [B]uffers" })
-map("n", "<leader>fk",      "<cmd>Pick keymaps<cr>",                  { desc = "Find [K]eymaps" })
-map("n", "<leader>fh",      "<cmd>Pick hl_groups<cr>",                { desc = "Find [H]ighlights" })
-map("n", "<leader>fc",      "<cmd>Pick history scope=':'<cr>",        { desc = "Find [C]ommands" })
-map("n", "<leader>fs",      "<cmd>Pick history scope='/'<cr>",        { desc = "Find [S]earch" })
-map("n", "<leader>gk",      "<cmd>Pick git_hunks<cr>",                { desc = "Git Hun[k]s" })
-map("n", "<leader>gs",      "<cmd>Pick git_hunks scope='staged'<cr>", { desc = "Git [S]taged" })
+map("n", "<leader>ff",      "<cmd>Pick frecency<cr>",                     { desc = "Find [F]iles" })
+map("n", "<leader><space>", "<cmd>Pick files<cr>",                        { desc = "Find [F]iles" })
+map("n", "<leader>fg",      "<cmd>Pick grep_live<cr>",                    { desc = "Find [G]rep_live" })
+map("n", "<leader>fG",      "<cmd>Pick grep pattern='<cword>'<cr>",       { desc = "Find [C]urrent word" })
+map("n", "<leader>fo",      "<cmd>Pick oldfiles<cr>",                     { desc = "Find [O]ld files" })
+map("n", "<leader>fr",      "<cmd>Pick resume<cr>",                       { desc = "Find [R]esume" })
+map("n", "<leader>fh",      "<cmd>Pick help<cr>",                         { desc = "Find [H]elp" })
+map("n", "<leader>fk",      "<cmd>Pick keymaps<cr>",                      { desc = "Find [K]eymaps" })
+map("n", "<leader>b",       "<cmd>Pick buffers<cr>",                      { desc = "Find [B]uffers" })
+map("n", "<leader>fk",      "<cmd>Pick keymaps<cr>",                      { desc = "Find [K]eymaps" })
+map("n", "<leader>fh",      "<cmd>Pick hl_groups<cr>",                    { desc = "Find [H]ighlights" })
+map("n", "<leader>fc",      "<cmd>Pick history scope=':'<cr>",            { desc = "Find [C]ommands" })
+map("n", "<leader>fs",      "<cmd>Pick history scope='/'<cr>",            { desc = "Find [S]earch" })
+map("n", "<leader>fv",      "<cmd>Pick visit_paths cwd=''<cr>",           { desc = "Visit paths (all)" })
+map("n", "<leader>fV",      "<cmd>Pick visit_paths<cr>",                  { desc = "Visit paths (cwd)" })
+map("n", "<leader>gk",      "<cmd>Pick git_hunks<cr>",                    { desc = "Git Hun[k]s" })
+map("n", "<leader>gs",      "<cmd>Pick git_hunks scope='staged'<cr>",     { desc = "Git [S]taged" })
+map("n", "<leader>gK",      "<cmd>Pick git_hunks path='%'<cr>",           { desc = "Git Hun[k]s (current)" })
+-- map("n", "<leader>cr",      "<cmd>Pick lsp scope='references'<cr>",       { desc = "References (LSP)" })
+map("n", "<leader>cs",      "<cmd>Pick lsp scope='document_symbol'<cr>",  { desc = "Symbols buffer (LSP)" })
+map("n", "<leader>cS",      "<cmd>Pick lsp scope='workspace_symbol'<cr>", { desc = "Symbols workspace (LSP)" })
+map("n", "<leader>cd",      "<cmd>Pick diagnostic scope='all'<cr>",       { desc = "Diagnostic workspace" })
+map("n", "<leader>cD",      "<cmd>Pick diagnostic scope='current'<cr>",   { desc = "Diagnostic buffer" })
 -- stylua: ignore end
 
+-- useful for scrolling long files
+function M.minimap()
+	vim.keymap.set(
+		"n",
+		"<leader>ms",
+		"<cmd>lua Minimap.toggle_focus()<cr>",
+		{ desc = "scroll by minimap" }
+	)
+end
 -- I got this from reddit - wow, look how simple it is
 M.mini_files_key = {
 	{
@@ -157,6 +218,11 @@ M.mini_files_key = {
 		{ desc = "File explorer" },
 	},
 }
+
+-- ── Spell ─────────────────────────────────────────────────────────────
+-- Thanks to Bekaboo, Correct misspelled word / mark as correct
+vim.keymap.set("i", "<C-g>+", "<Esc>[szg`]a")
+vim.keymap.set("i", "<C-g>=", "<C-g>u<Esc>[s1z=`]a<C-G>u") --first suggestions
 
 -- credit to @MariaSolOs
 -- Use dressing (or mini.pick) for spelling suggestions.
@@ -172,6 +238,18 @@ map("n", "z=", function()
 	)
 end, { desc = "Spelling suggestions" })
 
+-- ── Terminal ──────────────────────────────────────────────────────────
+-- TODO: change this mappings to Ctrl
+-- stylua: ignore start 
+map( "t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+function M.term()
+	local term = require("nvterm.terminal")
+	map("n", "<leader>th", function() term.new("horizontal") end, { desc = "New horizontal term" })
+	map("n", "<leader>tv", function() term.new("vertical") end, { desc = "New vertical term" })
+	map("n", "<leader>tf", function() term.new("float") end, { desc = "New tab term" })
+end
+-- stylua: ignore end
 -- ── clean registers ───────────────────────────────────────────────────
 local function clear_registers()
 	local registers =
@@ -182,8 +260,23 @@ local function clear_registers()
 end
 map("n", "<leader>rg", clear_registers, { desc = "Clear registers" })
 
+vim.keymap.set(
+	"x",
+	"<Space>dc",
+	u.diff_with_clipboard,
+	{ noremap = true, silent = true }
+)
 -- ── Abbreviations ─────────────────────────────────────────────────────
-vim.keymap.set("!a", "sis", "stylua: ignore start")
-vim.keymap.set("!a", "sie", "stylua: ignore end")
+if vim.fn.has("nvim-0.10") == 1 then
+	vim.keymap.set("!a", "sis", "stylua: ignore start")
+	vim.keymap.set("!a", "sie", "stylua: ignore end")
+end
+
+-- ── Neovide ───────────────────────────────────────────────────────────
+
+if vim.g.neovide then
+	vim.keymap.set("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
+	vim.keymap.set("n", "<>D-t>", "<cmd>!cd ~ &&neovide<cr>")
+end
 
 return M
