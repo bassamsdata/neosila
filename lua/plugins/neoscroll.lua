@@ -1,12 +1,12 @@
 return {
 	{
 		"karb94/neoscroll.nvim",
-		cond = not vim.g.vscode,
+		cond = not vim.g.vscode and not vim.g.neovide,
 		-- event = { "BufReadPost", "BufNewFile" },
 		keys = { "<C-u>", "<C-d>", "zt", "zz", "zb" },
-		enabled = function()
-			return not vim.g.neovide -- no need for this in neovide
-		end,
+		-- cond = function()
+		-- 	return not vim.g.neovide -- no need for this in neovide
+		-- end,
 		config = function()
 			require("neoscroll").setup({
 				-- All these keys will be mapped to their corresponding default scrolling animation
