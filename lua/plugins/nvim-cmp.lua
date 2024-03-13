@@ -37,6 +37,14 @@ return {
 			local lspkind = require("lspkind")
 			-- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
 			require("luasnip.loaders.from_vscode").lazy_load()
+			-- when cmp completion is loaded, clear the virtual text from codium
+
+			cmp.event:on("menu_opened", function()
+				if vim.g.codeium_enabled == true then
+					return vim.fn["codeium#Clear"]()
+				end
+			end)
+
 			cmp.setup({
 				-- Other configurations...
 				enabled = function()
