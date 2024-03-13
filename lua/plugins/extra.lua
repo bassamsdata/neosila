@@ -12,10 +12,11 @@ return {
 		cmd = "Arrow open",
 		keys = {
 			{ ";" },
+			{ "<tab>" },
 		},
 		opts = {
 			show_icons = true,
-			leader_key = ";", -- Recommended to be a single key
+			leader_key = "<tab>", -- Recommended to be a single key
 		},
 	},
 

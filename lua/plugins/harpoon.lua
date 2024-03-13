@@ -1,3 +1,4 @@
+-- TODO: delete either harpoon or Arrow
 local function harpoon()
 	return require("harpoon")
 end
@@ -7,8 +8,8 @@ return {
 	branch = "harpoon2",
 	keys = {
     -- stylua: ignore start
-		{ "<leader>a", function() harpoon():list():append() end,  },
-		{ "<A-j>",     function() harpoon():list():select(1) end, },
+		{ "<leader>ha", function() harpoon():list():append() end, desc = "Add file to Harpoon" },
+		{ "<A-j>",     function() harpoon():list():select(1) end, desc = "Select file in Harpoon" },
 		{ "<A-k>",     function() harpoon():list():select(2) end, },
 		{ "<C-n>",     function() harpoon():list():select(3) end, },
 		{ "<C-s>",     function() harpoon():list():select(4) end, },

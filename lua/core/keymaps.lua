@@ -88,7 +88,6 @@ map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" }) -- Open the package ma
 map("n", "n", "nzzzv", { desc = "Next result" })
 map("n", "N", "Nzzzv", { desc = "Previous result" })
 
--- TODO: Change the the mappings of vim-visual-multi
 -- ── page shift ────────────────────────────────────────────────────────
 map("n", "<C-Up>", "<C-y>k", { desc = "Shift page up one line" })
 map("n", "<C-Down>", "<C-e>j", { desc = "Shift page down one line" })
@@ -138,7 +137,7 @@ map("x", "y", "ygv<ESC>") -- preserve cursor position on visual yank
 map("n", "==", "==_") -- move cursor to the start of the line on format
 map("x", "=", "=gv_")
 map("n", "J", "J_") -- go to end after a join
--- TODO: replace it with treesj plugin
+-- TODO: replace it with treesj or splitjoin mini plugin
 map("n", "S", "T hr<CR>k$") -- split (opposite of J)
 -- Add undo break-points
 -- map("i", ",", ", <c-g>u") -- caused some problems
@@ -241,10 +240,10 @@ map("n", "z=", function()
 end, { desc = "Spelling suggestions" })
 
 -- ── Terminal ──────────────────────────────────────────────────────────
--- TODO: change this mappings to Ctrl
 -- stylua: ignore start 
 map( "t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-map( "t", "<C-k>", "<C-\\><C-n><C-w><C-k>", { desc = "Exit terminal mode" })
+map( "t", "<C-k>", "<C-\\><C-n><C-w><C-k>", { desc = "out of terminal to top" })
+map( "t", "<C-h>", "<C-\\><C-n><C-w><C-kh", { desc = "Out of terminal to left" })
 
 function M.term()
 	local term = require("nvterm.terminal")
@@ -271,18 +270,29 @@ vim.keymap.set(
 )
 -- ── Abbreviations ─────────────────────────────────────────────────────
 if vim.fn.has("nvim-0.10") == 1 then
-	vim.keymap.set("!a", "sis", "stylua: ignore start")
-	vim.keymap.set("!a", "sie", "stylua: ignore end")
+	vim.keymap.set("!a", "sis", "-- stylua: ignore start")
+	vim.keymap.set("!a", "sie", "-- stylua: ignore end")
 end
 
 -- ── Go Stuff ─────────────────────────────────────────────────────
 map("n", "<leader>cg", "<cmd>!go run %<cr>", { desc = "Run go file" })
 
+-- ── Ai ───────────────────────────────────────────────────────────
+-- stylua: ignore start 
+map("n",   "<leader>ac", "<cmd>CodiChat<cr>", { desc = "[A]i Codi chat" })
+map("n",   "<leader>tc", "<cmd>CodiChat<cr>", { desc = "[T]oggle [C]odi chat" })
+map("n",   "<leader>ad", "<cmd>CodiDo<cr>",   { desc = "[A]i Codi Do" })
+map({ "n", "v" },        "<leader>at",        "<cmd>CodiTask<cr>",    { desc = "[A]i Codi Go" })
+map({ "n", "v" },        "<leader>aa",        "<cmd>CodiAsk<cr>",     { desc = "[A]i Codi Ask" })
+map({ "n", "v" },        "<leader>ae",        "<cmd>CodiExplain<cr>", { desc = "[A]i Codi Explain" })
+-- stylua: ignore end
 -- ── Neovide ───────────────────────────────────────────────────────────
 
 if vim.g.neovide then
+	vim.keymap.set("c", "<D-v>", "<C-R>+") -- Paste command mode
+	vim.keymap.set("i", "<D-v>", "<ESC>pli") -- Paste insert mode
 	vim.keymap.set("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
-	vim.keymap.set("n", "<>D-t>", "<cmd>!cd ~ &&neovide<cr>")
+	vim.keymap.set("n", "<D-t>", "<cmd>!cd ~ &&neovide<cr>")
 end
 
 return M

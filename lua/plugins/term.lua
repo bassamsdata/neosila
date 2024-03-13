@@ -26,6 +26,7 @@ return {
 			},
 		},
 		config = function()
+			require("core.keymaps").term()
 			require("nvterm").setup({
 				terminals = {
 					type_opts = {
