@@ -21,6 +21,7 @@ return {
 				formatters_by_ft = {
 					lua = { "stylua" },
 					go = { "goimports", "gofmt" },
+					sql = { "sqlfmt" },
 					python = function(bufnr)
 						if
 							require("conform").get_formatter_info("ruff_format", bufnr).available

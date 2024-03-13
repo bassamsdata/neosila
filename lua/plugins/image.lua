@@ -8,7 +8,7 @@ return {
 	{ -- for images
 		"3rd/image.nvim",
 		event = {
-			"FileType markdown,norg,quarto",
+			"FileType norg",
 			"BufRead *.png,*.jpg,*.gif,*.webp,*.ipynb",
 		},
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
@@ -23,8 +23,8 @@ return {
 					filetypes = { "markdown", "vimwiki", "quarto" },
 				},
 			},
-			max_width = 80,
-			max_height = 20,
+			max_width = 300,
+			max_height = 80,
 			max_width_window_percentage = math.huge,
 			max_height_window_percentage = math.huge,
 			kitty_method = "normal",

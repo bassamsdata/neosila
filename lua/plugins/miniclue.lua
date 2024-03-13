@@ -139,6 +139,8 @@ return {
 					{ mode = "n", keys = "<leader>c", desc = "+code" },
 					{ mode = "n", keys = "<leader>f", desc = "+find" },
 					{ mode = "n", keys = "<leader>g", desc = "+git" },
+					{ mode = "n", keys = "<leader>gh", desc = "+gitsigns" },
+					{ mode = "n", keys = "<leader>gd", desc = "+DiffView" },
 					-- { mode = "n", keys = "<leader>s", desc = "+search" },
 					{ mode = "n", keys = "<leader>u", desc = "+ui" },
 					-- { mode = "n", keys = "<leader>w", desc = "+window" },

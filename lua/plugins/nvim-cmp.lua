@@ -1,3 +1,7 @@
+local function get_bufnrs() -- this fn from Nv-macro, thanks
+	return vim.b.bigfile and {} or { vim.api.nvim_get_current_buf() }
+end
+
 -- Initialize global variable for cmp-nvim toggle
 vim.g.cmp_enabled = true
 return {
@@ -8,7 +12,7 @@ return {
 	},
 	{
 		"hrsh7th/cmp-nvim-lsp",
-		event = "InsertEnter",
+		event = "LspAttach",
 	},
 	{
 		"hrsh7th/cmp-cmdline",
@@ -17,19 +21,20 @@ return {
 	},
 	{
 		"hrsh7th/nvim-cmp",
-		event = { "LspAttach", "InsertCharPre" },
+		cond = not vim.b.bigfile,
+		event = { "LspAttach", "BufReadPost" },
 		dependencies = {
 			"hrsh7th/cmp-path", -- source for file system paths
 			"L3MON4D3/LuaSnip", -- snippet engine
 			"saadparwaiz1/cmp_luasnip", -- for autocompletion
 			"rafamadriz/friendly-snippets", -- useful snippets
 			"onsails/lspkind.nvim", -- vs-code like pictograms
-			{
-				"Exafunction/codeium.nvim",
-				cmd = "Codeium",
-				build = ":Codeium Auth",
-				opts = {},
-			},
+			-- {
+			-- 	"Exafunction/codeium.nvim",
+			-- 	cmd = "Codeium",
+			-- 	build = ":Codeium Auth",
+			-- 	opts = {},
+			-- },
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -45,11 +50,19 @@ return {
 				end
 			end)
 
+			-- if vim.g.codeium_enabled == true then
+			-- cmp.event:on("menu_opened", function()
+			-- 	return vim.fn["codeium#Clear"]()
+			-- end)
+			-- end
 			cmp.setup({
 				-- Other configurations...
 				enabled = function()
-					return vim.g.cmp_enabled
+					return vim.bo.ft ~= "" and not vim.b.bigfile
 				end,
+				-- enabled = function()
+				-- 	return vim.g.cmp_enabled
+				-- end,
 				completion = {
 					completeopt = "menu,menuone,preview,noselect",
 				},
@@ -64,8 +77,17 @@ return {
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-,>"] = cmp.mapping.complete(), -- show completion suggestions
-					["<C-e>"] = cmp.mapping.abort(), -- close completion window
-					["<§>"] = cmp.mapping.close(),
+					["<C-m>"] = cmp.mapping.complete({ -- trigger ai sources only
+						config = {
+							sources = {
+								{ name = "codeium" },
+								{ name = "cody" },
+							},
+						},
+					}),
+					-- TODO: I should add invoke codeium to use it and remove it from `ai.lua` file
+					["<C-e>"] = cmp.mapping.abort(), -- close completion windo
+					["<C-l>"] = cmp.mapping.close(),
 					-- ["<Down>"] = function(fb)
 					-- 	cmp.close()()
 					-- end,
@@ -73,7 +95,7 @@ return {
 					-- TODO: if statement to accept codeium suggestions.
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
-							cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
+							cmp.select_next_item()
 						elseif luasnip.expand_or_locally_jumpable() then
 							luasnip.expand_or_jump()
 						else
@@ -93,11 +115,19 @@ return {
 				-- sources for autocompletion
 				sources = cmp.config.sources({
 					{ name = "codeium", group_index = 1, priority = 100 },
-					{ name = "cmp_tabnine" },
+					{ name = "cody" },
 					{ name = "otter" },
+					{ name = "cmp_r" },
 					{ name = "nvim_lsp" },
+					-- { name = "cmp_tabnine" },
 					{ name = "luasnip" }, -- snippets
-					{ name = "buffer" }, -- text within current buffer
+					{
+						name = "buffer",
+						max_item_count = 8,
+						option = {
+							get_bufnrs = get_bufnrs,
+						},
+					}, -- text within current buffer
 					{ name = "path" }, -- file system paths
 				}),
 				-- configure lspkind for vs-code like pictograms in completion menu
@@ -109,7 +139,8 @@ return {
 						symbol_map = {
 							Codeium = "",
 							otter = "🦦",
-							TabNine = "",
+							Cody = "",
+							cmp_nvim_r = "R",
 						},
 					}),
 				},
@@ -130,16 +161,21 @@ return {
 						max_width = math.floor(vim.o.columns * 0.4),
 					},
 				},
-				experimental = {
-					ghost_text = { hl_group = "LspCodeLens" },
-				},
+				-- experimental = {
+				-- 	ghost_text = { hl_group = "LspCodeLens" },
+				-- },
 			})
 			cmp.setup.cmdline({ "/", "?" }, {
 				view = {
 					entries = { name = "wildmenu", separator = "|" },
 				},
 				sources = {
-					{ name = "buffer" },
+					{
+						name = "buffer",
+						option = {
+							get_bufnrs = get_bufnrs,
+						},
+					},
 				},
 			})
 			-- TODO: implement exceptions: https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-cmdline-completion-for-certain-commands-such-as-increname
@@ -148,8 +184,14 @@ return {
 					entries = { name = "wildmenu", separator = "|" },
 				},
 				sources = {
-					{ name = "path" },
-					{ name = "cmdline" },
+					{ name = "path", group_index = 1 },
+					{
+						name = "cmdline",
+						option = {
+							ignore_cmds = {},
+						},
+						group_index = 2,
+					},
 				},
 			})
 		end,

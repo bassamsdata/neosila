@@ -6,9 +6,11 @@ return {
 			"stevearc/dressing.nvim",
 		},
 	},
+
 	{
 		"NeogitOrg/neogit",
 		cmd = "Neogit",
+		keys = { { "<leader>gg", "<cmd>Neogit<cr>", desc = "Open Neogit" } },
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"sindrets/diffview.nvim",
@@ -37,6 +39,9 @@ return {
 			popup = {
 				kind = "split",
 			},
+			status = {
+				recent_commit_count = 20,
+			},
 			-- TODO: Change mappings and keys
 			mappings = {
 				-- modify status buffer mappings
@@ -53,6 +58,7 @@ return {
 			},
 		},
 	},
+
 	{
 		"sindrets/diffview.nvim",
 		dependencies = "nvim-lua/plenary.nvim",
@@ -78,6 +84,7 @@ return {
 			{ "<leader>gdc", "<cmd>DiffviewClose<cr>", desc = "Diffview [C]lose" },
 		},
 	},
+
 	{
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPost", "BufNewFile", "BufWritePre" },

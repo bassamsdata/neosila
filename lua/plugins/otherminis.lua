@@ -5,7 +5,7 @@ return {
 		cond = function()
 			return not vim.b.large_file
 		end,
-		event = "FileType lua,norg,quarto",
+		event = "FileType lua,norg,quarto,py,go,markdown,R",
 		config = function()
 			local map = require("mini.map")
 			local gen_integr = map.gen_integration
@@ -107,6 +107,7 @@ return {
 	},
 	{
 		"folke/todo-comments.nvim",
+		event = "BufRead",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = {
 			keywords = {

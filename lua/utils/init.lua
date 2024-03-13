@@ -33,6 +33,8 @@ local swap_pairs = {
 	{ "1", "0" },
 	{ "foo", "bar" },
 	{ "TRUE", "FALSE" },
+	{ "True", "False" },
+	{ "fg", "bg" },
 }
 
 function M.swapBooleanInLine()
@@ -48,6 +50,76 @@ function M.swapBooleanInLine()
 		end
 	end
 	vim.api.nvim_set_current_line(line)
+end
+
+M.file_path = vim.fn.stdpath("config") .. "/plugin/colorswitch.lua"
+
+function M.replace_word(old, new)
+	local file, err = io.open(M.file_path, "r")
+	if not file then
+		vim.notify("Failed to open file: " .. err, vim.log.levels.ERROR)
+		return
+	end
+	local content = file:read("*all")
+	file:close()
+	-- TODO: vim.g.colors_name only output the first word - try to implemtnt vim.fn.getcompletion('', 'color')
+	-- local added_pattern = string.gsub(old, "-", "%%-") -- add % before - if exists
+	local new_content = content:gsub(old, new)
+	file, err = io.open(M.file_path, "w")
+	if not file then
+		vim.notify("Failed to open file for writing: " .. err, vim.log.levels.ERROR)
+		return
+	end
+	file:write(new_content)
+	file:close()
+end
+
+-- idea taken from MariaSolOs:
+-- https://github.com/MariaSolOs/dotfiles/blob/main/.config/nvim/lua/commands.lua#L36
+-- Define GxHandler function
+function M.gxhandler()
+	local file = vim.fn.expand("<cfile>")
+	-- Consider anything that looks like string/string a GitHub link.
+	local link = file:match("%w[%w%-]+/[%w%-%._]+")
+	if link then
+		vim.fn.system("open https://www.github.com/" .. link)
+	else
+		vim.notify("Failed to open link: " .. file, vim.log.levels.ERROR)
+	end
+end
+
+function M.gxdotfyle()
+	local file = vim.fn.expand("<cfile>")
+	-- Consider anything that looks like string/string a GitHub link.
+	local link = file:match("%w[%w%-]+/[%w%-%._]+")
+	if link then
+		vim.fn.system("open https://www.dotfyle.com/plugins/" .. link)
+	else
+		vim.notify("Failed to open link: " .. file, vim.log.levels.ERROR)
+	end
+end
+
+function M.diff_with_clipboard()
+	local ftype = vim.api.nvim_get_option_value("filetype", {})
+	local cmd = string.format(
+		[[
+    normal! "xy
+    vsplit
+    enew
+    normal! P
+    setlocal buftype=nowrite
+    set filetype=%s
+    diffthis
+    normal! \<C-w>\<C-w>
+    enew
+    set filetype=%s
+    normal! "xP
+    diffthis
+  ]],
+		ftype,
+		ftype
+	)
+	vim.api.nvim_exec2(cmd, {})
 end
 
 function M.messages_to_quickfix()
@@ -82,41 +154,6 @@ function M.read_file(path)
 	local content = file:read("*a")
 	file:close()
 	return content or ""
-end
-
----Write string into file
----@param path string
----@return boolean success
-function M.write_file(path, str)
-	local file = io.open(path, "w")
-	if not file then
-		return false
-	end
-	file:write(str)
-	file:close()
-	return true
-end
----Read json contents as lua table
----@param path string
----@param opts table? same option table as `vim.json.decode()`
----@return table
-function M.read(path, opts)
-	opts = opts or {}
-	local str = M.read_file(path)
-	local ok, tbl = pcall(vim.json.decode, str, opts)
-	return ok and tbl or {}
-end
-
----Write json contents
----@param path string
----@param tbl table
----@return boolean success
-function M.write(path, tbl)
-	local ok, str = pcall(vim.json.encode, tbl)
-	if not ok then
-		return false
-	end
-	return M.write_file(path, str)
 end
 
 -- TODO: organize that

@@ -1,5 +1,4 @@
 return {
-	-- { "cmpadden/pomodoro.nvim", keys = { "<leader>p" }, opts = {} },
 	{
 		"echasnovski/mini.pick",
 		dependencies = {
@@ -95,6 +94,12 @@ return {
 				-- relative = "editor",
 			}
 
+			-- Create new picker to search nvim config whatever the cwd is
+			MiniPick.registry.config = function()
+				local opts = { source = { cwd = vim.fn.stdpath("config") } }
+				return MiniPick.builtin.files({}, opts)
+			end
+
 			-- Define a new picker for the quickfix list
 			MiniPick.registry.quickfix = function()
 				return MiniExtra.pickers.list({ scope = "quickfix" }, {})
@@ -131,6 +136,19 @@ return {
 					{ window = { config = center_small } }
 				)
 			end
+
+			MiniPick.registry.registry = function()
+				local items = vim.tbl_keys(MiniPick.registry)
+				table.sort(items)
+				local source =
+					{ items = items, name = "Registry", choose = function() end }
+				local chosen_picker_name = MiniPick.start({ source = source })
+				if chosen_picker_name == nil then
+					return
+				end
+				return MiniPick.registry[chosen_picker_name]()
+			end
+
 			-- TODO: enhance this one by remocving mini.fuzzy dependencies and move things outside loops
 			-- this got it from https://github.com/echasnovski/mini.nvim/discussions/609#
 			MiniPick.registry.frecency = function()

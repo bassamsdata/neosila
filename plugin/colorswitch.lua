@@ -1,35 +1,45 @@
-local utils = require("utils")
-local colors_file = string.format(vim.fn.stdpath("state") .. "colors.json")
--- 1. Restore dark/light background and colorscheme from json so that nvim
---    "remembers" the background and colorscheme when it is restarted.
--- 2. Spawn setbg/setcolors on colorscheme change to make other nvim instances
---    and system color consistent with the current nvim instance.
+-- total rewrite version, thanks to Bekaboo "https://github.com/Bekaboo/nvim/blob/master/plugin/colorswitch.lua"
+-- thanks to nvchad as well for the idea of dofile and replace_word
 
-local saved = utils.read(colors_file)
-saved.colors_name = saved.colors_name or "dragon"
+-- local M = {}
+local color_scheme = {
+	bg = "dark",
+	colors_name = "original_cockatoo",
+}
 
-if saved.bg and saved.bg ~= vim.go.bg then
-	vim.go.bg = saved.bg
+if color_scheme.bg ~= vim.go.bg then
+	vim.go.bg = color_scheme.bg
 end
 
-if saved.colors_name and saved.colors_name ~= vim.g.colors_name then
+if color_scheme.colors_name ~= vim.g.colors_name then
 	vim.cmd.colorscheme({
-		args = { saved.colors_name },
+		args = { color_scheme.colors_name },
 		mods = { emsg_silent = true },
 	})
 end
 
 vim.api.nvim_create_autocmd("Colorscheme", {
 	group = vim.api.nvim_create_augroup("ColorSwitch", {}),
-	desc = "Spawn setbg/setcolors on colorscheme change.",
+	desc = "Update color scheme on colorscheme change.",
 	callback = function()
-		local data = utils.read(colors_file)
-		if data.colors_name ~= vim.g.colors_name or data.bg ~= vim.go.bg then
-			data.colors_name = vim.g.colors_name
-			data.bg = vim.go.bg
-			if not utils.write(colors_file, data) then
-				return
+		local replace_word = require("utils").replace_word
+		-- we can utilize dofile() here but this option is better
+		local old = color_scheme
+		vim.schedule(function()
+			local new = vim.g.colors_name
+			local n_bg = vim.go.bg
+			if new ~= old.colors_name or n_bg ~= old.bg then
+				replace_word(old.bg, n_bg)
+				replace_word(old.colors_name, new)
+				pcall(vim.system, { "setbg", vim.go.bg })
+				pcall(vim.system, { "setcolor", vim.g.colors_name })
+				color_scheme = {
+					bg = n_bg,
+					colors_name = new,
+				}
 			end
-		end
+		end)
 	end,
 })
+
+-- return M

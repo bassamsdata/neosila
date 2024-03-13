@@ -1,3 +1,4 @@
+local autocmd = vim.api.nvim_create_autocmd
 return {
 	{
 		"echasnovski/mini.files",
@@ -5,17 +6,35 @@ return {
 			{ -- one keymapping to toggle
 				"<leader>e",
 				function()
-					-- added this just to open the mini.files at the current file location
+					-- open  at the current file location
 					local bufname = vim.api.nvim_buf_get_name(0)
-					local _ = require("mini.files").close()
-						or require("mini.files").open(bufname, false)
+					if vim.bo.filetype == "minintro" then -- adding if because of the customized intro
+						local _ = require("mini.files").close()
+							or require("mini.files").open()
+					else
+						local _ = require("mini.files").close()
+							or require("mini.files").open(bufname, false)
+					end
 				end,
 				{ desc = "File explorer" },
+			},
+			{ -- nice way to do that like oil
+				"-",
+				function()
+					local current_file = vim.fn.expand("%")
+					local _ = require("mini.files").close()
+						or require("mini.files").open(current_file, false)
+					vim.cmd("normal @")
+				end,
 			},
 		},
 		config = function()
 			-- create mappings for splits
 			local map_split = function(buf_id, lhs, direction)
+				local ok, MiniFiles = pcall(require, "mini.files")
+				if not ok then
+					return
+				end
 				local rhs = function()
 					local window = MiniFiles.get_target_window()
 					-- ensure doesn't make weired behaviour on directories
@@ -40,7 +59,7 @@ return {
 				vim.keymap.set("n", lhs, rhs, { buffer = buf_id, desc = desc })
 			end
 
-			vim.api.nvim_create_autocmd("User", {
+			autocmd("User", {
 				pattern = "MiniFilesBufferCreate",
 				callback = function(args)
 					local buf_id = args.data.buf_id
@@ -50,7 +69,7 @@ return {
 				end,
 			})
 			-- make rounded borders, credit to MariaSolos
-			vim.api.nvim_create_autocmd("User", {
+			autocmd("User", {
 				desc = "Add rounded corners to minifiles window",
 				pattern = "MiniFilesWindowOpen",
 				callback = function(args)

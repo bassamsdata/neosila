@@ -3,11 +3,11 @@
 -- Author:       Bekaboo <kankefengjing@gmail.com>
 -- Maintainer:   Bekaboo <kankefengjing@gmail.com>
 -- License:      GPL-3.0
--- Last Updated: Mon 12 Feb 2024 02:17:12 am EST
+-- Last Updated: Mon 12 Feb 2024 02:21:35 am EST
 
 -- Clear hlgroups and set colors_name {{{
 vim.cmd.hi("clear")
-vim.g.colors_name = "cockatoo"
+vim.g.colors_name = "original_cockatoo"
 -- }}}
 
 -- Palette {{{
@@ -78,7 +78,7 @@ if vim.go.bg == 'dark' then
   c_iron           = '#313742'
   c_deepsea        = '#334154'
   c_ocean          = '#303846'
-  c_jeans          = '#0F111A'
+  c_jeans          = '#262f3e'
   c_space          = '#13161f'
   c_black          = '#09080b'
   c_shadow         = '#09080b'
@@ -184,7 +184,7 @@ local hlgroups = {
   CursorColumn = { bg = c_ocean },
   CursorIM = { fg = c_space, bg = c_flashlight },
   CursorLine = { bg = c_ocean },
-  CursorLineNr= { fg = c_orange, bold = true },
+  CursorLineNr = { fg = c_orange, bold = true },
   DebugPC = { bg = c_purple_blend },
   lCursor = { link = 'Cursor' },
   TermCursor = { fg = c_space, bg = c_orange },
@@ -200,7 +200,7 @@ local hlgroups = {
   ErrorMsg = { fg = c_scarlet },
   FoldColumn = { fg = c_steel },
   Folded = { fg = c_steel, bg = c_ocean },
-  FloatBorder = { fg = c_smoke, bg = c_jeans },
+  FloatBorder = { fg = c_smoke, bg = c_jeans},
   FloatShadow = { bg = c_shadow, blend = 70 },
   FloatShadowThrough = { link = 'None' },
   HealthSuccess = { fg = c_tea },
@@ -213,7 +213,7 @@ local hlgroups = {
   MsgArea = { link = 'Normal' },
   MsgSeparator = { link = 'StatusLine' },
   MatchParen = { bg = c_thunder, bold = true },
-  NonText = { fg = c_steel },
+  NonText = { fg = c_iron  },-- c_steel },
   Pmenu = { fg = c_smoke, bg = c_ocean },
   PmenuSbar = { bg = c_deepsea },
   PmenuSel = { fg = c_white, bg = c_thunder },
@@ -226,7 +226,7 @@ local hlgroups = {
   SpellCap = { link = 'SpellBad' },
   SpellLocal = { link = 'SpellBad' },
   SpellRare = { link = 'SpellBad' },
-  StatusLine = { fg = c_smoke, bg = nil }, -- c_deepsea
+  StatusLine = { fg = c_smoke, bg = c_deepsea },
   StatusLineNC = { fg = c_steel, bg = c_ocean },
   Substitute = { link = 'Search' },
   TabLine = { link = 'StatusLine' },
@@ -288,11 +288,12 @@ local hlgroups = {
   Ignore = { fg = c_iron },
   Error = { fg = c_scarlet },
   Todo = { fg = c_black, bg = c_beige, bold = true },
-  -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
-  NormalMode = { fg = c_magenta},
-  VisualMode = { fg = "#cb4251" },
-  InsertMode = { fg = c_aqua },
-  CommandMode = { fg = "#ffc73d" },
+    -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
+  NormalMode = { fg = c_orange, bold =true},
+  VisualMode = { fg = "#cb4251", bold =true },
+  InsertMode = { fg = c_aqua, bold =true },
+  CommandMode = { fg = "#ffc73d", bold =true },
+
   -- }}}2
 
   -- Treesitter syntax {{{2
@@ -414,7 +415,6 @@ local hlgroups = {
   LspSignatureActiveParameter = { link = 'IncSearch' },
   LspInfoBorder = { link = 'FloatBorder' },
   LspInlayHint = { link = 'DiagnosticVirtualTextHint' },
-  LspCodeLens = {  fg= c_magenta, italic = true },
   -- }}}2
 
   -- Diagnostic {{{2
@@ -741,9 +741,6 @@ local hlgroups = {
   StatusLineGitRemoved = { fg = c_scarlet, bg = c_deepsea },
   StatusLineHeader = { fg = c_jeans, bg = c_pigeon },
   StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre },
-  StatusLineNormal = { fg = c_jeans, bg = c_cerulean },
-  StatusLineInsert = { fg = c_jeans, bg = c_tea },
-  StatusLineVisual = { fg = c_jeans, bg = c_orange },
 
   -- glance.nvim
   GlanceBorderTop = { link = 'WinSeparator' },
@@ -758,33 +755,21 @@ local hlgroups = {
   GlanceWinBarFilename = { fg = c_pigeon, bg = c_deepsea, bold = true },
   GlanceWinBarFilepath = { fg = c_pigeon, bg = c_deepsea },
   GlanceWinBarTitle = { fg = c_pigeon, bg = c_deepsea, bold = true },
-
-  -- mini.nvim highlights
-  MiniMapSymbolView = {link = 'VertSplit'},
-  MiniNotifyBorder = {fg = c_jeans},
-
-  -- Treesitter Context Menu
-  -- TreesitterContextBottom = { underline = true, sp = c_tea},
   -- }}}2
-
 
   -- Extra {{{2
   Yellow = { fg = c_yellow },
   Earth = { fg = c_earth },
   Orange = { fg = c_orange },
   Scarlet = { fg = c_scarlet },
-  Scarlet_bg = { bg = c_scarlet },
   Ochre = { fg = c_ochre },
-  Ochre_bg = {fg = c_jeans, bg = c_ochre },
   Wine = { fg = c_wine },
   Pink = { fg = c_pink },
   Tea = { fg = c_tea },
   Flashlight = { fg = c_flashlight },
   Aqua = { fg = c_aqua },
-  Aqua_bg = { fg = c_jeans, bg = c_aqua },
   Cerulean = { fg = c_cerulean },
   SkyBlue = { fg = c_skyblue },
-  SkyBlue_bg = { fg = c_jeans, bg = c_skyblue },
   Turquoise = { fg = c_turquoise },
   Lavender = { fg = c_lavender },
   Magenta = { fg = c_magenta },
@@ -800,13 +785,13 @@ local hlgroups = {
   Ocean = { fg = c_ocean },
   Space = { fg = c_space },
   Black = { fg = c_black },
-  -- }}}2
-
+  -- HiPatterns
   HiPatternsNOTE = {link = "Aqua"},
-  HiPatternsTODO = {link = "SkyBlue"},
+  HiPatternsTODO = {link = "CursorIM"},
   HiPatternsERROR = {link = "Error"},
   HiPatternsLOVE = {link = "Tea"},
   HiPatternsFIX = {link = "Yellow"},
+  -- }}}2
 }
 -- }}}1
 

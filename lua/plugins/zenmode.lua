@@ -1,0 +1,51 @@
+return {
+	-- TODO: Add semizen mode for neovide cause this plugin slows down neovim
+	-- { "Pocco81/vrai-zen.nvim", dev = true, opts = {} },
+	"folke/zen-mode.nvim",
+	keys = { { "<leader>z", "<cmd>ZenMode<cr>", desc = "ZenMode" } },
+	opts = {
+		window = {
+			width = 0.75,
+			options = {
+				number = false,
+				relativenumber = false,
+				list = false,
+				scrolloff = 99,
+			},
+		},
+		plugins = {
+			twilight = { enabled = false }, -- enable to start Twilight when zen mode opens
+			gitsigns = { enabled = false },
+			wezterm = {
+				enabled = false,
+				font = "+4", -- (10% increase per step)
+			},
+			options = {
+				enabled = true,
+				ruler = false, -- disables the ruler text in the cmd line area
+				showcmd = false, -- disables the command in the last line of the screen
+				laststatus = 0,
+			},
+		},
+		on_open = function()
+			-- vim.cmd("IBLDisable")
+
+			vim.opt.listchars:append({
+				trail = "·",
+				-- tab = "│ ",
+			})
+			vim.opt.sidescrolloff = 0
+		end,
+		on_close = function()
+			-- vim.cmd("IBLEnable")
+			vim.opt.listchars:append({
+				trail = "·",
+				-- leadmultispace = "│ ", -- this caused problems
+				-- multispace  = "│ ",
+				tab = "│ ",
+				-- space = "⋅",
+			})
+			vim.opt.sidescrolloff = 4
+		end,
+	},
+}
