@@ -86,7 +86,14 @@ return {
 						},
 					}),
 					-- TODO: I should add invoke codeium to use it and remove it from `ai.lua` file
-					["<C-e>"] = cmp.mapping.abort(), -- close completion windo
+					["<C-e>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.abort()
+							return vim.fn["codeium#Complete"]()
+						else
+							fallback()
+						end
+					end),
 					["<C-l>"] = cmp.mapping.close(),
 					-- ["<Down>"] = function(fb)
 					-- 	cmp.close()()
