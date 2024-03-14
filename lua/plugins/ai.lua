@@ -2,7 +2,7 @@ return {
 	{
 		"Exafunction/codeium.nvim",
 		event = { "InsertEnter" },
-		cond = not vim.g.vscode,
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
@@ -23,6 +23,7 @@ return {
 
 	{
 		"Exafunction/codeium.vim",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = { "BufReadPost", "InsertEnter" },
 		config = function()
 			vim.g.codeium_enabled = true

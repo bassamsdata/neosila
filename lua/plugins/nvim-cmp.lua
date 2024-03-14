@@ -7,21 +7,24 @@ vim.g.cmp_enabled = true
 return {
 	{
 		"hrsh7th/cmp-buffer", -- source for text in buffer
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = { "CmdlineEnter", "InsertEnter" },
 		dependencies = "hrsh7th/nvim-cmp",
 	},
 	{
 		"hrsh7th/cmp-nvim-lsp",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "LspAttach",
 	},
 	{
 		"hrsh7th/cmp-cmdline",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "CmdlineEnter",
 		dependencies = "hrsh7th/nvim-cmp",
 	},
 	{
 		"hrsh7th/nvim-cmp",
-		cond = not vim.b.bigfile,
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = { "LspAttach", "BufReadPost" },
 		dependencies = {
 			"hrsh7th/cmp-path", -- source for file system paths

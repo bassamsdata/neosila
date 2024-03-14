@@ -42,5 +42,5 @@ return {
 
 	{ "lunarvim/bigfile.nvim", event = "VeryLazy", opts = {} },
 
-	{ "laytan/cloak.nvim", cmd = "CloakToggle", opts = {} },
+	{ "laytan/cloak.nvim", cmd = "CloakToggle", ft = "sh", opts = {} },
 }

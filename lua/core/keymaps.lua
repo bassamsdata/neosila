@@ -279,12 +279,12 @@ map("n", "<leader>cg", "<cmd>!go run %<cr>", { desc = "Run go file" })
 
 -- ── Ai ───────────────────────────────────────────────────────────
 -- stylua: ignore start 
-map("n",   "<leader>ac", "<cmd>CodiChat<cr>", { desc = "[A]i Codi chat" })
-map("n",   "<leader>tc", "<cmd>CodiChat<cr>", { desc = "[T]oggle [C]odi chat" })
-map("n",   "<leader>ad", "<cmd>CodiDo<cr>",   { desc = "[A]i Codi Do" })
-map({ "n", "v" },        "<leader>at",        "<cmd>CodiTask<cr>",    { desc = "[A]i Codi Go" })
-map({ "n", "v" },        "<leader>aa",        "<cmd>CodiAsk<cr>",     { desc = "[A]i Codi Ask" })
-map({ "n", "v" },        "<leader>ae",        "<cmd>CodiExplain<cr>", { desc = "[A]i Codi Explain" })
+map("n",   "<leader>ac", "<cmd>CodyChat<cr>", { desc = "[A]i Codi chat" })
+map("n",   "<leader>tc", "<cmd>CodyChat<cr>", { desc = "[T]oggle [C]odi chat" })
+map("n",   "<leader>ad", "<cmd>CodyDo<cr>",   { desc = "[A]i Codi Do" })
+map({ "n", "v" },        "<leader>at",        "<cmd>CodyTask<cr>",    { desc = "[A]i Codi Go" })
+map({ "n", "v" },        "<leader>aa",        "<cmd>CodyAsk<cr>",     { desc = "[A]i Codi Ask" })
+map({ "n", "v" },        "<leader>ae",        "<cmd>CodyExplain<cr>", { desc = "[A]i Codi Explain" })
 -- stylua: ignore end
 -- ── Neovide ───────────────────────────────────────────────────────────
 
