@@ -1,6 +1,7 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		version = false, -- last release is way too old
 		cmd = {
 			"TSInstall",
@@ -31,7 +32,7 @@ return {
 			end
 			vim.schedule(function()
 				require("nvim-treesitter.configs").setup({
-					highlight = { enable = not vim.g.vscode },
+					highlight = { enable = not vim.g.vscode or not vim.b.bigfile },
 					indent = { enable = true },
 					ensure_installed = {
 						"c",
@@ -137,6 +138,7 @@ return {
 	{ "nvim-treesitter/nvim-treesitter-textobjects", lazy = true },
 	{
 		"nvim-treesitter/nvim-treesitter-context",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		-- Match the context lines to the source code.
 		-- multiline_threshold = 1,
 		lazy = true,
