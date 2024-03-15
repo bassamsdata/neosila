@@ -1,13 +1,5 @@
 return {
 	{
-		"chrisgrieser/nvim-tinygit",
-		ft = { "gitrebase", "gitcommit" }, -- so ftplugins are loaded
-		dependencies = {
-			"stevearc/dressing.nvim",
-		},
-	},
-
-	{
 		"NeogitOrg/neogit",
 		cmd = "Neogit",
 		keys = { { "<leader>gg", "<cmd>Neogit<cr>", desc = "Open Neogit" } },
