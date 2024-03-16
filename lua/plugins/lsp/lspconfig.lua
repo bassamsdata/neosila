@@ -1,4 +1,18 @@
 return {
+	{ -- LSP signature help
+		"deathbeam/autocomplete.nvim",
+		cond = not vim.g.vscode or not vim.b.bigfile,
+		-- ft = "r",
+		event = "LspAttach",
+		config = function()
+			require("autocomplete.signature").setup({
+				border = "rounded", -- Signature help border style
+				debounce_delay = 100,
+				max_width = 80,
+			})
+		end,
+	},
+
 	{
 		"neovim/nvim-lspconfig",
 		cond = not vim.g.vscode or not vim.b.bigfile,
@@ -9,10 +23,10 @@ return {
 		},
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
-			{
-				"ray-x/lsp_signature.nvim",
-				cond = not vim.g.vscode or not vim.b.bigfile,
-			},
+			-- {
+			-- 	"ray-x/lsp_signature.nvim",
+			-- 	cond = not vim.g.vscode or not vim.b.bigfile,
+			-- },
 		},
 
 		config = function()
@@ -37,16 +51,16 @@ return {
 			local capabilities = client_capabilities()
 			-- local capabilities = cmp_nvim_lsp.default_capabilities()
 
-			local lsp_signature = require("lsp_signature")
-			if lsp_signature then
-				lsp_signature.setup({
-					hint_enable = true,
-					bind = true,
-					border = "rounded",
-					wrap = false,
-					max_width = 120,
-				})
-			end
+			-- local lsp_signature = require("lsp_signature")
+			-- if lsp_signature then
+			-- 	lsp_signature.setup({
+			-- 		hint_enable = true,
+			-- 		bind = true,
+			-- 		border = "rounded",
+			-- 		wrap = false,
+			-- 		max_width = 120,
+			-- 	})
+			-- end
 
 			-- Configure diagnostic display
 			vim.diagnostic.config({
