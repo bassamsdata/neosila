@@ -167,6 +167,48 @@ local function get_word_count()
 	return ""
 end
 
+local function arrow_not() -- You can rename this function if you prefer
+	-- Check if arrow.nvim is loaded
+	if vim.g.arrow_enabled == nil then
+		return ""
+	end
+	local current_file = vim.fn.expand("%")
+	local arrow_files = vim.g.arrow_filenames
+	-- Check if current file is in the Arrow list
+	local file_in_arrow = false
+	for _, filename in ipairs(arrow_files) do
+		if filename == current_file then
+			file_in_arrow = true
+			break -- Found it, no need to continue the loop
+		end
+	end
+
+	if not file_in_arrow then
+		return ""
+	end -- Only proceed if file is in the list
+	local total_items = #arrow_files
+
+	if total_items == 0 then
+		return ""
+	end
+
+	local output = { "󱡁 " }
+
+	-- Display up to 4 numbers:
+	for index, filename in ipairs(arrow_files) do
+		local hl
+
+		if filename == current_file then
+			hl = "StatusLineGitAdded" -- Use your highlight group name
+		else
+			hl = "StatusLine" -- Use your less prominent highlight group
+		end
+
+		table.insert(output, string.format("%%#%s#%d", hl, index))
+	end
+
+	return table.concat(output, " ")
+end
 -- Setup the statusline
 function statusline.active()
 	return table.concat({
@@ -176,6 +218,7 @@ function statusline.active()
 		"%=",
 		get_filename(),
 		"%=",
+		arrow_not(),
 		get_diagnostics(),
 		get_lsp_status(),
 		get_filetype(),

@@ -8,16 +8,19 @@ return {
 	{
 		"bassamsdata/arrow.nvim",
 		dev = true,
-		event = "BufReadPost",
+		-- event = "BufReadPost",
 		cmd = "Arrow open",
 		keys = {
 			{ ";" },
 			{ "<tab>" },
 		},
-		opts = {
-			show_icons = true,
-			leader_key = "<tab>", -- Recommended to be a single key
-		},
+		config = function()
+			vim.g.arrow_enabled = true
+			require("arrow").setup({
+				show_icons = true,
+				leader_key = "<tab>",
+			})
+		end,
 	},
 
 	{

@@ -8,6 +8,7 @@
 
 # log files
 *.log
+.env
 
 sesstion.vim
 *.nvim
