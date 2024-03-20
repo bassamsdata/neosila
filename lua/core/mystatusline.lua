@@ -31,18 +31,44 @@ local function mode_highlight()
 end
 
 -- Function to get the current mode text
+-- stylua: ignore start
 local function get_mode()
 	local modes = {
-		n = "NO",
-		i = "IN",
-		v = "VI",
-		[""] = "I",
-		V = "VI_",
-		c = "CO",
+		["n"]      = "NO",
+		["no"]     = "OP",
+		["nov"]    = "OC",
+		["noV"]    = "OL",
+		["no\x16"] = "OB",
+		["nt"]     = "NT",
+		["ntT"]    = "TM",
+		["v"]      = "VI",
+		[""]     = "I",
+		["V"]      = "VL",
+		["s"]      = "SE",
+		["S"]      = "SL",
+		["\x13"]   = "SB",
+		["i"]      = "IN",
+		["ic"]     = "IC",
+		["ix"]     = "IX",
+		["R"]      = "RE",
+		["Rc"]     = "RC",
+		["Rx"]     = "RX",
+		["Rv"]     = "RV",
+		["Rvc"]    = "RC",
+		["Rvx"]    = "RX",
+		["c"]      = "CO",
+		["cv"]     = "CV",
+		["r"]      = "PR",
+		["rm"]     = "PM",
+		["r?"]     = "P?",
+		["!"]      = "SH",
+		["t"]      = "TE",
 	}
+  -- stylua: ignore end 
+  local hl = vim.bo.mod and 'StatusLineHeaderModified' or 'StatusLineHeader'
 	return string.format(
-		"%%#%s# %s ",
-		mode_highlight(),
+		"%%#%s# %s",
+		hl,
 		modes[vim.api.nvim_get_mode().mode] or "UNKNOWN"
 	)
 end
@@ -84,7 +110,7 @@ local function get_git_status()
 		-- stylua: ignore end
 		local branch_name = "  " .. gitsigns.head
 		return string.format(
-			"%%#StatusLineGitBranch#%s %s %s %s",
+			"%%#StatusLineGitBranch#%s %s%s%s",
 			branch_name,
 			added,
 			changed,
@@ -98,9 +124,10 @@ end
 local function get_lsp_status()
 	local clients = vim.lsp.get_clients()
 	for _, client in ipairs(clients) do
+		---@diagnostic disable-next-line: undefined-field
 		local filetypes = client.config.filetypes
 		if filetypes and vim.fn.index(filetypes, vim.bo.filetype) ~= -1 then
-			return "[" .. client.name .. "]"
+			return " [" .. client.name .. "]"
 		end
 	end
 	return ""
@@ -146,7 +173,7 @@ local function get_diagnostics()
 			table.insert(
 				result,
 				string.format(
-					"%%#StatusLineDiagnostic%s#%s %d ",
+					"%%#StatusLineDiagnostic%s#%s %d",
 					severity,
 					icons[i],
 					counts[i]
@@ -167,7 +194,7 @@ local function get_word_count()
 	return ""
 end
 
-local function arrow_not() -- You can rename this function if you prefer
+local function arrow_not()
 	-- Check if arrow.nvim is loaded
 	if vim.g.arrow_enabled == nil then
 		return ""
@@ -192,22 +219,20 @@ local function arrow_not() -- You can rename this function if you prefer
 		return ""
 	end
 
-	local output = { "󱡁 " }
+	local icon = { "󱡁 " }
 
-	-- Display up to 4 numbers:
-	for index, filename in ipairs(arrow_files) do
-		local hl
+  for index = 1, math.min(total_items, 3) do -- Iterate up to a maximum of 3 (whatever is less)
+    local hl
+    if arrow_files[index] == current_file then
+      hl = "StatusLineArrow"
+    else
+      hl = "StatusLine" -- Use your less prominent highlight group
+    end
 
-		if filename == current_file then
-			hl = "StatusLineGitAdded" -- Use your highlight group name
-		else
-			hl = "StatusLine" -- Use your less prominent highlight group
-		end
+    table.insert(icon, string.format("%%#%s#%d", hl, index))
+  end
 
-		table.insert(output, string.format("%%#%s#%d", hl, index))
-	end
-
-	return table.concat(output, " ")
+  return table.concat(icon, "")
 end
 -- Setup the statusline
 function statusline.active()
