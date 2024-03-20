@@ -3,28 +3,20 @@ return {
 		"benlubas/molten-nvim",
 		ft = "python",
 		event = "BufEnter *.ipynb",
-		dependencies = {
-			"3rd/image.nvim",
-			cond = function()
-				return not vim.g.vscode or not vim.g.neovide
-			end,
-		},
 		build = ":UpdateRemotePlugins",
 		init = function()
 			-- vim.g.molten_show_mimetype_debug = true
 			vim.g.molten_auto_open_output = false
-			-- if not vim.g.neovide then
-			-- vim.g.molten_image_provider = "image.nvim"
-			-- end
-			-- vim.g.molten_output_show_more = true
-			vim.g.molten_output_win_border = { "", "━", "", "" }
-			vim.g.molten_output_win_max_height = 14
+			vim.g.molten_output_show_more = true
+			-- vim.g.molten_output_win_border = { "", "━", "", "" }
+			-- vim.g.molten_output_win_max_height = 14
 			-- vim.g.molten_output_virt_lines = true
 			vim.g.molten_virt_text_output = true
-			vim.g.molten_use_border_highlights = true
+			-- vim.g.molten_use_border_highlights = true
 			vim.g.molten_virt_lines_off_by_1 = true
 			vim.g.molten_wrap_output = true
-			vim.g.molten_tick_rate = 175
+			-- vim.g.molten_tick_rate = 175
+			vim.g.molten_auto_image_popup = true
 
 			local autocmd = vim.api.nvim_create_autocmd
 			local map = vim.keymap.set
@@ -70,27 +62,26 @@ return {
           map( "n", "<localleader>md", ":MoltenDelete<CR>",                { desc = "delete Molten cell",        silent = true })
           local open = false
           map("n", "<localleader>ot", function() open = not open vim.fn.MoltenUpdateOption("auto_open_output", open) end) -- stylua: ignore end
-          -- if we're in a python file, change the configuration a little
-          if vim.bo.filetype == "python" then
-            vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
-            vim.fn.MoltenUpdateOption("molten_virt_text_output", false)
-          end
+					-- if we're in a python file, change the configuration a little
+					if vim.bo.filetype == "python" then
+					  vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
+					end
 				end,
 			})
 
 			-- change the configuration when editing a python file
-			autocmd("BufEnter", {
-				pattern = "*.py",
-				callback = function(e)
-					if string.match(e.file, ".otter.") then
-						return
-					end
-					if require("molten.status").initialized() == "Molten" then
-						vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
-						vim.fn.MoltenUpdateOption("molten_virt_text_output", false)
-					end
-				end,
-			})
+			-- autocmd("BufEnter", {
+			-- 	pattern = "*.py",
+			-- 	callback = function(e)
+			-- 		if string.match(e.file, ".otter.") then
+			-- 			return
+			-- 		end
+			-- 		if require("molten.status").initialized() == "Molten" then
+			-- 			vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
+			-- 			-- vim.fn.MoltenUpdateOption("molten_virt_text_output", false)
+			-- 		end
+			-- 	end,
+			-- })
 
 			-- Undo those config changes when we go back to a markdown or quarto file
 			-- vim.api.nvim_create_autocmd("BufEnter", {
@@ -132,14 +123,14 @@ return {
 			-- })
 
 			-- automatically export output chunks to a jupyter notebook
-			autocmd("BufWritePost", {
-				pattern = { "*.ipynb" },
-				callback = function()
-					if require("molten.status").initialized() == "Molten" then
-						vim.cmd("MoltenExportOutput!")
-					end
-				end,
-			})
+			-- autocmd("BufWritePost", {
+			-- 	pattern = { "*.ipynb" },
+			-- 	callback = function()
+			-- 		if require("molten.status").initialized() == "Molten" then
+			-- 			vim.cmd("MoltenExportOutput!")
+			-- 		end
+			-- 	end,
+			-- })
 		end,
 	},
 }
