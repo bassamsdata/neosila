@@ -732,18 +732,19 @@ local hlgroups = {
   CopilotAnnotation = { fg = c_steel, italic = true },
 
   -- statusline plugin
-  StatusLineDiagnosticError = { fg = c_wine, bg = c_deepsea },
-  StatusLineDiagnosticHint = { fg = c_pigeon, bg = c_deepsea },
-  StatusLineDiagnosticInfo = { fg = c_smoke, bg = c_deepsea },
-  StatusLineDiagnosticWarn = { fg = c_earth, bg = c_deepsea },
-  StatusLineGitAdded = { fg = c_tea, bg = c_deepsea },
-  StatusLineGitChanged = { fg = c_lavender, bg = c_deepsea },
-  StatusLineGitRemoved = { fg = c_scarlet, bg = c_deepsea },
+  StatusLineDiagnosticError = { fg = c_wine, bg = c_jeans},
+  StatusLineDiagnosticHint = { fg = c_pigeon, bg = c_jeans},
+  StatusLineDiagnosticInfo = { fg = c_smoke, bg = c_jeans},
+  StatusLineDiagnosticWarn = { fg = c_earth, bg = c_jeans},
+  StatusLineGitAdded = { fg = c_tea, bg = c_jeans },
+  StatusLineGitChanged = { fg = c_lavender, bg = c_jeans },
+  StatusLineGitRemoved = { fg = c_scarlet, bg = c_jeans },
   StatusLineHeader = { fg = c_jeans, bg = c_pigeon },
   StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre },
   StatusLineNormal = { fg = c_jeans, bg = c_cerulean },
   StatusLineInsert = { fg = c_jeans, bg = c_tea },
   StatusLineVisual = { fg = c_jeans, bg = c_orange },
+  StatusLineArrow = {fg = c_ochre, bg = c_jeans, bold = true},
 
   -- glance.nvim
   GlanceBorderTop = { link = 'WinSeparator' },

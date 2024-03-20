@@ -739,8 +739,9 @@ local hlgroups = {
   StatusLineGitAdded = { fg = c_tea, bg = c_deepsea },
   StatusLineGitChanged = { fg = c_lavender, bg = c_deepsea },
   StatusLineGitRemoved = { fg = c_scarlet, bg = c_deepsea },
-  StatusLineHeader = { fg = c_jeans, bg = c_pigeon },
-  StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre },
+  StatusLineHeader = { fg = c_jeans, bg = c_pigeon ,bold = true },
+  StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre , bold = true },
+  StatusLineArrow = {fg = c_ochre, bg = c_deepsea, bold = true},
 
   -- glance.nvim
   GlanceBorderTop = { link = 'WinSeparator' },
