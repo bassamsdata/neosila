@@ -13,20 +13,10 @@ vim.g.mapleader = " "
 -- Set <\> as the local leader key - it gives me a whole new set of letters.
 vim.g.maplocalleader = "\\" -- we need to escabe \ with another \
 
--- TODO: to seprate these options into 2 modules and then call the more
--- essential one and any additional options will be via pcall.
--- Reason: if I made a small mistake, nvim is totally mess my whole configs.
-
 -- Appearance
 opt.termguicolors = true
 opt.background = "dark"
 opt.signcolumn = "yes"
-
--- vim.filetype.add({
--- 	extension = {
--- 		psql = "sql",
--- 	},
--- })
 
 -- line numbers
 opt.relativenumber = true
@@ -50,6 +40,8 @@ opt.cursorline = true
 
 if not vim.g.neovide then
 	opt.guicursor = "a:hor25-Cursor/lCursor,v:block,i:ver25-TermCursor"
+	-- it has a bug with neovide currently
+	opt.inccommand = "split" -- split window for substitute - nice to have
 end
 -- view and session options
 opt.viewoptions = "cursor,folds"
@@ -66,12 +58,6 @@ vim.opt.listchars:append({
 	-- space = "⋅",
 })
 
--- vim.opt.listchars:append("tab:│ ")
-
--- if vim.fn.has("nvim-0.9") == 1 then
--- 	opt.statuscolumn = [[%!v:lua.require'utils'.statuscolumn()]]
--- end
-
 -- UI characters.
 opt.fillchars:append({
 	foldopen = "",
@@ -87,7 +73,6 @@ opt.laststatus = 3
 opt.pumheight = 10 -- Maximum number of entries in a popup
 opt.scrolloff = 8
 opt.sidescrolloff = 4
-opt.inccommand = "split" -- split window for substitute - nice to have
 --spli windows
 opt.splitright = true
 opt.splitbelow = true
@@ -139,12 +124,13 @@ vim.g.loaded_node_provider = 0
 
 if vim.g.neovide then
 	vim.g.neovide_transparency = 1
-	vim.g.neovide_input_macos_alt_is_meta = false
+	vim.g.neovide_input_macos_alt_is_meta = true
 	vim.g.neovide_cursor_animation_length = 0.2
 	vim.g.neovide_cursor_trail_size = 0.2
 	vim.g.neovide_cursor_antialiasing = false
 	vim.g.neovide_cursor_animate_in_insert_mode = true
 	vim.opt.linespace = 8
+	vim.g.neovide_hide_mouse_when_typing = true
 end
 
 --

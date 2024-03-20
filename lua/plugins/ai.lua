@@ -13,7 +13,7 @@ return {
 	{
 		"sourcegraph/sg.nvim",
 		cond = not vim.g.vscode or not vim.b.bigfile,
-		event = { "LspAttach", "BufReadPost" },
+		event = { "LspAttach", "InsertEnter" },
 		cmd = "CodyToggle",
 		dependencies = {
 			"nvim-lua/plenary.nvim",

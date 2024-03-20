@@ -1,30 +1,7 @@
-local toggle_modes = { "n", "t" }
 return {
 	{
 		"NvChad/nvterm",
-		keys = {
-			{
-				"<M-t>",
-				function()
-					require("nvterm.terminal").toggle("horizontal")
-				end,
-				mode = toggle_modes,
-			},
-			{
-				"<M-v>",
-				function()
-					require("nvterm.terminal").toggle("vertical")
-				end,
-				mode = toggle_modes,
-			},
-			{
-				"<M-f>",
-				function()
-					require("nvterm.terminal").toggle("float")
-				end,
-				mode = toggle_modes,
-			},
-		},
+		keys = { { "<M-t>" }, { "<M-v>" }, { "<M-f>" } },
 		config = function()
 			require("core.keymaps").term()
 			require("nvterm").setup({

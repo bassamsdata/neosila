@@ -18,7 +18,7 @@ require("core.options")
 require("core.keymaps")
 require("core.lazy")
 require("core.autcommands")
-require("core.intro2").open()
+-- require("core.intro2").open()
 if vim.fn.has("nvim-0.10") == 1 then -- remove this when stable
 	pcall(require, "core.mystatusline")
 end
