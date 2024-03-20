@@ -32,6 +32,13 @@ return {
 	},
 
 	{
+		"brenoprata10/nvim-highlight-colors",
+		cond = not vim.g.vscode or not vim.b.bigfile,
+		event = "BufReadPost",
+		opts = {},
+	},
+
+	{
 		"b0o/incline.nvim",
 		event = "BufReadPost",
 		opts = {},
