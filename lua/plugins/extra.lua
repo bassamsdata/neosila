@@ -11,7 +11,7 @@ return {
 		-- event = "BufReadPost",
 		cmd = "Arrow open",
 		keys = {
-			{ ";" },
+			-- { ";" },
 			{ "<tab>" },
 		},
 		config = function()
@@ -19,8 +19,19 @@ return {
 			require("arrow").setup({
 				show_icons = true,
 				leader_key = "<tab>",
+				separate_save_and_remove = true, -- if true, will remove the toggle and create the save/remove keymaps.
+				always_show_path = true,
+				window = {
+					border = "rounded",
+				},
 			})
 		end,
+	},
+
+	{
+		"NStefan002/15puzzle.nvim",
+		cmd = "Play15puzzle",
+		config = true,
 	},
 
 	{
@@ -40,12 +51,14 @@ return {
 
 	{
 		"b0o/incline.nvim",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "BufReadPost",
 		opts = {},
 	},
 
 	{ -- TODO: try to replicate it but simply
 		"kawre/neotab.nvim",
+		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "InsertEnter",
 		opts = {},
 	},
