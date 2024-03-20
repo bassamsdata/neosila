@@ -2,7 +2,7 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 
-local headeras = {
+local headers = {
 	"         .▄▄ · ▪  ▄▄▌   ▄▄▄·    󰲓     Z ",
 	" 󰩖     ▐█ ▀. ██ ██•  ▐█ ▀█      Z     ",
 	"         ▄▀▀▀█▄▐█·██▪  ▄█▀▀█   z        ",
@@ -11,26 +11,24 @@ local headeras = {
 	"       As Cutest As The Moon 󰽦          ",
 }
 
-local headerAscii = headeras
-local emmptyLine = string.rep(" ", vim.fn.strwidth(headerAscii[1]))
+local emmptyLine = string.rep(" ", vim.fn.strwidth(headers[1]))
 
-table.insert(headerAscii, 1, emmptyLine)
-table.insert(headerAscii, 2, emmptyLine)
+table.insert(headers, 1, emmptyLine)
+table.insert(headers, 2, emmptyLine)
 
-headerAscii[#headerAscii + 1] = emmptyLine
-headerAscii[#headerAscii + 1] = emmptyLine
+headers[#headers + 1] = emmptyLine
+headers[#headers + 1] = emmptyLine
 
 api.nvim_create_autocmd("BufLeave", {
+	pattern = "sila",
 	callback = function()
-		if vim.bo.ft == "nvdash" then
-			vim.g.nvdash_displayed = false
-		end
+		vim.cmd("bdelete!")
 	end,
 })
 
-local nvdashWidth = #headerAscii[1] + 3
+local silaWidth = #headers[1] + 3
 
-local max_height = #headerAscii + 4 -- 4  = extra spaces i.e top/bottom
+local max_height = #headers + 4 -- 4  = extra spaces i.e top/bottom
 local get_win_height = api.nvim_win_get_height
 
 M.set_cleanbuf_opts = function(ft)
@@ -58,14 +56,14 @@ M.open = function()
 	local win = api.nvim_get_current_win()
 
 	-- switch to larger win if cur win is small
-	if nvdashWidth + 6 > api.nvim_win_get_width(0) then
+	if silaWidth + 6 > api.nvim_win_get_width(0) then
 		vim.api.nvim_set_current_win(api.nvim_list_wins()[2])
 		win = api.nvim_get_current_win()
 	end
 
 	api.nvim_win_set_buf(win, buf)
 
-	local header = headerAscii
+	local header = headers
 
 	local function addPadding_toHeader(str)
 		local pad = (api.nvim_win_get_width(win) - fn.strwidth(str)) / 2
@@ -99,26 +97,19 @@ M.open = function()
 
 	api.nvim_buf_set_lines(buf, 0, -1, false, result)
 
-	local nvdash = api.nvim_create_namespace("nvdash")
+	local sila = api.nvim_create_namespace("sila")
 	local horiz_pad_index = math.floor(
-		(api.nvim_win_get_width(win) / 2) - (nvdashWidth / 2)
+		(api.nvim_win_get_width(win) / 2) - (silaWidth / 2)
 	) - 2
 
 	for i = abc, abc + #header do
-		api.nvim_buf_add_highlight(
-			buf,
-			nvdash,
-			"NvDashAscii",
-			i,
-			horiz_pad_index,
-			-1
-		)
+		api.nvim_buf_add_highlight(buf, sila, "SilaHeader", i, horiz_pad_index, -1)
 	end
 
 	for i = abc + #header - 2, abc + #dashboard do
 		api.nvim_buf_add_highlight(
 			buf,
-			nvdash,
+			sila,
 			"NvDashButtons",
 			i,
 			horiz_pad_index,
@@ -131,7 +122,7 @@ M.open = function()
 	-- 	{ abc + #header, math.floor(vim.o.columns / 2) - 13 }
 	-- )
 
-	M.set_cleanbuf_opts("nvdash")
+	M.set_cleanbuf_opts("sila")
 end
 
 return M
