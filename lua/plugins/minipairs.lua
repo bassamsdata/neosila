@@ -1,24 +1,24 @@
 return {
-	{ -- TRY: try this one
-		"altermo/ultimate-autopair.nvim",
-		event = { "InsertEnter", "CmdlineEnter" },
-		opts = {
-			tabout = { -- *ultimate-autopair-map-tabout-config*
-				enable = false,
-				map = "<A-tab>", --string or table
-				cmap = "<A-tab>", --string or table
-				conf = {},
-				--contains extension config
-				multi = false,
-				--use multiple configs (|ultimate-autopair-map-multi-config|)
-				hopout = false,
-				-- (|) > tabout > ()|
-				do_nothing_if_fail = true,
-				--add a module so that if close fails
-				--then a `\t` will not be inserted
-			},
-		},
-	},
+	-- { -- TRY: try this one
+	-- 	"altermo/ultimate-autopair.nvim",
+	-- 	event = { "InsertEnter", "CmdlineEnter" },
+	-- 	opts = {
+	-- 		tabout = { -- *ultimate-autopair-map-tabout-config*
+	-- 			enable = false,
+	-- 			map = "<A-tab>", --string or table
+	-- 			cmap = "<A-tab>", --string or table
+	-- 			conf = {},
+	-- 			--contains extension config
+	-- 			multi = false,
+	-- 			--use multiple configs (|ultimate-autopair-map-multi-config|)
+	-- 			hopout = false,
+	-- 			-- (|) > tabout > ()|
+	-- 			do_nothing_if_fail = true,
+	-- 			--add a module so that if close fails
+	-- 			--then a `\t` will not be inserted
+	-- 		},
+	-- 	},
+	-- },
 	-- {
 	-- 	"echasnovski/mini.pairs",
 	-- 	event = "InsertEnter",
