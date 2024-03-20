@@ -77,7 +77,7 @@ return {
 				severity_sort = true, -- Sort diagnostics by severity
 				float = {
 					border = "rounded", -- Rounded border for floating window
-					source = "always", -- Show source of diagnostic in floating window
+					source = true, -- Show source of diagnostic in floating window
 				},
 			})
 
@@ -188,7 +188,12 @@ return {
 			})
 
 			-- configure python server
-			lspconfig["pyright"].setup({
+			-- lspconfig["pyright"].setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = on_attach,
+			-- })
+
+			lspconfig["basedpyright"].setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
 			})
