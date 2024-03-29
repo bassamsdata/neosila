@@ -78,8 +78,33 @@ return {
 	},
 
 	{
-		"lewis6991/gitsigns.nvim",
+		"echasnovski/mini.diff",
 		event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+		keys = {
+			{
+				"<leader>go",
+				function()
+					require("mini.diff").toggle_overlay(0)
+				end,
+				desc = "Toggle mini.diff overlay",
+			},
+		},
+		opts = {
+			view = {
+				style = "sign",
+				signs = {
+					add = "▎",
+					change = "▎",
+					delete = "",
+				},
+			},
+		},
+	},
+
+	{
+		"lewis6991/gitsigns.nvim",
+		lazy = true,
+		-- event = { "BufReadPost", "BufNewFile", "BufWritePre" },
 		opts = {
 			signs = {
 				add = { text = "▎" },

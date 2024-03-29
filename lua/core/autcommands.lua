@@ -1,4 +1,5 @@
 local u = require("utils")
+local git = require("utils.git")
 local autocmd = vim.api.nvim_create_autocmd
 
 -- Create automatic naming for groups
@@ -32,6 +33,15 @@ if vim.fn.has("nvim-0.10") == 1 then
 		end,
 	})
 end
+
+-- Autocommand to clear the Git branch cache when the directory changes
+autocmd("DirChanged", {
+	callback = git.clear_git_branch_cache,
+})
+-- Call this function when the buffer is opened in a window
+autocmd("BufWinEnter", {
+	callback = git.update_git_branch,
+})
 
 autocmd({ "BufWinLeave", "BufWritePost" }, {
 	group = augroup("save_view"),

@@ -14,7 +14,8 @@ return {
 					integrations = {
 						gen_integr.builtin_search(),
 						gen_integr.diagnostic(),
-						gen_integr.gitsigns(),
+						-- TODO: add minidiff integrations
+						-- gen_integr.gitsigns(),
 					},
 					window = {
 						show_integration_count = false,
