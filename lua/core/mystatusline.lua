@@ -98,17 +98,17 @@ local function get_filename()
 	return string.format("%%#StatusLineFile# %s%s ", relative_path, modified)
 end
 
--- Function to get the Git branch and status
+
 local function get_git_status()
-	local gitsigns = vim.b.gitsigns_status_dict
-	if gitsigns then
+	local minidiff = vim.b.minidiff_summary
+	if minidiff then
     -- this is a modfified logic from NvChad statusline ui (thank you) to show only if > 0.
-    -- stylua: ignore start 
-    local added   = gitsigns.added and gitsigns.added     ~= 0 and string.format("%%#StatusLineGitAdded# +%d",   gitsigns.added) or ""
-    local changed = gitsigns.changed and gitsigns.changed ~= 0 and string.format("%%#StatusLineGitChanged# ~%d", gitsigns.changed) or ""
-    local removed = gitsigns.removed and gitsigns.removed ~= 0 and string.format("%%#StatusLineGitRemoved# -%d", gitsigns.removed) or ""
+    -- stylua: ignore start
+    local added   = minidiff.add and minidiff.add       ~= 0 and string.format("%%#StatusLineGitAdded# +%d",   minidiff.add) or ""
+    local changed = minidiff.change and minidiff.change ~= 0 and string.format("%%#StatusLineGitChanged# ~%d", minidiff.change) or ""
+    local removed = minidiff.delete and minidiff.delete ~= 0 and string.format("%%#StatusLineGitRemoved# -%d", minidiff.delete) or ""
+    local branch_name = vim.b.git_branch and "  " .. vim.b.git_branch or ""
 		-- stylua: ignore end
-		local branch_name = "  " .. gitsigns.head
 		return string.format(
 			"%%#StatusLineGitBranch#%s %s%s%s",
 			branch_name,
@@ -119,6 +119,28 @@ local function get_git_status()
 	end
 	return ""
 end
+
+-- Function to get the Git branch and status
+-- local function get_git_status()
+-- 	local gitsigns = vim.b.gitsigns_status_dict
+-- 	if gitsigns then
+--     -- this is a modfified logic from NvChad statusline ui (thank you) to show only if > 0.
+--     -- stylua: ignore start
+--     local added   = gitsigns.added and gitsigns.added     ~= 0 and string.format("%%#StatusLineGitAdded# +%d",   gitsigns.added) or ""
+--     local changed = gitsigns.changed and gitsigns.changed ~= 0 and string.format("%%#StatusLineGitChanged# ~%d", gitsigns.changed) or ""
+--     local removed = gitsigns.removed and gitsigns.removed ~= 0 and string.format("%%#StatusLineGitRemoved# -%d", gitsigns.removed) or ""
+-- 		-- stylua: ignore end
+-- 		local branch_name = "  " .. gitsigns.head
+-- 		return string.format(
+-- 			"%%#StatusLineGitBranch#%s %s%s%s",
+-- 			branch_name,
+-- 			added,
+-- 			changed,
+-- 			removed
+-- 		)
+-- 	end
+-- 	return ""
+-- end
 
 -- Function to get the LSP status
 local function get_lsp_status()
