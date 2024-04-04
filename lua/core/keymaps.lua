@@ -151,12 +151,8 @@ map(
 map("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 map("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
-vim.keymap.set(
-	"n",
-	"<leader>fl",
-	"<cmd>lua require('utils').gxhandler()<cr>",
-	{ desc = "Follow link" }
-)
+-- TODO: use as ft for this in lua files and packages for go files
+vim.keymap.set("n", "<leader>gx", u.gxhandler, { desc = "Follow link" })
 vim.keymap.set(
 	"n",
 	"<leader>fd",
@@ -238,6 +234,9 @@ map("n", "z=", function()
 	)
 end, { desc = "Spelling suggestions" })
 
+vim.keymap.set("n", "<leader>td", function()
+	require("core.todo_notes").open()
+end, {})
 -- ── Terminal ──────────────────────────────────────────────────────────
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 map("t", "<C-k>", "<C-\\><C-n><C-w><C-k>", { desc = "out of terminal to top" })
@@ -256,6 +255,12 @@ function M.term()
 end
 
 -- ── clean registers ───────────────────────────────────────────────────
+map("n", "p", "<Plug>(miniyank-autoput)")
+map("n", "P", "<Plug>(miniyank-autoPut)")
+map("n", "<leader>p", "<Plug>(miniyank-startput)")
+map("n", "<leader>P", "<Plug>(miniyank-startPut)")
+map("n", "<leader>n", "<Plug>(miniyank-cycle)")
+map("n", "<leader>N", "<Plug>(miniyank-cycleback)")
 local function clear_registers()
 	local registers =
 		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-"'
@@ -279,14 +284,15 @@ map("n", "<leader>cg", "<cmd>!go run %<cr>", { desc = "Run go file" })
 -- stylua: ignore start
 map("n", "<leader>ac", "<cmd>CodyChat<cr>", { desc = "[A]i [C]hat - cody" })
 map("n", "<leader>tc", "<cmd>CodyChat<cr>", { desc = "[T]oggle [C]odi chat" })
-map("n", "<leader>ad", "<cmd>CodyDo<cr>", { desc = "[A]i Cody Do" })
-map({ "n", "v" }, "<leader>at", "<cmd>CodyTask<cr>", { desc = "[A]i Cody Go" })
-map({ "n", "v" }, "<leader>aa", "<cmd>CodyAsk<cr>", { desc = "[A]i Cody Ask" })
+map("n", "<leader>ad", "<cmd>CodyDo<cr>",   { desc = "[A]i Cody Do" })
+
+map({ "n", "v" }, "<leader>at", "<cmd>CodyTask<cr>",    { desc = "[A]i Cody Go" })
+map({ "n", "v" }, "<leader>aa", "<cmd>CodyAsk<cr>",     { desc = "[A]i Cody Ask" })
 map({ "n", "v" }, "<leader>ae", "<cmd>CodyExplain<cr>", { desc = "[A]i Cody Explain" })
 -- stylua: ignore end
--- ── Arrow ───────────────────────────────────────────────────────────
 
-map("n", "<C-a>", function() -- Select first file
+-- ── Arrow ───────────────────────────────────────────────────────────
+map("n", "<C-s>", function() -- Select first file
 	local _ = pcall(require, "arrow")
 	local arrow_files = vim.g.arrow_filenames
 
@@ -295,7 +301,7 @@ map("n", "<C-a>", function() -- Select first file
 	end
 end, { desc = "Select first file", silent = true })
 
-map("n", "<C-;>", function() -- Select second file
+map("n", "<C-,>", function() -- Select second file
 	local _ = pcall(require, "arrow")
 	local arrow_files = vim.g.arrow_filenames
 
@@ -303,6 +309,14 @@ map("n", "<C-;>", function() -- Select second file
 		vim.cmd("edit " .. arrow_files[2])
 	end
 end, { desc = "Select second file", silent = true })
+
+-- ── Marks ───────────────────────────────────────────────────────────
+local function deleteMarks()
+	local char = vim.fn.nr2char(vim.fn.getchar())
+	vim.cmd("delmarks " .. char)
+end
+map("n", "dm", deleteMarks, { noremap = true, silent = true })
+
 -- ── Neovide ───────────────────────────────────────────────────────────
 
 if vim.g.neovide then

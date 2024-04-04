@@ -54,6 +54,9 @@ end
 
 M.file_path = vim.fn.stdpath("config") .. "/plugin/colorswitch.lua"
 
+---@param old string
+---@param new string
+---@return nil
 function M.replace_word(old, new)
 	local file, err = io.open(M.file_path, "r")
 	if not file then
@@ -74,20 +77,25 @@ function M.replace_word(old, new)
 	file:close()
 end
 
--- idea taken from MariaSolOs:
+-- idea thanks to MariaSolOs:
 -- https://github.com/MariaSolOs/dotfiles/blob/main/.config/nvim/lua/commands.lua#L36
--- Define GxHandler function
+-- Function to open GitHub links in lua and go
 function M.gxhandler()
 	local file = vim.fn.expand("<cfile>")
-	-- Consider anything that looks like string/string a GitHub link.
-	local link = file:match("%w[%w%-]+/[%w%-%._]+")
-	if link then
-		vim.fn.system("open https://www.github.com/" .. link)
+	local ft = vim.bo.filetype
+	if ft == "lua" then
+		local link = file:match("%w[%w%-]+/[%w%-%._]+")
+		if link then
+			vim.fn.system("open https://www.github.com/" .. link)
+		end
+	elseif ft == "go" then
+		vim.fn.system("open https://www." .. file)
 	else
-		vim.notify("Failed to open link: " .. file, vim.log.levels.ERROR)
+		vim.notify("Unsupported filetype for gxhandler")
 	end
 end
 
+-- Function to open dotfyle links for lua plugins
 function M.gxdotfyle()
 	local file = vim.fn.expand("<cfile>")
 	-- Consider anything that looks like string/string a GitHub link.
@@ -99,6 +107,7 @@ function M.gxdotfyle()
 	end
 end
 
+-- TODO: do this with mini.diff for better diffing
 function M.diff_with_clipboard()
 	local ftype = vim.api.nvim_get_option_value("filetype", {})
 	local cmd = string.format(
@@ -166,6 +175,7 @@ function M.grepandopen()
 	end)
 end
 
+---@return nil
 function M.helpgrepnopen()
 	vim.ui.input({ prompt = "Enter pattern: " }, function(pattern)
 		if pattern ~= nil then
@@ -178,7 +188,6 @@ vim.keymap.set("n", "<leader>ug", M.helpgrepnopen)
 
 --This code below regarding statuscolumn was borrowed from LazyVim.
 --credit to folke/LazyVim https://github.com/LazyVim/LazyVim
--- TODO: use the statuscolumn plugin.
 -- Returns a list of regular and extmark signs sorted by priority (low to high)
 -- -@return Sign[]
 ---@param buf number
@@ -250,7 +259,6 @@ function M.icon(sign, len)
 	return sign.texthl and ("%#" .. sign.texthl .. "#" .. text .. "%*") or text
 end
 
--- TODO: change the icons
 function M.foldtext()
 	local start_line = vim.api.nvim_buf_get_lines(
 		0,
@@ -269,25 +277,6 @@ function M.foldtext()
 
 	return start_line .. " ... " .. end_line
 end
-
--- function M.foldtext()
--- 	local ok = pcall(vim.treesitter.get_parser, vim.api.nvim_get_current_buf())
--- 	local ret = ok and vim.treesitter.foldtext and vim.treesitter.foldtext()
--- 	if not ret or type(ret) == "string" then
--- 		ret = { { vim.api.nvim_buf_get_lines(0, vim.v.lnum - 1, vim.v.lnum, false)[1], {} } }
--- 	end
--- 	table.insert(ret, { " " .. "󰇘" })
---
--- 	if not vim.treesitter.foldtext then
--- 		return table.concat(
--- 			vim.tbl_map(function(line)
--- 				return line[1]
--- 			end, ret),
--- 			" "
--- 		)
--- 	end
--- 	return ret
--- end
 
 function M.statuscolumn()
 	local win = vim.g.statusline_winid
@@ -337,6 +326,10 @@ function M.statuscolumn()
 		components[2] = "%=" .. components[2] .. " " -- right align
 	end
 
+	if vim.v.virtnum ~= 0 then
+		components[2] = "%= "
+	end
+
 	return table.concat(components, "")
 end
 
@@ -383,6 +376,7 @@ function M.get_mode_name()
 end
 
 --- returns current vim mode highlight
+--- @return string
 function M.get_mode_hl()
 	local mode_hls = {
 		n = "NormalMode",
