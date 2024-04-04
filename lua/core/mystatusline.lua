@@ -2,7 +2,6 @@
 _G.statusline = {}
 
 -- Helper function to get the highlight for the current mode
--- TODO: there are modes needs to be added
 local function mode_highlight()
 	local mode_color = {
 		n = "Normal",
@@ -99,6 +98,7 @@ local function get_filename()
 end
 
 
+---@return string
 local function get_git_status()
 	local minidiff = vim.b.minidiff_summary
 	if minidiff then
@@ -155,18 +155,19 @@ local function get_lsp_status()
 	return ""
 end
 
+-- TODO: Organize this and clean it / I didn't like it
 -- Function to get the line and column info
 local function get_line_info()
-	local line = vim.fn.line(".")
+	-- local line = vim.fn.line(".")
 	local column = vim.fn.col(".")
 	local total_lines = vim.fn.line("$")
-	local percent = math.floor((line / total_lines) * 100) .. tostring("%%")
+	-- local percent = math.floor((line / total_lines) * 100) .. tostring("%%")
 	return string.format(
-		" %%#StatusLinePosition#%d:%d/%d %s",
+		" %%#StatusLinePosition#%d/%d ",
 		column,
-		line,
-		total_lines,
-		percent
+		-- line,
+		total_lines
+		-- percent
 	)
 end
 

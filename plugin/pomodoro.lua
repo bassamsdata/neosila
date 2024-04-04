@@ -19,6 +19,8 @@ local STATE_MESSAGE_MAPPING = {
 }
 
 -- Assuming you have a function to notify with the timer name
+---@param state_message string
+---@return nil
 local function notify_with_timer_name(state_message)
 	local timer_name = "Pomodoro" -- You can make this dynamic based on user input
 	vim.notify(timer_name .. " - " .. state_message)

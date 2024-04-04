@@ -196,6 +196,12 @@ return {
 			lspconfig["basedpyright"].setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
+				-- TODO: add this and modify it
+				-- before_init = function(_, config)
+				-- 	local default_venv_path =
+				-- 		path.join(vim.env.HOME, "virtualenvs", "nvim-venv", "bin", "python")
+				-- 	config.settings.python.pythonPath = default_venv_path
+				-- end,
 			})
 
 			-- configure r langauge server
