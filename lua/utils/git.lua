@@ -1,6 +1,8 @@
 -- Get Git branch Name ---------------------------------------------
 local M = {}
 -- Utility function to perform checks
+---@param buf_id number
+---@return boolean
 local function is_valid_git_repo(buf_id)
 	-- Check if it's a valid buffer
 	local path = vim.api.nvim_buf_get_name(buf_id)
@@ -18,11 +20,13 @@ end
 local branch_cache = {}
 
 -- Function to clear the Git branch cache
+---@return nil
 M.clear_git_branch_cache = function()
 	-- Clear by doing an empty table :)
 	branch_cache = {}
 end
 
+---@param data table
 M.update_git_branch = function(data)
 	if not is_valid_git_repo(data.buf) then
 		return

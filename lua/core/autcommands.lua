@@ -35,7 +35,7 @@ if vim.fn.has("nvim-0.10") == 1 then
 end
 
 -- Autocommand to clear the Git branch cache when the directory changes
-autocmd("DirChanged", {
+autocmd({ "DirChanged", "FileChangedShellPost" }, {
 	callback = git.clear_git_branch_cache,
 })
 -- Call this function when the buffer is opened in a window

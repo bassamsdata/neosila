@@ -53,11 +53,6 @@ return {
 				end
 			end)
 
-			-- if vim.g.codeium_enabled == true then
-			-- cmp.event:on("menu_opened", function()
-			-- 	return vim.fn["codeium#Clear"]()
-			-- end)
-			-- end
 			cmp.setup({
 				-- Other configurations...
 				enabled = function()
@@ -73,6 +68,11 @@ return {
 					expand = function(args)
 						luasnip.lsp_expand(args.body)
 					end,
+				},
+				view = {
+					entries = {
+						follow_cursor = true,
+					},
 				},
 				mapping = cmp.mapping.preset.insert({
 					["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
@@ -92,6 +92,7 @@ return {
 					["<C-e>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.abort()
+							--TODO: add if statment
 							return vim.fn["codeium#Complete"]()
 						else
 							fallback()

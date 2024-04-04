@@ -123,13 +123,14 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
 if vim.g.neovide then
+	-- vim.o.guifont = "Iosevka Comfy:h15:w1" -- text below applies for VimScript
 	vim.g.neovide_transparency = 1
 	vim.g.neovide_input_macos_alt_is_meta = true
 	vim.g.neovide_cursor_animation_length = 0.2
 	vim.g.neovide_cursor_trail_size = 0.2
 	vim.g.neovide_cursor_antialiasing = false
 	vim.g.neovide_cursor_animate_in_insert_mode = true
-	vim.opt.linespace = 8
+	vim.opt.linespace = 10 -- 8 was nice for commit font
 	vim.g.neovide_hide_mouse_when_typing = true
 end
 

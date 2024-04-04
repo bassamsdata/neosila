@@ -8,7 +8,11 @@ return {
 		},
 		-- cmd = "Codeium",
 		build = ":Codeium Auth",
-		opts = {},
+		opts = {
+			enable_chat = true,
+			enable_local_search = true,
+			enable_index_service = true,
+		},
 	},
 	{
 		"sourcegraph/sg.nvim",
