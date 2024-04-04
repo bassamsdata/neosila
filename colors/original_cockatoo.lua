@@ -9,6 +9,8 @@
 vim.cmd.hi("clear")
 vim.g.colors_name = "original_cockatoo"
 -- }}}
+--
+-- TODO: add color shades function
 
 -- Palette {{{
 -- stylua: ignore start
@@ -543,8 +545,18 @@ local hlgroups = {
   CmpItemMenu = { link = 'Pmenu' },
   CmpVirtualText = { fg = c_steel, italic = true },
 
+  -- TODO: add minidiff highlights to the colorscheme
+  --
+  -- MiniDiff
+  MiniDiffSignAdd = { fg = c_tea_blend },
+  MiniDiffSignChange = { fg = c_lavender_blend },
+  MiniDiffSignDelete = { fg = c_wine },
+  MiniDiffOverAdd = { link = 'DiffAdd' },
+  MiniDiffOverChange = { fg = c_lavender, bg = c_lavender_blend },
+  MiniDiffOverDelete = { fg = c_scarlet, bg = c_scarlet_blend, },
+  MiniDiffOverContext = { fg = c_pink, bg =  c_purple_blend},
+
   -- gitsigns
-  GitSignsAdd = { fg = c_tea_blend },
   GitSignsAddInline = { fg = c_tea, bg = c_tea_blend },
   GitSignsAddLnInline = { fg = c_tea, bg = c_tea_blend },
   GitSignsAddPreview = { link = 'DiffAdded' },

@@ -32,7 +32,6 @@ local c_vermillion
 local c_black
 local c_magenta
 
--- ksdsdsjdbsjdb
 if vim.go.bg == 'dark' then
   c_foreground = '#cbced2'
   c_background = '#2e3440'
@@ -52,7 +51,7 @@ if vim.go.bg == 'dark' then
   c_violet     = '#616b96'
   c_vermillion = '#c85926'
   c_black      = '#1c2027'
-  c_magenta        = '#dc8ed3'
+  c_magenta    = '#dc8ed3'
 else
   c_foreground = '#495b64'
   c_background = '#ffffff'
@@ -198,7 +197,8 @@ local hlgroups = {
 	Float = { link = "Number" },
 	Identifier = { fg = c_foreground },
 	Builtin = { fg = c_foreground },
-	Field = { link = c_magenta },
+	-- TODO: make it light shade
+	Field = { link = "None" },
 	Enum = { fg = c_faded },
 	Namespace = { fg = c_foreground },
 	Function = { fg = c_strong, bold = true },
@@ -220,9 +220,9 @@ local hlgroups = {
 	StorageClass = { link = "Keyword" },
 	Structure = { link = "Type" },
 	Typedef = { fg = c_salient },
-	Special = { fg = c_critical },
+	Special = { fg = c_salient },
 	SpecialChar = { link = "Special" },
-	Tag = { fg = c_subtle, underline = true },
+	Tag = { fg = c_pine, underline = true },
 	Delimiter = { fg = c_foreground },
 	Bracket = { fg = c_foreground },
 	SpecialComment = { link = "SpecialChar" },
@@ -231,12 +231,6 @@ local hlgroups = {
 	Ignore = { fg = c_subtle },
 	Error = { fg = c_popout },
 	Todo = { fg = c_background, bg = c_popout, bold = true },
-
-	-- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
-	NormalMode = { fg = c_faded, bold = true },
-	VisualMode = { fg = c_vermillion, bold = true },
-	InsertMode = { fg = c_pine, bold = true },
-	CommandMode = { fg = "#ffc73d", bold = true },
 
 	-- }}}2
 
@@ -254,7 +248,7 @@ local hlgroups = {
 	["@markup.list"] = { link = "Delimiter" },
 	["@string"] = { link = "String" },
 	["@string.regexp"] = { link = "String" },
-	["@string.escape"] = { link = "SpecialChar" },
+	["@string.escape"] = { fg = c_popout },
 	["@character"] = { link = "Character" },
 	["@character.special"] = { link = "SpecialChar" },
 	["@boolean"] = { link = "Boolean" },
@@ -350,12 +344,11 @@ local hlgroups = {
 	-- }}}2
 
 	-- LSP {{{2
-	LspReferenceText = { link = "search" },
+	LspReferenceText = { link = "Identifier" },
 	LspReferenceRead = { link = "LspReferenceText" },
 	LspReferenceWrite = { link = "LspReferenceText" },
 	LspSignatureActiveParameter = { link = "IncSearch" },
 	LspInfoBorder = { link = "FloatBorder" },
-	LspInlayHint = { link = "DiagnosticVirtualTextHint" },
 	-- }}}2
 
 	-- Diagnostic {{{2
@@ -482,6 +475,17 @@ local hlgroups = {
 	CmpItemKind = { fg = c_foreground },
 	CmpItemMenu = { link = "Pmenu" },
 	CmpVirtualText = { fg = c_faint, italic = true },
+
+	-- TODO: add minidiff highlights to the colorscheme
+	--
+	-- MiniDiff
+	-- MiniDiffSignAdd = { fg = c_tea_blend },
+	-- MiniDiffSignChange = { fg = c_lavender_blend },
+	-- MiniDiffSignDelete = { fg = c_wine },
+	-- MiniDiffOverAdd = { link = "DiffAdd" },
+	-- MiniDiffOverChange = { fg = c_lavender, bg = c_lavender_blend },
+	-- MiniDiffOverDelete = { fg = c_scarlet, bg = c_scarlet_blend },
+	-- MiniDiffOverContext = { fg = c_pink, bg = c_purple_blend },
 
 	-- gitsigns
 	GitSignsAdd = { fg = c_tea },
@@ -707,15 +711,22 @@ local hlgroups = {
 	GlanceWinBarTitle = { fg = c_faded, bg = c_subtle, bold = true },
 
 	-- IBL
-	IblIndent = { link = "Ignore" },
+	-- IblIndent = { link = "Ignore" },
 	-- IblScope  = { fg = c_disabled },
 
-	HiPatternsNOTE = { link = "DiagnosticInfo" },
-	HiPatternsTODO = { link = "DiagnosticOK" },
-	HiPatternsERROR = { link = "DiagnosticError" },
-	HiPatternsLOVE = { link = c_vermillion },
-	HiPatternsFIX = { link = "DiagnosticWarn" },
+	-- HiPatternsNOTE = { link = "DiagnosticInfo" },
+	-- HiPatternsTODO = { link = "DiagnosticOK" },
+	-- HiPatternsERROR = { link = "DiagnosticError" },
+	-- HiPatternsLOVE = { link = c_vermillion },
+	-- HiPatternsFIX = { link = "DiagnosticWarn" },
 	-- }}}2
+
+	-- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
+	-- Modes Colors
+	NormalMode = { fg = c_faded, bold = true },
+	VisualMode = { fg = c_vermillion, bold = true },
+	InsertMode = { fg = c_pine, bold = true },
+	CommandMode = { fg = "#ffc73d", bold = true },
 }
 -- }}}1
 
@@ -734,4 +745,5 @@ for hlgroup_name, hlgroup_attr in pairs(hlgroups) do
 	vim.api.nvim_set_hl(0, hlgroup_name, hlgroup_attr)
 end
 -- }}}1
+
 -- vim:ts=2:sw=2:sts=2:fdm=marker:fdl=0
