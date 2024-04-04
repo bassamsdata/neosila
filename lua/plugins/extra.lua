@@ -53,10 +53,19 @@ return {
 		"b0o/incline.nvim",
 		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "BufReadPost",
-		opts = {},
+		opts = {
+			hide = {
+				cursorline = "focused_win",
+				focused_win = false,
+				only_win = true,
+			},
+		},
 	},
 
-	{ -- TODO: try to replicate it but simply
+	-- TEST: testing this plugin
+	{ "bfredl/nvim-miniyank", event = "TextYankPost" },
+
+	{
 		"kawre/neotab.nvim",
 		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "InsertEnter",
