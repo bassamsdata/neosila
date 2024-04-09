@@ -34,6 +34,23 @@ if vim.fn.has("nvim-0.10") == 1 then
 	})
 end
 
+local mygroup =
+	vim.api.nvim_create_augroup("MyCommentSettings", { clear = true })
+autocmd({ "FileType" }, {
+	group = mygroup,
+	pattern = { "v", "vsh", "vv", "json" },
+	callback = function()
+		vim.bo.commentstring = "// %s"
+	end,
+})
+autocmd({ "FileType" }, {
+	group = mygroup,
+	pattern = { "sql", "plpgsql", "plsql", "psql", "postgresql", "prql" },
+	callback = function()
+		vim.bo.commentstring = "-- %s"
+	end,
+})
+
 -- Autocommand to clear the Git branch cache when the directory changes
 autocmd({ "DirChanged", "FileChangedShellPost" }, {
 	callback = git.clear_git_branch_cache,
