@@ -41,7 +41,7 @@ return {
 	-- },
 	{
 		"echasnovski/mini.surround",
-		keys = { "gsa", { "gs", mode = "v" } },
+		keys = { "gsa", "gsr", "gsd", { "gs", mode = "v" } },
 		config = function()
 			local MiniSurround = require("mini.surround")
 			MiniSurround.setup({

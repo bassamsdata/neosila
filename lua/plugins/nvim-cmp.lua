@@ -28,8 +28,8 @@ return {
 		event = { "LspAttach", "BufReadPost" },
 		dependencies = {
 			"hrsh7th/cmp-path", -- source for file system paths
-			"L3MON4D3/LuaSnip", -- snippet engine
-			"saadparwaiz1/cmp_luasnip", -- for autocompletion
+			-- "L3MON4D3/LuaSnip", -- snippet engine
+			-- "saadparwaiz1/cmp_luasnip", -- for autocompletion
 			"rafamadriz/friendly-snippets", -- useful snippets
 			"onsails/lspkind.nvim", -- vs-code like pictograms
 			-- {
@@ -41,10 +41,10 @@ return {
 		},
 		config = function()
 			local cmp = require("cmp")
-			local luasnip = require("luasnip")
+			-- local luasnip = require("luasnip")
 			local lspkind = require("lspkind")
 			-- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
-			require("luasnip.loaders.from_vscode").lazy_load()
+			-- require("luasnip.loaders.from_vscode").lazy_load()
 			-- when cmp completion is loaded, clear the virtual text from codium
 
 			cmp.event:on("menu_opened", function()
@@ -66,7 +66,7 @@ return {
 				},
 				snippet = { -- configure how nvim-cmp interacts with snippet engine
 					expand = function(args)
-						luasnip.lsp_expand(args.body)
+						-- luasnip.lsp_expand(args.body)
 					end,
 				},
 				view = {
@@ -102,13 +102,13 @@ return {
 					-- ["<Down>"] = function(fb)
 					-- 	cmp.close()()
 					-- end,
-					["<CR>"] = cmp.mapping.confirm({ select = false }),
+					["<CR>"] = cmp.mapping.confirm({ select = true }),
 					-- TODO: if statement to accept codeium suggestions.
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
-						elseif luasnip.expand_or_locally_jumpable() then
-							luasnip.expand_or_jump()
+						-- elseif luasnip.expand_or_locally_jumpable() then
+						-- 	luasnip.expand_or_jump()
 						else
 							fallback()
 						end
@@ -116,8 +116,8 @@ return {
 					["<S-Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
-						elseif luasnip.expand_or_locally_jumpable(-1) then
-							luasnip.jump(-1)
+						-- elseif luasnip.expand_or_locally_jumpable(-1) then
+						-- 	luasnip.jump(-1)
 						else
 							fallback()
 						end
@@ -131,7 +131,7 @@ return {
 					{ name = "cmp_r" },
 					{ name = "nvim_lsp" },
 					-- { name = "cmp_tabnine" },
-					{ name = "luasnip" }, -- snippets
+					-- { name = "luasnip" }, -- snippets
 					{
 						name = "buffer",
 						max_item_count = 8,

@@ -13,10 +13,11 @@ local fts = {
 	rmd = "R -e 'rmarkdown::render(\"%\")'",
 	markdown = "pandoc % -o %:r.html",
 }
-M.run_file_term = function(option)
+M.run_file_term = function(option, term_height)
 	local cmd = fts[vim.bo.ft]
+	local height = term_height or 15
 	vim.cmd(
-		cmd and ("w | " .. (option or "") .. "sp | term " .. cmd)
+		cmd and ("w | " .. (option or "") .. height .. "sp | term " .. cmd)
 			or "echo 'No command for this filetype'"
 	)
 	vim.cmd("startinsert")

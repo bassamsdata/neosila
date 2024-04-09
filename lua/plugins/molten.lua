@@ -8,6 +8,7 @@ return {
 			-- vim.g.molten_show_mimetype_debug = true
 			vim.g.molten_auto_open_output = false
 			vim.g.molten_output_show_more = true
+			-- vim.g.molten_image_provider = "wezterm"
 			-- vim.g.molten_output_win_border = { "", "━", "", "" }
 			-- vim.g.molten_output_win_max_height = 14
 			-- vim.g.molten_output_virt_lines = true

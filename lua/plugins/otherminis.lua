@@ -120,7 +120,8 @@ return {
 				PERF = { icon = "󰓅 ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
 				NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
 				TEST = { icon = "󰙨", color = "test", alt = { "TESTING", "PASSED", "FAILED" }, },
-        Del = { icon = " ", color = "error", alt = { "DELETE" } },
+        DEL = { icon = " ", color = "error", alt = { "DELETE" } },
+        SUG = { icon = "󰭙 ", color = "info", alt = { "SUGGEST" } },
 				-- stylua: ignore end
 			},
 			colors = {
