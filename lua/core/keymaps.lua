@@ -1,6 +1,7 @@
 local map = vim.keymap.set
 local M = {}
 local u = require("utils")
+local f = require("functions")
 
 -- ── love section ──────────────────────────────────────────────────────
 -- LOVE: I love these mappings. **They are fun**
@@ -24,6 +25,7 @@ map(
 	":%s/<C-r><C-w>/<C-r><C-w>/gcI<Left><Left><Left><Left>",
 	{ silent = false }
 )
+
 map("n", "dd", function()
 	---@diagnostic disable-next-line: param-type-mismatch
 	if vim.fn.getline(".") == "" then
@@ -245,18 +247,16 @@ map("t", "<C-h>", "<C-\\><C-n><C-w><C-kh", { desc = "Out of terminal to left" })
 function M.term()
 	local term = require("nvterm.terminal")
 -- stylua: ignore start
-  map({ "n", "t" }, "<M-t>",      function() require("nvterm.terminal").toggle("horizontal") end, { desc = "New horizontal term" })
-  map({ "n", "t" }, "<M-v>",      function() require("nvterm.terminal").toggle("vertical") end,   { desc = "New vertical term" })
-  map({ "n", "t" }, "<M-f>",      function() require("nvterm.terminal").toggle("float") end,      { desc = "New tab term" })
-  map("n", "<leader>th", function() term.new("horizontal") end,                          { desc = "New horizontal term" })
-  map("n", "<leader>tv", function() term.new("vertical") end,                            { desc = "New vertical term" })
-  map("n", "<leader>tf", function() term.new("float") end,                               { desc = "New tab term" })
+  map({ "n", "t" }, "<M-t>", function() require("nvterm.terminal").toggle("horizontal") end, { desc = "New horizontal term" })
+  map({ "n", "t" }, "<M-v>", function() require("nvterm.terminal").toggle("vertical") end,   { desc = "New vertical term" })
+  map({ "n", "t" }, "<M-f>", function() require("nvterm.terminal").toggle("float") end,      { desc = "New tab term" })
+  map("n", "<leader>th", function() term.new("horizontal") end, { desc = "New horizontal term" })
+  map("n", "<leader>tv", function() term.new("vertical") end,   { desc = "New vertical term" })
+  map("n", "<leader>tf", function() term.new("float") end,      { desc = "New tab term" })
 	-- stylua: ignore end
 end
 
 -- ── clean registers ───────────────────────────────────────────────────
-map("n", "p", "<Plug>(miniyank-autoput)")
-map("n", "P", "<Plug>(miniyank-autoPut)")
 map("n", "<leader>p", "<Plug>(miniyank-startput)")
 map("n", "<leader>P", "<Plug>(miniyank-startPut)")
 map("n", "<leader>n", "<Plug>(miniyank-cycle)")
@@ -277,8 +277,9 @@ if vim.fn.has("nvim-0.10") == 1 then
 	vim.keymap.set("!a", "sie", "-- stylua: ignore end")
 end
 
--- ── Go Stuff ─────────────────────────────────────────────────────
-map("n", "<leader>cg", "<cmd>!go run %<cr>", { desc = "Run go file" })
+-- ── run Stuff ─────────────────────────────────────────────────────
+map("n", "<leader>cg", f.run_file, { desc = "[C]ode [G]o mode" })
+map("n", "<leader>cr", f.run_file_term, { desc = "[C]ode [R]un in Term" })
 
 -- ── Ai ───────────────────────────────────────────────────────────
 -- stylua: ignore start
@@ -318,12 +319,16 @@ end
 map("n", "dm", deleteMarks, { noremap = true, silent = true })
 
 -- ── Neovide ───────────────────────────────────────────────────────────
-
 if vim.g.neovide then
+  -- stylua: ignore start 
+  vim.keymap.set({ "n", "v" }, "<C-=>", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>")
+  vim.keymap.set({ "n", "v" }, "<C-->", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>")
+  vim.keymap.set({ "n", "v" }, "<C-0>", ":lua vim.g.neovide_scale_factor = 1<CR>")
 	vim.keymap.set("c", "<D-v>", "<C-R>+") -- Paste command mode
 	vim.keymap.set("i", "<D-v>", "<ESC>pli") -- Paste insert mode
 	vim.keymap.set("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
 	vim.keymap.set("n", "<D-t>", "<cmd>!cd ~ &&neovide<cr>")
+	-- stylua: ignore end
 end
 
 return M

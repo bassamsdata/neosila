@@ -6,8 +6,8 @@ return {
 	},
 
 	{
-		"bassamsdata/arrow.nvim",
-		dev = true,
+		"otavioschwanck/arrow.nvim",
+		-- dev = true,
 		-- event = "BufReadPost",
 		cmd = "Arrow open",
 		keys = {
@@ -57,13 +57,21 @@ return {
 			hide = {
 				cursorline = "focused_win",
 				focused_win = false,
-				only_win = true,
+				only_win = false,
 			},
 		},
 	},
 
-	-- TEST: testing this plugin
-	{ "bfredl/nvim-miniyank", event = "TextYankPost" },
+	{
+		"bfredl/nvim-miniyank",
+    -- stylua: ignore start 
+		keys = {
+      { "p", "<plug>(miniyank-autoput)", mode = "", desc = "autoput with miniyank", },
+			{ "P", "<plug>(miniyank-autoPut)", mode = "", desc = "autoput with miniyank", },
+		},
+		-- stylua: ignore end
+		event = { "TextYankPost" },
+	},
 
 	{
 		"kawre/neotab.nvim",
