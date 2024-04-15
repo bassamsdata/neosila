@@ -84,7 +84,7 @@ end
 local function get_filename()
 	local file = vim.fn.expand("%:p") -- Get the full path of the current file
 	local cwd = vim.fn.getcwd() -- Get the current working directory
-	local modified = vim.bo.modified and "[+]" or ""
+	local modified = vim.bo.modified and "[+]" or "" -- TODO: change the plus to colored dot
 
 	-- Calculate the relative path by removing the CWD from the full path
 	local relative_path = file:gsub(cwd .. "/", "")

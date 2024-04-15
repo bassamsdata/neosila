@@ -191,6 +191,7 @@ map("n", "<leader>cs",      "<cmd>Pick lsp scope='document_symbol'<cr>",  { desc
 map("n", "<leader>cS",      "<cmd>Pick lsp scope='workspace_symbol'<cr>", { desc = "Symbols workspace (LSP)" })
 map("n", "<leader>cd",      "<cmd>Pick diagnostic scope='all'<cr>",       { desc = "Diagnostic workspace" })
 map("n", "<leader>cD",      "<cmd>Pick diagnostic scope='current'<cr>",   { desc = "Diagnostic buffer" })
+map("n", "<localleader>mn",      "<cmd>15sp | lua MiniNotify.show_history()<cr>",   { desc = "Diagnostic buffer" })
 -- stylua: ignore end
 
 -- useful for scrolling long files
@@ -219,8 +220,8 @@ M.mini_files_key = {
 
 -- ── Spell ─────────────────────────────────────────────────────────────
 -- Thanks to Bekaboo, Correct misspelled word / mark as correct
-vim.keymap.set("i", "<C-g>+", "<Esc>[szg`]a")
-vim.keymap.set("i", "<C-g>=", "<C-g>u<Esc>[s1z=`]a<C-G>u") --first suggestions
+map("i", "<C-g>+", "<Esc>[szg`]a")
+map("i", "<C-g>=", "<C-g>u<Esc>[s1z=`]a<C-G>u") --first suggestions
 
 -- credit to @MariaSolOs
 -- Use dressing (or mini.pick) for spelling suggestions.
@@ -236,7 +237,7 @@ map("n", "z=", function()
 	)
 end, { desc = "Spelling suggestions" })
 
-vim.keymap.set("n", "<leader>td", function()
+map("n", "<leader>td", function()
 	require("core.todo_notes").open()
 end, {})
 -- ── Terminal ──────────────────────────────────────────────────────────
@@ -271,10 +272,11 @@ end
 map("n", "<leader>rg", clear_registers, { desc = "Clear registers" })
 
 map("x", "<Space>dc", u.diff_with_clipboard, { desc = "Diff with clipboard" })
+map("x", "<Space>dC", u.diff_with_clipboard2, { desc = "Diff with clipboard" })
 -- ── Abbreviations ─────────────────────────────────────────────────────
 if vim.fn.has("nvim-0.10") == 1 then
-	vim.keymap.set("!a", "sis", "-- stylua: ignore start")
-	vim.keymap.set("!a", "sie", "-- stylua: ignore end")
+	map("!a", "sis", "-- stylua: ignore start")
+	map("!a", "sie", "-- stylua: ignore end")
 end
 
 -- ── run Stuff ─────────────────────────────────────────────────────
@@ -321,14 +323,29 @@ map("n", "dm", deleteMarks, { noremap = true, silent = true })
 -- ── Neovide ───────────────────────────────────────────────────────────
 if vim.g.neovide then
   -- stylua: ignore start 
-  vim.keymap.set({ "n", "v" }, "<C-=>", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>")
-  vim.keymap.set({ "n", "v" }, "<C-->", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>")
-  vim.keymap.set({ "n", "v" }, "<C-0>", ":lua vim.g.neovide_scale_factor = 1<CR>")
-	vim.keymap.set("c", "<D-v>", "<C-R>+") -- Paste command mode
-	vim.keymap.set("i", "<D-v>", "<ESC>pli") -- Paste insert mode
-	vim.keymap.set("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
-	vim.keymap.set("n", "<D-t>", "<cmd>!cd ~ &&neovide<cr>")
+  map({ "n", "v" }, "<C-=>", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>")
+  map({ "n", "v" }, "<C-->", ":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>")
+  map({ "n", "v" }, "<C-0>", ":lua vim.g.neovide_scale_factor = 1<CR>")
+  map("c", "<D-v>", "<C-R>+") -- Paste command mode
+  map("i", "<D-v>", "<ESC>pli") -- Paste insert mode
+  map("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
+  map("n", "<D-t>", "<cmd>!cd ~ &&neovide<cr>")
 	-- stylua: ignore end
 end
 
+map("n", "R", Gat("v:lua.Substitute"), { desc = "Substitute", silent = true })
+-- map( "n", "R", "m'<cmd>set opfunc=v:lua.Substitute<CR>g@", { desc = "Substitute", silent = true })
+
+map(
+	"n",
+	"dM",
+	f.delmarks_motion,
+	{ desc = "Delete marks in motion", silent = true }
+)
+-- Usage:
+--   <key>ipfoo<CR>         Substituteee every occurrence of the word under
+--                          the cursor with 'foo' in the current paragraph
+--   <key>Gfoo<CR>          Same, from here to the end of the buffer
+--   <key>?bar<CR>foo<CR>   Same, from previous occurrence of 'bar'
+--                          to current line
 return M

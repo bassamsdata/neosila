@@ -17,12 +17,15 @@ return {
 				theme = {
 					enable = true,
 				},
+				folds = {
+					folded = false,
+				},
 				border = {
 					enable = true,
 					top_char = vim.opt.fillchars:get().horiz,
 					bottom_char = vim.opt.fillchars:get().horiz,
 				},
-				hooks = {
+				hooks = { -- if theere is 1 result, and in the same buffer, jump to it, else open glance win
 					before_open = function(results, open, jump, method)
 						local uri = vim.uri_from_bufnr(0)
 						if #results == 1 then

@@ -51,6 +51,7 @@ local c_wine_blend
 local c_earth_blend
 local c_smoke_blend
 
+
 if vim.go.bg == 'dark' then
   c_yellow         = '#e6bb86'
   c_earth          = '#c1a575'

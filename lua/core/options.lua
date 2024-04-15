@@ -1,6 +1,24 @@
 local M = {}
 local opt = vim.opt -- for concisenes
 
+vim.cmd([[
+function! Grep(...)
+	return system(join([&grepprg] + [expandcmd(join(a:000, ' '))], ' '))
+endfunction
+
+command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr Grep(<f-args>)
+command! -nargs=+ -complete=file_in_path -bar LGrep lgetexpr Grep(<f-args>)
+
+cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
+cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
+
+augroup quickfix
+	autocmd!
+	autocmd QuickFixCmdPost cgetexpr cwindow
+	autocmd QuickFixCmdPost lgetexpr lwindow
+augroup END
+]])
+
 -- those for image.nvim to work
 package.path = table.concat({
 	package.path,
@@ -39,7 +57,7 @@ opt.undolevels = 10000
 opt.cursorline = true
 
 if not vim.g.neovide then
-	opt.guicursor = "a:hor25-Cursor/lCursor,v:block,i:ver25-TermCursor"
+	opt.guicursor = "a:block-Cursor/lCursor,v:block,i:ver25-TermCursor"
 	-- it has a bug with neovide currently
 	opt.inccommand = "split" -- split window for substitute - nice to have
 end
@@ -95,7 +113,7 @@ opt.cpoptions:append(">")
 vim.opt.wildignore:append({ ".DS_Store" })
 opt.conceallevel = 2 -- Hide * markup for bold and italic
 opt.foldcolumn = "1"
-opt.foldlevel = 99
+opt.foldlevel = 999
 -- opt.foldtext = "v:lua.require'utils'.foldtext()"
 if vim.fn.has("nvim-0.10") == 1 then
 	opt.smoothscroll = true
@@ -126,10 +144,10 @@ if vim.g.neovide then
 	-- vim.o.guifont = "Iosevka Comfy:h15:w1" -- text below applies for VimScript
 	vim.g.neovide_transparency = 1
 	vim.g.neovide_input_macos_alt_is_meta = true
-	vim.g.neovide_cursor_animation_length = 0.2
+	vim.g.neovide_cursor_animation_length = 0.1
 	vim.g.neovide_cursor_trail_size = 0.2
 	vim.g.neovide_cursor_antialiasing = false
-	vim.g.neovide_cursor_animate_in_insert_mode = true
+	-- vim.g.neovide_cursor_animate_in_insert_mode = true
 	vim.opt.linespace = 10 -- 8 was nice for commit font
 	vim.g.neovide_hide_mouse_when_typing = true
 end

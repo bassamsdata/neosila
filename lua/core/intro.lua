@@ -34,7 +34,8 @@ intro.splash_screen = vim.schedule_wrap(function()
 	}
 	-- stylua: ignore end
 	local arg = vim.fn.argv(0)
-	if (vim.bo.ft ~= "lazy") and (vim.bo.ft ~= "netrw") and (arg == "") then
+	local excluded_ft = { "lazy", "netrw", "man" }
+	if not vim.tbl_contains(excluded_ft, vim.bo.ft) and (arg == "") then
 		vim.fn.matchadd("Error", "[░▒]")
 		vim.fn.matchadd("Function", "[▓█▄▀▐▌]")
 		local map = function(lhs, rhs)
@@ -63,6 +64,7 @@ intro.splash_screen = vim.schedule_wrap(function()
 	end
 end)
 
+-- TODO: add InsertEnter and VimResized autocommands
 vim.api.nvim_create_autocmd(
 	"UIEnter",
 	{ pattern = "*", callback = intro.splash_screen }

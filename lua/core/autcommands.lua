@@ -51,6 +51,12 @@ autocmd({ "FileType" }, {
 	end,
 })
 
+autocmd("QuickFixCmdPost", {
+	group = augroup("qf"),
+	pattern = { "[^l]*" },
+	command = "cwindow",
+})
+
 -- Autocommand to clear the Git branch cache when the directory changes
 autocmd({ "DirChanged", "FileChangedShellPost" }, {
 	callback = git.clear_git_branch_cache,
@@ -235,6 +241,7 @@ autocmd("FileType", {
 		"spectre_panel",
 		"startuptime",
 		"checkhealth",
+		"mininotify-history",
 	},
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false

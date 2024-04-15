@@ -35,6 +35,7 @@ local swap_pairs = {
 	{ "TRUE", "FALSE" },
 	{ "True", "False" },
 	{ "fg", "bg" },
+	{ "open", "close" },
 }
 
 function M.swapBooleanInLine()
@@ -107,7 +108,6 @@ function M.gxdotfyle()
 	end
 end
 
--- TODO: do this with mini.diff for better diffing
 function M.diff_with_clipboard()
 	local ftype = vim.api.nvim_get_option_value("filetype", {})
 	local cmd = string.format(
@@ -129,6 +129,14 @@ function M.diff_with_clipboard()
 		ftype
 	)
 	vim.api.nvim_exec2(cmd, {})
+end
+
+-- TODO: need to figure out how to improve it
+function M.diff_with_clipboard2()
+	local selected_text = vim.fn.getreg('"')
+	local _, diff = pcall(require, "mini.diff")
+	diff.set_ref_text(0, selected_text)
+	diff.toggle_overlay(0)
 end
 
 function M.messages_to_quickfix()

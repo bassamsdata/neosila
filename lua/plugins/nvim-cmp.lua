@@ -32,12 +32,6 @@ return {
 			-- "saadparwaiz1/cmp_luasnip", -- for autocompletion
 			"rafamadriz/friendly-snippets", -- useful snippets
 			"onsails/lspkind.nvim", -- vs-code like pictograms
-			-- {
-			-- 	"Exafunction/codeium.nvim",
-			-- 	cmd = "Codeium",
-			-- 	build = ":Codeium Auth",
-			-- 	opts = {},
-			-- },
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -61,9 +55,9 @@ return {
 				-- enabled = function()
 				-- 	return vim.g.cmp_enabled
 				-- end,
-				completion = {
-					completeopt = "menu,menuone,preview,noselect",
-				},
+				-- completion = {
+				-- 	completeopt = "menu,menuone,preview,noinsert",
+				-- },
 				snippet = { -- configure how nvim-cmp interacts with snippet engine
 					expand = function(args)
 						-- luasnip.lsp_expand(args.body)
@@ -75,12 +69,12 @@ return {
 					},
 				},
 				mapping = cmp.mapping.preset.insert({
-					["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-					["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
+					["<C-p>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+					["<C-n>"] = cmp.mapping.select_next_item(), -- next suggestion
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-,>"] = cmp.mapping.complete(), -- show completion suggestions
-					["<C-m>"] = cmp.mapping.complete({ -- trigger ai sources only
+					["<C-j>"] = cmp.mapping.complete({ -- trigger ai sources only
 						config = {
 							sources = {
 								{ name = "codeium" },
@@ -102,13 +96,13 @@ return {
 					-- ["<Down>"] = function(fb)
 					-- 	cmp.close()()
 					-- end,
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
+					["<C-y>"] = cmp.mapping.confirm({ select = true }),
 					-- TODO: if statement to accept codeium suggestions.
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
-						-- elseif luasnip.expand_or_locally_jumpable() then
-						-- 	luasnip.expand_or_jump()
+							-- elseif luasnip.expand_or_locally_jumpable() then
+							-- 	luasnip.expand_or_jump()
 						else
 							fallback()
 						end
@@ -116,8 +110,8 @@ return {
 					["<S-Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
-						-- elseif luasnip.expand_or_locally_jumpable(-1) then
-						-- 	luasnip.jump(-1)
+							-- elseif luasnip.expand_or_locally_jumpable(-1) then
+							-- 	luasnip.jump(-1)
 						else
 							fallback()
 						end

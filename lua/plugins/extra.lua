@@ -57,7 +57,7 @@ return {
 			hide = {
 				cursorline = "focused_win",
 				focused_win = false,
-				only_win = false,
+				only_win = true,
 			},
 		},
 	},

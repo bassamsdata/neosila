@@ -9,13 +9,13 @@ return {
 		config = function()
 			local map = require("mini.map")
 			local gen_integr = map.gen_integration
+			require("core.keymaps").minimap()
 			if map then
 				map.setup({
 					integrations = {
 						gen_integr.builtin_search(),
 						gen_integr.diagnostic(),
-						-- TODO: add minidiff integrations
-						-- gen_integr.gitsigns(),
+						gen_integr.diff(),
 					},
 					window = {
 						show_integration_count = false,
@@ -32,12 +32,34 @@ return {
 							.. "zv<Cmd>lua MiniMap.refresh({}, { lines = false, scrollbar = false })<CR>"
 					)
 				end
-
+				local autocmd = vim.api.nvim_create_autocmd
 				vim.api.nvim_set_hl(0, "MiniMapSymbolCount", { fg = "#f38ba9" })
-				map.open()
-				vim.api.nvim_create_autocmd("VimResized", {
+				-- map.open()
+				-- autocmd("VimResized", {
+				-- 	callback = function()
+				-- 		map.refresh()
+				-- 	end,
+				-- })
+				-- hide on insert
+				-- autocmd("ModeChanged", {
+				-- 	callback = function()
+				-- 		local mode = vim.api.nvim_get_mode().mode
+				-- 		if mode == "i" then
+				-- 			map.close()
+				-- 		end
+				-- 	end,
+				-- })
+				autocmd({ "WinScrolled", "WinResized" }, {
 					callback = function()
-						map.refresh()
+						map.open()
+					end,
+				})
+				autocmd("CursorHold", {
+					callback = function()
+						-- Delay map.close by 1000 ms
+						vim.defer_fn(function()
+							map.close()
+						end, 2000)
 					end,
 				})
 			end
