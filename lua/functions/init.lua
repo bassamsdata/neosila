@@ -49,4 +49,60 @@ M.delmarks = function()
 	end
 end
 
+function M.delmarks_motion()
+	-- Backup the previous operatorfunc
+	local old_func = vim.go.operatorfunc
+
+	-- Define a new function that will be called by the motion command
+	_G.op_func_delmarks = function()
+		-- Get the start and end positions of the motion
+		local start = vim.api.nvim_buf_get_mark(0, "[")
+		local finish = vim.api.nvim_buf_get_mark(0, "]")
+
+		-- Iterate through the marks in the range and delete them
+		for i = string.byte("a"), string.byte("z") do
+			local mark = string.char(i)
+			local mark_line = vim.fn.getpos("'" .. mark .. "'")[2]
+			if mark_line >= start[1] and mark_line <= finish[1] then
+				vim.cmd("delmarks " .. mark)
+			end
+		end
+
+		-- Restore the previous operatorfunc and remove the temporary function
+		vim.go.operatorfunc = old_func
+		_G.op_func_delmarks = nil
+	end
+
+	-- Set the operatorfunc to the new function
+	vim.go.operatorfunc = "v:lua.op_func_delmarks"
+
+	-- Trigger the motion command
+	vim.api.nvim_feedkeys("g@", "n", false)
+end
+
+------------------------------------------
+-- Substitution function
+-- lua version of the original post, thanks to https://gist.github.com/romainl/b00ccf58d40f522186528012fd8cd13d
+-- TODO: make it print the old name as well like lsp rename using vim.ui.input
+-- this doesn't work after mini.surround, we need to do it like delete marks
+_G.Substitute = function()
+	-- I tried this way but it didn't work,vim.api.nvim_win_get_cursor(0)
+	local cur = vim.fn.getpos("''")
+	vim.fn.cursor(cur[2], cur[3])
+	local cword = vim.fn.expand("<cword>")
+	local input = vim.fn.input(cword .. "/")
+	local cmd = "'[,']s/" .. cword .. "/" .. input .. "/g"
+	vim.fn.execute(cmd)
+	vim.fn.cursor(cur[2], cur[3])
+	vim.notify(cword .. " -> " .. input, vim.log.levels.INFO)
+end
+
+_G.Gat = function(method)
+	vim.api.nvim_set_option_value("operatorfunc", method, {})
+	-- vim.go.operatorfunc = method
+	return "m' g@"
+end
+
+------------------------------------------
+
 return M
