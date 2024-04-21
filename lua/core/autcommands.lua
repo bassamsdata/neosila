@@ -126,6 +126,7 @@ autocmd("TextYankPost", {
 		vim.highlight.on_yank()
 	end,
 })
+
 local function save_cursorline_colors()
 	_G.cursorline_bg_orig_gui =
 		vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("CursorLine")), "bg", "gui")

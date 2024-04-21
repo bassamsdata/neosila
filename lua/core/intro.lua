@@ -42,6 +42,7 @@ intro.splash_screen = vim.schedule_wrap(function()
 			vim.keymap.set("n", lhs, rhs, { silent = true, buffer = 0 })
 		end
 		local keys = {
+			N = "neovide/config.toml",
 			K = "kitty/kitty.conf",
 			W = "wezterm/wezterm.lua",
 			I = "nvim/init.lua",

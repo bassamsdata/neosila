@@ -104,17 +104,35 @@ map({ "n", "t" }, "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true
 map({ "n", "t" }, "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
 -- stylua: ignore end
 
--- ── Resize window using <ctrl> arrow keys ─────────────────────────────
--- stylua: ignore start
-map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
-map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
-map("n", "<C-Left>", "<cmd>vertical resize +2<cr>", { desc = "Decrease window width" })
-map("n", "<C-Right>", "<cmd>vertical resize -2<cr>", { desc = "Increase window width" })
+-- -- ── Resize window using <ctrl> arrow keys ─────────────────────────────
+local function setupResizeKeymap(key, direction)
+	vim.keymap.set("n", key, function()
+		local currentWin = vim.fn.winnr()
+		local adjacentWin = vim.fn.winnr(direction)
+		if currentWin ~= adjacentWin then
+			if direction == "l" or direction == "h" then
+				vim.cmd("vertical resize -2")
+			else
+				vim.cmd("resize -2")
+			end
+		else
+			if direction == "l" or direction == "h" then
+				vim.cmd("vertical resize +2")
+			else
+				vim.cmd("resize +2")
+			end
+		end
+	end, { desc = "Resize window " .. direction })
+end
+
+setupResizeKeymap("<C-Left>", "l")
+setupResizeKeymap("<C-Right>", "h")
+setupResizeKeymap("<C-Up>", "j")
+setupResizeKeymap("<C-Down>", "k")
 
 -- Buffers
-map("n", "L", "<cmd>bn<cr>")              -- switch to next buffer
-map("n", "H", "<cmd>bp<cr>")              -- switch to previous buffer
--- stylua: ignore end
+map("n", "L", "<cmd>bn<cr>") -- switch to next buffer
+map("n", "H", "<cmd>bp<cr>") -- switch to previous buffer
 
 -- Make U opposite to u.
 map("n", "U", "<C-r>", { desc = "Redo" })
@@ -220,7 +238,6 @@ M.mini_files_key = {
 
 -- ── Spell ─────────────────────────────────────────────────────────────
 -- Thanks to Bekaboo, Correct misspelled word / mark as correct
-map("i", "<C-g>+", "<Esc>[szg`]a")
 map("i", "<C-g>=", "<C-g>u<Esc>[s1z=`]a<C-G>u") --first suggestions
 
 -- credit to @MariaSolOs
@@ -270,7 +287,12 @@ local function clear_registers()
 	end
 end
 map("n", "<leader>rg", clear_registers, { desc = "Clear registers" })
-
+vim.keymap.set(
+	"n",
+	"ghy",
+	require("utils.git").copy_hunk_ref_text,
+	{ desc = "Copy hunk's reference lines" }
+)
 map("x", "<Space>dc", u.diff_with_clipboard, { desc = "Diff with clipboard" })
 map("x", "<Space>dC", u.diff_with_clipboard2, { desc = "Diff with clipboard" })
 -- ── Abbreviations ─────────────────────────────────────────────────────
@@ -335,6 +357,7 @@ if vim.g.neovide then
 end
 
 map("n", "R", Gat("v:lua.Substitute"), { desc = "Substitute", silent = true })
+-- map("v", "T", Gat("v:lua.Substitute2"), { silent = true })
 -- map( "n", "R", "m'<cmd>set opfunc=v:lua.Substitute<CR>g@", { desc = "Substitute", silent = true })
 
 map(
