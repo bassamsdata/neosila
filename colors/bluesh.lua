@@ -14,6 +14,7 @@ vim.g.colors_name = "bluesh"
 -- stylua: ignore start
 local c_foreground
 local c_background
+local c_extra_dim
 local c_highlight
 local c_critical
 local c_salient
@@ -32,6 +33,7 @@ local c_vermillion
 local c_black
 local c_orange
 local hello
+local c_faint_extra
 
 if hello  == true then
  local bg          = "#1D2433"
@@ -53,25 +55,27 @@ end
 
 
 if vim.go.bg == 'dark' then
-  c_foreground = '#bdd9f2'
-  c_background = '#1d2433'
-  c_highlight  = '#181E2C' -- fg_dim
-  c_critical   = '#ebcb8b'
-  c_salient    = '#81a1c0'
-  c_strong     = '#e5e7ec'
-  c_popout     = '#d67c8e' -- error
- c_orange     = "#D6A37C"  -- # warnings, less important stuff,
-  c_subtle     = '#434c5e'
-  c_shaded     = '#4f596e'
-  c_faint      = '#606D88' -- comment
-  c_faded      = '#ACDF96'
-  c_grass      = '#43565a'
-  c_tea        = '#495c60'
-  c_pine       = '#79968b'
-  c_lavender   = '#48506e'
-  c_violet     = '#616b96'
-  c_vermillion = '#c85926'
-  c_black      = '#1c2027'
+  c_foreground  = '#bdd9f2'
+  c_background  = '#1d2433'
+  c_highlight   = '#181E2C' -- fg_dim
+  c_extra_dim   = '#212a3e'
+  c_critical    = '#ebcb8b'
+  c_salient     = '#81a1c0'
+  c_strong      = '#e5e7ec'
+  c_popout      = '#d67c8e' -- error
+ c_orange       = "#D6A37C"  -- # warnings, less important stuff,
+  c_subtle      = '#434c5e'
+  c_shaded      = '#4f596e'
+  c_faint       = '#606D88' -- comment
+  c_faint_extra = '#424c62'
+  c_faded       = '#ACDF96'
+  c_grass       = '#43565a'
+  c_tea         = '#495c60'
+  c_pine        = '#79968b'
+  c_lavender    = '#48506e'
+  c_violet      = '#616b96'
+  c_vermillion  = '#c85926'
+  c_black       = '#1c2027'
 else
   c_foreground = '#495b64'
   c_background = '#ffffff'
@@ -161,13 +165,13 @@ local hlgroups = {
 	Folded = { fg = c_faded, bg = c_highlight },
 	HealthSuccess = { fg = c_faded },
 	IncSearch = { fg = c_background, bg = c_popout, bold = true },
-	LineNr = { fg = c_faint },
+	LineNr = { fg = c_faint_extra },
 	MatchParen = { bg = c_subtle, bold = true },
 	ModeMsg = { fg = c_foreground },
 	MoreMsg = { fg = c_foreground },
 	MsgArea = { link = "Normal" },
 	MsgSeparator = { link = "StatusLine" },
-	NonText = { fg = c_subtle },
+	NonText = { fg = c_extra_dim },
 	Normal = { fg = c_foreground, bg = c_background },
 	NormalFloat = { fg = c_foreground, bg = c_background },
 	NormalNC = { link = "Normal" },
@@ -707,6 +711,7 @@ local hlgroups = {
 	StatusLineGitRemoved = { fg = c_popout, bg = c_highlight },
 	StatusLineHeader = { fg = c_background, bg = c_faded },
 	StatusLineHeaderModified = { fg = c_background, bg = c_popout },
+	StatusLineArrow = { fg = c_popout, bg = c_highlight, bold = true },
 
 	-- winbar
 	WinBarIconUIIndicator = { fg = c_salient },
