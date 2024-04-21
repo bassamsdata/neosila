@@ -4,7 +4,7 @@
 -- local M = {}
 local color_scheme = {
 	bg = "dark",
-	colors_name = "original_cockatoo",
+	colors_name = "bluesh",
 }
 
 if color_scheme.bg ~= vim.go.bg then

@@ -341,6 +341,20 @@ function M.statuscolumn()
 	return table.concat(components, "")
 end
 
+--- Merge one or more tables into the first table.
+---@generic T
+---@param base T
+---@vararg T
+---@return T
+function M.mergeTables(base, ...)
+	for _, additional in ipairs({ ... }) do
+		for k, v in pairs(additional) do
+			base[k] = v
+		end
+	end
+	return base
+end
+
 -- Neovim Utils
 --- returns current vim mode name
 function M.get_mode_name()

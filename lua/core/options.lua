@@ -19,13 +19,6 @@ augroup quickfix
 augroup END
 ]])
 
--- those for image.nvim to work
-package.path = table.concat({
-	package.path,
-	vim.fs.normalize("~/.luarocks/share/lua/5.0/?/init.lua"),
-	vim.fs.normalize("~/.luarocks/share/lua/5.1/?.lua"),
-	vim.fs.normalize("~/.luarocks/share/lua/5.1/magick/init.lua"),
-}, ";")
 -- set leader key to space
 vim.g.mapleader = " "
 -- Set <\> as the local leader key - it gives me a whole new set of letters.
@@ -113,15 +106,15 @@ opt.cpoptions:append(">")
 vim.opt.wildignore:append({ ".DS_Store" })
 opt.conceallevel = 2 -- Hide * markup for bold and italic
 opt.foldcolumn = "1"
-opt.foldlevel = 999
+-- opt.foldlevel = 999
 -- opt.foldtext = "v:lua.require'utils'.foldtext()"
 if vim.fn.has("nvim-0.10") == 1 then
 	opt.smoothscroll = true
-	vim.opt.foldmethod = "expr"
-	vim.wo.foldtext = "v:lua.vim.treesitter.foldtext()"
-	vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-else
-	vim.opt.foldmethod = "indent"
+	-- vim.opt.foldmethod = "expr"
+	-- vim.wo.foldtext = "v:lua.vim.treesitter.foldtext()"
+	-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+	-- else
+	--vim.opt.foldmethod = "indent"
 end
 
 -- backsapace

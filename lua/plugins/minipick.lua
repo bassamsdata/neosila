@@ -10,6 +10,7 @@ return {
 		config = function()
 			local MiniPick = require("mini.pick")
 			local MiniExtra = require("mini.extra")
+			local utils = require("utils")
 
 			-- copy the item under the cursor
 			local copy_to_register = {

@@ -1,8 +1,17 @@
-- [ ] Hello
+- Reorganize the configuration files
 
+## hello
 
-- [ ] World
-    - [ ] Hello
-    - [ ] World
+tree .
+- init.lua
+- lua/
+    - plugins/
+    - helpers/
+    - functions/
+    - core/
+        - essentials/
+        - mappings/
+        - options/
+        - autocmds/
 
-- [ ] Hello
+pin a config to neovim version

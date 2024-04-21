@@ -1,10 +1,10 @@
 -- Total rewrite - idea from this post https://www.reddit.com/r/neovim/comments/1bl8wug/comment/kw5og55/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-local height, width, buf, win, cwd, buf_options, setupKeymap
-local M = {}
-height = math.floor(0.618 * vim.o.lines)
-width = math.floor(0.618 * vim.o.columns)
 
+local M = {}
 M.open = function()
+	local height, width, buf, win, cwd, buf_options, setupKeymap
+	height = math.floor(0.618 * vim.o.lines)
+	width = math.floor(0.618 * vim.o.columns)
 	buf = vim.api.nvim_create_buf(false, true)
 	win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",

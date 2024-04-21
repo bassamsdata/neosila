@@ -88,6 +88,7 @@ local function get_filename()
 
 	-- Calculate the relative path by removing the CWD from the full path
 	local relative_path = file:gsub(cwd .. "/", "")
+  vim.b.filename_statusline = relative_path
 
 	-- If the file is directly inside the CWD, show only the file name
 	if relative_path == file then
@@ -96,7 +97,6 @@ local function get_filename()
 
 	return string.format("%%#StatusLineFile# %s%s ", relative_path, modified)
 end
-
 
 ---@return string
 local function get_git_status()
@@ -120,27 +120,6 @@ local function get_git_status()
 	return ""
 end
 
--- Function to get the Git branch and status
--- local function get_git_status()
--- 	local gitsigns = vim.b.gitsigns_status_dict
--- 	if gitsigns then
---     -- this is a modfified logic from NvChad statusline ui (thank you) to show only if > 0.
---     -- stylua: ignore start
---     local added   = gitsigns.added and gitsigns.added     ~= 0 and string.format("%%#StatusLineGitAdded# +%d",   gitsigns.added) or ""
---     local changed = gitsigns.changed and gitsigns.changed ~= 0 and string.format("%%#StatusLineGitChanged# ~%d", gitsigns.changed) or ""
---     local removed = gitsigns.removed and gitsigns.removed ~= 0 and string.format("%%#StatusLineGitRemoved# -%d", gitsigns.removed) or ""
--- 		-- stylua: ignore end
--- 		local branch_name = "  " .. gitsigns.head
--- 		return string.format(
--- 			"%%#StatusLineGitBranch#%s %s%s%s",
--- 			branch_name,
--- 			added,
--- 			changed,
--- 			removed
--- 		)
--- 	end
--- 	return ""
--- end
 
 -- Function to get the LSP status
 local function get_lsp_status()
@@ -155,7 +134,6 @@ local function get_lsp_status()
 	return ""
 end
 
--- TODO: Organize this and clean it / I didn't like it
 -- Function to get the line and column info
 local function get_line_info()
 	-- local line = vim.fn.line(".")
@@ -189,7 +167,7 @@ local function get_diagnostics()
 
 	local result = {}
 	local severities = { "Error", "Warn", "Info", "Hint" }
-	local icons = { "", "", "", "" } -- Replace with your preferred icons
+	local icons = { " ", " ", " ", " " } -- Replace with your preferred icons
 
 	for i, severity in ipairs(severities) do
 		if counts[i] > 0 then
@@ -222,7 +200,8 @@ local function arrow_not()
 	if vim.g.arrow_enabled == nil then
 		return ""
 	end
-	local current_file = vim.fn.expand("%")
+	-- local current_file = vim.fn.expand("%")
+  local current_file = vim.b.filename_statusline
 	local arrow_files = vim.g.arrow_filenames
 	-- Check if current file is in the Arrow list
 	local file_in_arrow = false
@@ -249,7 +228,7 @@ local function arrow_not()
     if arrow_files[index] == current_file then
       hl = "StatusLineArrow"
     else
-      hl = "StatusLine" -- Use your less prominent highlight group
+      hl = "StatusLine"
     end
 
     table.insert(icon, string.format("%%#%s#%d", hl, index))

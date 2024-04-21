@@ -13,12 +13,14 @@ return {
 		keys = {
 			-- { ";" },
 			{ "<tab>" },
+			{ "m" },
 		},
 		config = function()
 			vim.g.arrow_enabled = true
 			require("arrow").setup({
 				show_icons = true,
 				leader_key = "<tab>",
+				buffer_leader_key = ",", -- Per Buffer Mappings
 				separate_save_and_remove = true, -- if true, will remove the toggle and create the save/remove keymaps.
 				always_show_path = true,
 				window = {

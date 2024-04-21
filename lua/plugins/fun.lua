@@ -3,13 +3,19 @@ return {
 	{
 		"ThePrimeagen/vim-apm",
 		enabled = not vim.g.bigfile,
-		event = "BufReadPost",
+		-- event = "BufReadPost",
+		keys = {
+			{
+				"<leader>apm",
+				function()
+					local apm = require("vim-apm")
+					apm:toggle_monitor()
+				end,
+			},
+		},
 		config = function()
 			local apm = require("vim-apm")
 			apm:setup({})
-			vim.keymap.set("n", "<leader>apm", function()
-				apm:toggle_monitor()
-			end)
 		end,
 	},
 	-- this plugins make your code rains,slide, scramble etc
@@ -33,7 +39,7 @@ return {
 				desc = "Fun scramble",
 			},
 			{
-				"<localleader>fs",
+				"<localleader>fl",
 				"<cmd>CellularAutomaton slide<cr>",
 				desc = "Fun slide",
 			},

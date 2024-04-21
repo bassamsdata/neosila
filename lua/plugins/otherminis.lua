@@ -34,32 +34,22 @@ return {
 				end
 				local autocmd = vim.api.nvim_create_autocmd
 				vim.api.nvim_set_hl(0, "MiniMapSymbolCount", { fg = "#f38ba9" })
-				-- map.open()
-				-- autocmd("VimResized", {
-				-- 	callback = function()
-				-- 		map.refresh()
-				-- 	end,
-				-- })
-				-- hide on insert
-				-- autocmd("ModeChanged", {
-				-- 	callback = function()
-				-- 		local mode = vim.api.nvim_get_mode().mode
-				-- 		if mode == "i" then
-				-- 			map.close()
-				-- 		end
-				-- 	end,
-				-- })
+
 				autocmd({ "WinScrolled", "WinResized" }, {
 					callback = function()
-						map.open()
+						vim.schedule(function()
+							map.open()
+						end)
 					end,
 				})
 				autocmd("CursorHold", {
 					callback = function()
 						-- Delay map.close by 1000 ms
-						vim.defer_fn(function()
-							map.close()
-						end, 2000)
+						vim.schedule(function()
+							vim.defer_fn(function()
+								map.close()
+							end, 1500)
+						end)
 					end,
 				})
 			end
@@ -94,8 +84,6 @@ return {
 							anchor = "SE",
 							title = "Notification ❰❰",
 							title_pos = "right",
-							---TODO: make max width 60%
-							-- width = math.floor(0.6 * vim.o.columns),
 							border = "solid",
 						}
 					end,
@@ -112,7 +100,10 @@ return {
 			{ "<leader>mm", "<cmd>lua MiniMisc.zoom()<cr>", desc = "Zoom" },
 			{
 				"<leader>ur",
-				"<cmd>lua MiniMisc.setup_auto_root()<cr>",
+				function()
+					require("mini.misc").find_root()
+					vim.cmd.edit("%")
+				end,
 				desc = "[U]I [Root]",
 			},
 		},

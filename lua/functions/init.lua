@@ -3,8 +3,8 @@ local M = {}
 -- thanks to tamton-aquib https://github.com/tamton-aquib/essentials.nvim/blob/b082e194dcd65656431411a4dd11c7f8b636616f/lua/essentials/init.lua#L93-L108
 
 local fts = {
-	python = "python %",
-	lua = "lua %",
+	python = "python3 %",
+	lua = "so %",
 	r = "R %",
 	sh = "chmod +x %", -- make script executable
 	go = "go run %",
@@ -22,7 +22,7 @@ M.run_file_term = function(option, term_height)
 	)
 	vim.cmd("startinsert")
 end
-
+-- This is what you need
 M.run_file = function(option)
 	local cmd = fts[vim.bo.ft]
 	vim.cmd(
@@ -99,8 +99,22 @@ end
 
 _G.Gat = function(method)
 	vim.api.nvim_set_option_value("operatorfunc", method, {})
-	-- vim.go.operatorfunc = method
 	return "m' g@"
+end
+
+_G.Substitute2 = function()
+	local cmd, cword = "", ""
+	local start_col, end_col, line, input
+
+	start_col = vim.fn.col("'<") - 1
+	end_col = vim.fn.col("'>") - 1
+	line = vim.fn.getline(".")
+	cword = string.sub(line, start_col + 1, end_col + 1) -- Corrected string slicing
+	input = vim.fn.input(cword .. "/")
+	cmd = "'<,'>s/" .. cword .. "/" .. input .. "/g"
+
+	vim.fn.execute(cmd)
+	vim.notify(cword .. " -> " .. input, vim.log.levels.INFO)
 end
 
 ------------------------------------------
