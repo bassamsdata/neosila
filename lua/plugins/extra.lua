@@ -52,6 +52,23 @@ return {
 	},
 
 	{
+		"VidocqH/lsp-lens.nvim",
+		lazy = true,
+		cmd = { "LspLensToggle", "LspLensOn" },
+		config = function()
+			local SymbolKind = vim.lsp.protocol.SymbolKind
+			require("lsp-lens").setup({
+				target_symbol_kinds = {
+					SymbolKind.Function,
+					SymbolKind.Method,
+					SymbolKind.Interface,
+					SymbolKind.Class,
+					SymbolKind.Struct,
+				},
+			})
+		end,
+	},
+	{
 		"b0o/incline.nvim",
 		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "BufReadPost",
