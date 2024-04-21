@@ -63,5 +63,34 @@ M.update_git_branch = function(data)
 	)
 end
 
+M.copy_hunk_ref_text = function()
+	local _, MiniDiff = pcall(require, "mini.diff")
+	local buf_data = MiniDiff.get_buf_data()
+	if buf_data == nil then
+		return
+	end
+
+	-- Get hunk under cursor
+	local cur_line, cur_hunk = vim.fn.line("."), nil
+	for _, h in ipairs(buf_data.hunks) do
+		local count = math.max(h.buf_count, 1)
+		if h.buf_start <= cur_line and cur_line <= h.buf_start + count then
+			cur_hunk = h
+		end
+	end
+	if cur_hunk == nil then
+		return
+	end
+
+	-- Get hunk's reference lines
+	local ref_lines = vim.split(buf_data.ref_text, "\n")
+	local from, to =
+		cur_hunk.ref_start, cur_hunk.ref_start + cur_hunk.ref_count - 1
+	local hunk_ref_lines = vim.list_slice(ref_lines, from, to)
+
+	-- Populate register '"' (to be usable with plain `p`) with target lines
+	vim.fn.setreg('"', hunk_ref_lines, "l")
+end
+
 return M
 ------------------------------------------------------------------------
