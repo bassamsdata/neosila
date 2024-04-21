@@ -282,6 +282,7 @@ end
 -- ── run Stuff ─────────────────────────────────────────────────────
 map("n", "<leader>cg", f.run_file, { desc = "[C]ode [G]o mode" })
 map("n", "<leader>cr", f.run_file_term, { desc = "[C]ode [R]un in Term" })
+map("n", "<leader>cl", "<cmd>w | so %<cr>", { desc = "[C]ode [R]un in Term" })
 
 -- ── Ai ───────────────────────────────────────────────────────────
 -- stylua: ignore start
