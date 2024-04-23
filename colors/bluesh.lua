@@ -1,9 +1,12 @@
--- Name:         nano
--- Description:  Colorscheme inspired by nano-emacs @rougier and nanovim @Anthony
--- Author:       Bekaboo <kankefengjing@gmail.com>
--- Maintainer:   Bekaboo <kankefengjing@gmail.com>
+-- Name:         bluesh
+-- Description:  Colorscheme inspired by blue and green :)
+-- Author:       Bassam -- @github: bassamsdata
+-- Maintainer:   Bassam -- @github: bassamsdata
 -- License:      GPL-3.0
--- Last Updated: Fri 15 Dec 2023 03:33:19 PM CST
+-- Last Updated: Sun 21 Apr 2024
+-- base theme:   nano - Bekaboo https://github.com/Bekaboo/nvim/blob/master/colors/nano.lua
+
+-- TODO: correct inlay hints colors
 
 -- Clear hlgroups and set colors_name {{{
 vim.cmd.hi("clear")
@@ -711,6 +714,7 @@ local hlgroups = {
 	StatusLineGitRemoved = { fg = c_popout, bg = c_highlight },
 	StatusLineHeader = { fg = c_background, bg = c_faded },
 	StatusLineHeaderModified = { fg = c_background, bg = c_popout },
+	StatusLineModified = { fg = c_popout, bg = c_highlight, bold = true },
 	StatusLineArrow = { fg = c_popout, bg = c_highlight, bold = true },
 
 	-- winbar
