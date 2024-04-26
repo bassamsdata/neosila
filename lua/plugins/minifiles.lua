@@ -8,14 +8,14 @@ return {
 				"<leader>e",
 				function()
 					-- open  at the current file location
-					local bufname = vim.api.nvim_buf_get_name(0)
-					if vim.bo.filetype == "minintro" then -- adding if because of the customized intro
-						local _ = require("mini.files").close()
-							or require("mini.files").open()
-					else
-						local _ = require("mini.files").close()
-							or require("mini.files").open(bufname, false)
-					end
+					-- local bufname = vim.api.nvim_buf_get_name(0)
+					-- if vim.bo.filetype == "minintro" then -- adding if because of the customized intro
+					local _ = require("mini.files").close()
+						or require("mini.files").open()
+					-- else
+					-- 	local _ = require("mini.files").close()
+					-- 		or require("mini.files").open(bufname, false)
+					-- end
 				end,
 				{ desc = "File explorer" },
 			},
@@ -28,7 +28,7 @@ return {
 					vim.schedule(function()
 						vim.defer_fn(function()
 							vim.cmd("normal @")
-						end, 1)
+						end, 10)
 					end)
 				end,
 			},
@@ -87,10 +87,16 @@ return {
 					go_in_plus = "<cr>",
 					go_out_plus = "<tab>",
 				},
-				options = { permanent_delete = false },
+				options = {
+					permanent_delete = false,
+					use_as_default_explorer = true,
+				},
+				windows = {
+					width_focus = 35,
+					width_nofocus = 20,
+				},
 			})
 
-			-- TODO: needs to integrate ignored files
 			local nsMiniFiles = vim.api.nvim_create_namespace("mini_files_git")
 
 			-- Cache for git status
@@ -103,7 +109,7 @@ return {
 					["A "] = { symbol = "+", hlGroup = "MiniDiffSignAdd" },
 					["D "] = { symbol = "-", hlGroup = "MiniDiffSignDelete" },
 					["??"] = { symbol = "?", hlGroup = "MiniDiffSignDelete" },
-					["!!"] = { symbol = "!", hlGroup = "NonText" },
+					["!!"] = { symbol = "!", hlGroup = "MiniDiffSignChange" },
 				}
 
 				local result = statusMap[status]
@@ -113,20 +119,24 @@ return {
 
 			local function fetchGitStatus(cwd, callback)
 				local stdout = (vim.uv or vim.loop).new_pipe(false)
+				---@diagnostic disable-next-line: unused-local
 				local handle, pid
+				---@diagnostic disable-next-line: unused-local
 				handle, pid = (vim.uv or vim.loop).spawn(
 					"git",
 					{
-						args = { "status", "--porcelain" },
+						args = { "status", ".", "--ignored", "--porcelain" },
 						cwd = cwd,
 						stdio = { nil, stdout, nil },
 					},
+					---@diagnostic disable-next-line: unused-local
 					vim.schedule_wrap(function(code, signal)
 						if code == 0 then
+							---@diagnostic disable-next-line: unused-local
 							stdout:read_start(function(err, content)
 								if content then
 									callback(content)
-									-- vim.g.content = content
+									vim.g.content = content
 								end
 								stdout:close()
 							end)
@@ -141,14 +151,22 @@ return {
 				)
 			end
 
+			local function escapePattern(str)
+				return str:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+			end
+
 			local function updateMiniWithGit(buf_id, gitStatusMap)
 				vim.schedule(function()
 					local nlines = vim.api.nvim_buf_line_count(buf_id)
-					local cwd = vim.fn.expand("%:p:h") -- we can use vim.fn.getcwd()
+					local cwd = vim.fn.getcwd() --  vim.fn.expand("%:p:h")
+					local escapedcwd = escapePattern(cwd)
 
 					for i = 1, nlines do
 						local entry = MiniFiles.get_fs_entry(buf_id, i)
-						local relativePath = entry.path:gsub("^" .. cwd .. "/", "")
+						-- TODO: probably we can use fnamemodify()
+						-- local entry1 = vim.fn.fnamemodify(entry.path, ":t")
+						-- vim.print(entry1)
+						local relativePath = entry.path:gsub("^" .. escapedcwd .. "/", "")
 						local status = gitStatusMap[relativePath]
 
 						if status then
@@ -211,10 +229,12 @@ return {
 
 			local function updateGitStatus(buf_id)
 				if not is_valid_git_repo() then
-					return
+					return print("Not a valid Git repository")
 				end
 				local cwd = vim.fn.expand("%:p:h")
+
 				local currentTime = os.time()
+
 				if
 					gitStatusCache[cwd]
 					and currentTime - gitStatusCache[cwd].time < cacheTimeout
@@ -269,6 +289,7 @@ return {
 					local cwd = vim.fn.expand("%:p:h")
 					if gitStatusCache[cwd] then
 						updateMiniWithGit(bufnr, gitStatusCache[cwd].statusMap)
+						-- vim.notify("Git update updated", vim.log.levels.INFO)
 					end
 				end,
 			})
