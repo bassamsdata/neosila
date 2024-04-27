@@ -152,7 +152,7 @@ return {
 			end
 
 			local function escapePattern(str)
-				return str:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+				return str:gsub("([%^%$%(%)%%%[%]%*%+%-%?])", "%%%1")
 			end
 
 			local function updateMiniWithGit(buf_id, gitStatusMap)
@@ -160,6 +160,9 @@ return {
 					local nlines = vim.api.nvim_buf_line_count(buf_id)
 					local cwd = vim.fn.getcwd() --  vim.fn.expand("%:p:h")
 					local escapedcwd = escapePattern(cwd)
+					if vim.fn.has("win32") == 1 then
+						escapedcwd = escapedcwd:gsub("\\", "/")
+					end
 
 					for i = 1, nlines do
 						local entry = MiniFiles.get_fs_entry(buf_id, i)
