@@ -93,9 +93,9 @@ opt.smartcase = true
 if vim.env.VSCODE then
 	vim.g.vscode = true
 end
--- Use ripgrep for grepping.
-opt.grepprg = "rg --vimgrep"
-opt.grepformat = "%f:%l:%c:%m"
+-- -- Use ripgrep for grepping.
+-- opt.grepprg = "rg --vimgrep"
+-- opt.grepformat = "%f:%l:%c:%m"
 -- Confirm to save changes before exiting modified buffer
 opt.confirm = true
 --line wrapping
