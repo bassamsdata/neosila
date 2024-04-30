@@ -54,6 +54,7 @@ if not vim.g.neovide then
 	-- it has a bug with neovide currently
 	opt.inccommand = "split" -- split window for substitute - nice to have
 end
+
 -- view and session options
 opt.viewoptions = "cursor,folds"
 opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize"
@@ -79,6 +80,7 @@ opt.fillchars:append({
 	diff = "╱",
 	eob = " ",
 })
+
 -- opt.splitkeep = "screen"
 opt.laststatus = 3
 opt.pumheight = 10 -- Maximum number of entries in a popup
@@ -93,9 +95,7 @@ opt.smartcase = true
 if vim.env.VSCODE then
 	vim.g.vscode = true
 end
--- -- Use ripgrep for grepping.
--- opt.grepprg = "rg --vimgrep"
--- opt.grepformat = "%f:%l:%c:%m"
+
 -- Confirm to save changes before exiting modified buffer
 opt.confirm = true
 --line wrapping
@@ -111,11 +111,13 @@ opt.foldcolumn = "1"
 if vim.fn.has("nvim-0.10") == 1 then
 	opt.smoothscroll = true
 	-- vim.opt.foldmethod = "expr"
+	vim.opt.foldtext = 'v:lua.require("utils").simple_fold()'
 	-- vim.wo.foldtext = "v:lua.vim.treesitter.foldtext()"
 	-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 	-- else
 	--vim.opt.foldmethod = "indent"
 end
+-- set this: vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 
 -- backsapace
 -- opt.backspace = "indent,eol,start"
@@ -138,12 +140,38 @@ if vim.g.neovide then
 	vim.g.neovide_transparency = 1
 	vim.g.neovide_input_macos_alt_is_meta = true
 	vim.g.neovide_cursor_animation_length = 0.1
+	-- vim.g.neovide_scroll_animation_length = 0.15
 	vim.g.neovide_cursor_trail_size = 0.2
 	vim.g.neovide_cursor_antialiasing = false
 	-- vim.g.neovide_cursor_animate_in_insert_mode = true
 	vim.opt.linespace = 10 -- 8 was nice for commit font
 	vim.g.neovide_hide_mouse_when_typing = true
+	vim.g.neovide_padding_right = 0
+	vim.g.neovide_padding_left = 0
 end
 
---
+-- Thanks to Bekaboo for this https://github.com/Bekaboo/nvim
+---Lazy-load runtime files
+local g = vim.g
+---@param runtime string
+---@param flag string
+---@param event string|string[]
+local function _load(runtime, flag, event)
+	if not g[flag] then
+		g[flag] = 0
+		vim.api.nvim_create_autocmd(event, {
+			once = true,
+			callback = function()
+				g[flag] = nil
+				vim.cmd.runtime(runtime)
+				return true
+			end,
+		})
+	end
+end
+
+_load("plugin/rplugin.vim", "loaded_remote_plugins", "FileType")
+_load("provider/python3.vim", "loaded_python3_provider", "FileType")
+_load("plugin/matchit.vim", "loaded_matchit", "FileType")
+
 return M
