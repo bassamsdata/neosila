@@ -166,9 +166,9 @@ return {
 
 					for i = 1, nlines do
 						local entry = MiniFiles.get_fs_entry(buf_id, i)
-						-- TODO: probably we can use fnamemodify()
-						-- local entry1 = vim.fn.fnamemodify(entry.path, ":t")
-						-- vim.print(entry1)
+						if not entry then
+							break
+						end
 						local relativePath = entry.path:gsub("^" .. escapedcwd .. "/", "")
 						local status = gitStatusMap[relativePath]
 
