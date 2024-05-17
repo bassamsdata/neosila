@@ -3,6 +3,7 @@
 local M = {}
 M.open = function()
 	local height, width, buf, win, cwd, buf_options, setupKeymap
+	-- relative height and width
 	height = math.floor(0.618 * vim.o.lines)
 	width = math.floor(0.618 * vim.o.columns)
 	buf = vim.api.nvim_create_buf(false, true)
@@ -10,6 +11,7 @@ M.open = function()
 		relative = "editor",
 		width = width,
 		height = height,
+		-- get the coordinates to ceneter the window
 		row = math.floor(0.5 * (vim.o.lines - height)),
 		col = math.floor(0.5 * (vim.o.columns - width)),
 		style = "minimal",

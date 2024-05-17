@@ -10,9 +10,12 @@ return {
 							{ prompt = "Enter the application name: " },
 							function(input)
 								if input == "" then
-									input = "vd"
+									input = "tv"
 								end
 								vim.cmd("tabnew | terminal " .. input .. " " .. tsv_file)
+								vim.cmd( -- set local: nonumber norelativenumber nosign-column ocursorcolumn
+									[[silent! setl nonu nornu nobl nolist nocul ]]
+								) -- buffer-history, backtrace
 								vim.cmd("startinsert")
 							end
 						)
@@ -130,9 +133,10 @@ return {
 			)
 		end,
 	},
-	{
+	{ -- TODO: check why this doesn't work
 		"lukas-reineke/headlines.nvim",
-		ft = { "markdown", "norg", "org", "qml", "quarto" },
+		lazy = true,
+		-- ft = { "markdown", "norg", "org", "qml", "quarto" },
 		dependencies = "nvim-treesitter/nvim-treesitter",
 		config = function()
 			local opts = {

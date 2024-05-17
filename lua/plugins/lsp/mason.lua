@@ -1,6 +1,9 @@
 local M = {
 	"williamboman/mason-lspconfig.nvim",
-	event = { "BufReadPre", "BufNewFile" },
+	event = { "BufReadPost", "BufNewFile" },
+	enabled = function()
+		return not vim.b.bigfile
+	end,
 	cmd = { "MasonInstall", "MasonUpdate" },
 	dependencies = {
 		"williamboman/mason.nvim",

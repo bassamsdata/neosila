@@ -4,18 +4,18 @@
 -- local M = {}
 local color_scheme = {
 	bg = "dark",
-	colors_name = "bluesh",
+	colors_name = "base",
 }
-
-if color_scheme.bg ~= vim.go.bg then
-	vim.go.bg = color_scheme.bg
-end
 
 if color_scheme.colors_name ~= vim.g.colors_name then
 	vim.cmd.colorscheme({
 		args = { color_scheme.colors_name },
 		mods = { emsg_silent = true },
 	})
+end
+
+if color_scheme.bg ~= vim.go.bg then
+	vim.go.bg = color_scheme.bg
 end
 
 vim.api.nvim_create_autocmd("Colorscheme", {

@@ -6,14 +6,26 @@ return {
 	},
 
 	{
+		"wildfunctions/myeyeshurt",
+		event = "VeryLazy",
+		opts = {
+			initialFlakes = 5,
+			flakeOdds = 20,
+			maxFlakes = 750,
+			nextFrameDelay = 175,
+			useDefaultKeymaps = false,
+			flake = { "*", "󰜗", "." },
+			minutesUntilRest = 20,
+		},
+	},
+
+	{
 		"otavioschwanck/arrow.nvim",
-		-- dev = true,
-		-- event = "BufReadPost",
+		event = "BufReadPost",
 		cmd = "Arrow open",
 		keys = {
-			-- { ";" },
 			{ "<tab>" },
-			{ "m" },
+			{ "," },
 		},
 		config = function()
 			vim.g.arrow_enabled = true
@@ -46,14 +58,18 @@ return {
 
 	{
 		"brenoprata10/nvim-highlight-colors",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = "BufReadPost",
-		opts = {},
+		opts = {
+			render = "virtual",
+			virtual_symbol = "",
+		},
 	},
 
 	{
 		"VidocqH/lsp-lens.nvim",
-		lazy = true,
 		cmd = { "LspLensToggle", "LspLensOn" },
 		config = function()
 			local SymbolKind = vim.lsp.protocol.SymbolKind
@@ -68,25 +84,61 @@ return {
 			})
 		end,
 	},
+
+	{ "sam4llis/nvim-tundra", opts = {}, event = "VeryLazy" },
+
 	{
 		"b0o/incline.nvim",
 		cond = not vim.g.vscode or not vim.b.bigfile,
 		event = "BufReadPost",
+		-- lazy = true,
 		opts = {
 			hide = {
 				cursorline = "focused_win",
 				focused_win = false,
 				only_win = true,
 			},
+			render = function(props)
+				local filename =
+					vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
+				local modified = vim.bo[props.buf].modified
+				return {
+					filename,
+					modified and { " ", guifg = "#d67c8e", gui = "bold" } or "",
+					-- guibg = "#111111",
+					-- guifg = "#eeeeee",
+				}
+			end,
 		},
+	},
+	{
+		"MeanderingProgrammer/markdown.nvim",
+		ft = { "markdown", "rmd", "quarto" },
+		name = "render-markdown",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		opts = {},
+	},
+
+	{
+		"cbochs/portal.nvim",
+		cmd = "Portal",
+		opts = {},
+	},
+
+	{
+		"Aityz/usage.nvim",
+		event = "BufReadPost",
+		config = function()
+			require("usage").setup()
+		end,
 	},
 
 	{
 		"bfredl/nvim-miniyank",
-    -- stylua: ignore start 
+	   -- stylua: ignore start
 		keys = {
       { "p", "<plug>(miniyank-autoput)", mode = "", desc = "autoput with miniyank", },
-			{ "P", "<plug>(miniyank-autoPut)", mode = "", desc = "autoput with miniyank", },
+      { "P", "<plug>(miniyank-autoPut)", mode = "", desc = "autoput with miniyank", },
 		},
 		-- stylua: ignore end
 		event = { "TextYankPost" },
@@ -98,8 +150,6 @@ return {
 		event = "InsertEnter",
 		opts = {},
 	},
-
-	{ "lunarvim/bigfile.nvim", event = "VeryLazy", opts = {} },
 
 	{ "laytan/cloak.nvim", cmd = "CloakToggle", ft = "sh", opts = {} },
 }

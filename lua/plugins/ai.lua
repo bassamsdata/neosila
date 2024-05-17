@@ -1,8 +1,10 @@
 return {
 	{
 		"Exafunction/codeium.nvim",
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = { "InsertEnter" },
-		cond = not vim.g.vscode or not vim.b.bigfile,
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
@@ -16,7 +18,9 @@ return {
 	},
 	{
 		"sourcegraph/sg.nvim",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = { "LspAttach", "InsertEnter" },
 		cmd = "CodyToggle",
 		dependencies = {
@@ -27,7 +31,10 @@ return {
 
 	{
 		"Exafunction/codeium.vim",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		cond = not vim.g.vscode,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = { "BufReadPost", "InsertEnter" },
 		config = function()
 			vim.g.codeium_enabled = true

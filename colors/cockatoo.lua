@@ -50,6 +50,7 @@ local c_scarlet_blend
 local c_wine_blend
 local c_earth_blend
 local c_smoke_blend
+local c_white2
 
 
 if vim.go.bg == 'dark' then
@@ -75,6 +76,7 @@ if vim.go.bg == 'dark' then
   c_white          = '#e5e5eb'
   c_smoke          = '#bebec3'
   c_beige          = '#b1aca7'
+  c_white2          = '#1b1e30'
   c_steel          = '#606d86'
   c_iron           = '#313742'
   c_deepsea        = '#334154'
@@ -115,6 +117,7 @@ else
   c_smoke          = '#404553'
   c_beige          = '#385372'
   c_steel          = '#9a978a'
+  c_white2          = '#e7e4d1'
   c_iron           = '#b8b7b3'
   c_deepsea        = '#e6ded6'
   c_ocean          = '#f0e8e2'
@@ -237,7 +240,7 @@ local hlgroups = {
   Visual = { bg = c_deepsea },
   VisualNOS = { link = 'Visual' },
   WarningMsg = { fg = c_yellow },
-  Whitespace = { link = 'NonText' },
+  Whitespace = {fg = c_white2},
   WildMenu = { link = 'PmenuSel' },
   WinSeparator = { link = 'VertSplit' },
   WinBar = { fg = c_smoke },

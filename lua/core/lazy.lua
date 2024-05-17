@@ -1,6 +1,11 @@
+if vim.env.NVIM_NOTHIRDPARTY then
+	return
+end
 -- install lazy.nvim if not already installed
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+---@diagnostic disable-next-line: undefined-field
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	print("Initializing lazy.nvim for the first")
 	vim.fn.system({
 		"git",
 		"clone",
@@ -14,11 +19,10 @@ vim.opt.rtp:prepend(lazypath)
 
 -- load plugins from specifications (The leader key must be set before this)
 require("lazy").setup({ { import = "plugins" }, { import = "plugins.lsp" } }, {
-	ui = { border = "rounded" },
 	install = {
 		-- Do not automatically install on startup.
 		missing = true,
-		colorscheme = { "cockatoo", "nano" },
+		colorscheme = { "bluesh", "cockatoo", "nano", "original_cockatoo" },
 	},
 	-- I like to play with my configs alot so less clutter please.
 	change_detection = { notify = false },
@@ -47,8 +51,14 @@ require("lazy").setup({ { import = "plugins" }, { import = "plugins.lsp" } }, {
 		-- directory where you store your local plugin projects
 		path = "~/repos",
 		---@type string[] plugins that match these patterns will use your local versions instead of being fetched from GitHub
-		patterns = {}, -- For example {"folke"}
+		patterns = { bassamsdata },
 		fallback = false, -- Fallback to git when local plugin doesn't exist
 	},
+	ui = {
+		border = "rounded",
+		-- The backdrop opacity. 0 is fully opaque, 100 is fully transparent.
+		backdrop = 100,
+		title = "Lazy", ---@type string only works when border is not "none"
+		title_pos = "left", ---@type "center" | "left" | "right"
+	},
 })
--- vim.cmd.colorscheme("nano")

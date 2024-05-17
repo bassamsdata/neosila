@@ -3,7 +3,7 @@ local M = {}
 -- thanks to tamton-aquib https://github.com/tamton-aquib/essentials.nvim/blob/b082e194dcd65656431411a4dd11c7f8b636616f/lua/essentials/init.lua#L93-L108
 
 local fts = {
-	python = "python3 %",
+	python = "ipython %",
 	lua = "so %",
 	r = "R %",
 	sh = "chmod +x %", -- make script executable

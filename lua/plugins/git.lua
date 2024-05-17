@@ -1,6 +1,7 @@
 return {
 	{
 		"NeogitOrg/neogit",
+		-- branch = "nightly",
 		cmd = "Neogit",
 		keys = { { "<leader>gg", "<cmd>Neogit<cr>", desc = "Open Neogit" } },
 		dependencies = {
@@ -34,7 +35,6 @@ return {
 			status = {
 				recent_commit_count = 20,
 			},
-			-- TODO: Change mappings and keys
 			mappings = {
 				-- modify status buffer mappings
 				status = {
@@ -53,6 +53,9 @@ return {
 
 	{
 		"sindrets/diffview.nvim",
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		dependencies = "nvim-lua/plenary.nvim",
 		cmd = {
 			"DiffviewOpen",

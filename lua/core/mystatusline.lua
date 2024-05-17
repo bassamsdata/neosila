@@ -1,32 +1,30 @@
 -- Statusline setup
 _G.statusline = {}
 
--- Helper function to get the highlight for the current mode
-local function mode_highlight()
-	local mode_color = {
-		n = "Normal",
-		i = "Insert",
-		v = "Visual",
-		[""] = "VisualBlock",
-		V = "VisualLine",
-		c = "Command",
-		no = "NormalOperatorPending",
-		s = "Select",
-		S = "SelectLine",
-		[""] = "SelectBlock",
-		ic = "InsertCompletion",
-		R = "Replace",
-		Rv = "VirtualReplace",
-		cv = "VisualEx",
-		ce = "NormalEx",
-		r = "HitEnter",
-		rm = "More",
-		["r?"] = "Confirm",
-		["!"] = "Shell",
-		t = "Terminal",
-	}
-	local current_mode = vim.api.nvim_get_mode().mode
-	return "StatusLineMode" .. (mode_color[current_mode] or "Normal")
+--- Thanks to MariaSolOs for this hilight function
+--- Keeps track of the highlight groups I've already created.
+---@type table<string, boolean>
+local statusline_hls = {}
+
+---@param hl string
+---@return string
+local function get_or_create_hl(hl)
+	local hl_name = "Statusline" .. hl
+
+	if not statusline_hls[hl] then
+		-- If not in the cache, create the highlight group using the icon's foreground color
+		-- and the statusline's background color.
+		local bg_hl = vim.api.nvim_get_hl(0, { name = "StatusLine" })
+		local fg_hl = vim.api.nvim_get_hl(0, { name = hl })
+		vim.api.nvim_set_hl(
+			0,
+			hl_name,
+			{ bg = ("#%06x"):format(bg_hl.bg), fg = ("#%06x"):format(fg_hl.fg) }
+		)
+		statusline_hls[hl] = true
+	end
+
+	return hl_name
 end
 
 -- Function to get the current mode text
@@ -81,10 +79,10 @@ local function get_cwd()
 end
 
 -- Function to get the current file path relative to CWD and modified status
-local function get_filename()
+local function get_filename()-- {{{
 	local file = vim.fn.expand("%:p") -- Get the full path of the current file
-	local cwd = vim.fn.getcwd() -- Get the current working directory
-	local modified = vim.bo.modified and "[+]" or "" -- TODO: change the plus to colored dot
+	local cwd = vim.fn.getcwd() -- Get the current working directory{{{
+	local modified = vim.bo.modified and "  " or ""-- }}}
 
 	-- Calculate the relative path by removing the CWD from the full path
 	local relative_path = file:gsub(cwd .. "/", "")
@@ -95,19 +93,24 @@ local function get_filename()
 		relative_path = vim.fn.expand("%:t")
 	end
 
-	return string.format("%%#StatusLineFile# %s%s ", relative_path, modified)
-end
+	return string.format("%%#StatusLineFile# %s%%#StatusLineModified#%s ", relative_path, modified)
+end-- }}}
 
 ---@return string
 local function get_git_status()
 	local minidiff = vim.b.minidiff_summary
-	if minidiff then
+  local branch_name = vim.b.git_branch and "  " .. vim.b.git_branch or ""
+	if not minidiff then
+		return string.format(
+			"%%#StatusLineGitBranch#%s ",
+			branch_name
+		)
+	 end
     -- this is a modfified logic from NvChad statusline ui (thank you) to show only if > 0.
     -- stylua: ignore start
     local added   = minidiff.add and minidiff.add       ~= 0 and string.format("%%#StatusLineGitAdded# +%d",   minidiff.add) or ""
     local changed = minidiff.change and minidiff.change ~= 0 and string.format("%%#StatusLineGitChanged# ~%d", minidiff.change) or ""
     local removed = minidiff.delete and minidiff.delete ~= 0 and string.format("%%#StatusLineGitRemoved# -%d", minidiff.delete) or ""
-    local branch_name = vim.b.git_branch and "  " .. vim.b.git_branch or ""
 		-- stylua: ignore end
 		return string.format(
 			"%%#StatusLineGitBranch#%s %s%s%s",
@@ -116,8 +119,6 @@ local function get_git_status()
 			changed,
 			removed
 		)
-	end
-	return ""
 end
 
 
@@ -150,7 +151,41 @@ local function get_line_info()
 end
 
 -- Function to get the file type
+-- SUG: change this to only icon
 local function get_filetype()
+    -- local special_icons = {
+    --     DiffviewFileHistory = {  'Number' },
+    --     DiffviewFiles = {  'Number' },
+    --     DressingInput = { '󰍩', 'Comment' },
+    --     DressingSelect = { '', 'Comment' },
+    --     OverseerForm = { '󰦬', 'Special' },
+    --     OverseerList = { '󰦬', 'Special' },
+    --     ['ccc-ui'] = { '', 'Comment' },
+    --     dapui_breakpoints = {  'DapUIRestart' },
+    --     dapui_scopes = {  'DapUIRestart' },
+    --     dapui_stacks = {  'DapUIRestart' },
+    --     fzf = { '', 'Special' },
+    --     gitcommit = {  'Number' },
+    --     gitrebase = {  'Number' },
+    --     lazy = {  'Special' },
+    --     lazyterm = { '', 'Special' },
+    --     minifiles = {  'Directory' },
+    --     qf = {  'Conditional' },
+    --     spectre_panel = {  'Constant' },
+    -- }
+
+    -- local filetype = vim.bo.filetype
+    -- if filetype == '' then
+    --     filetype = '[No Name]'
+    -- end
+
+    -- local icon, icon_hl
+    -- if special_icons[filetype] then
+    --     icon, icon_hl = unpack(special_icons[filetype])
+    --   end
+    -- icon_hl = get_or_create_hl(icon_hl)
+
+    -- return string.format('%%#%s#%s %%#StatuslineTitle#%s', icon_hl, icon, filetype)
 	return string.format(" %%#StatusLineFiletype#%s ", vim.bo.filetype:upper())
 end
 
@@ -158,6 +193,9 @@ end
 -- Function to get diagnostics count with improved efficiency
 -- TODO: use vim.diagnostic.count() when it is stable
 local function get_diagnostics()
+  if not vim.diagnostic.is_enabled() then
+  return ""
+  end
 	local diagnostics = vim.diagnostic.get(0)
 	local counts = { 0, 0, 0, 0 }
 
@@ -222,7 +260,6 @@ local function arrow_not()
 	end
 
 	local icon = { "󱡁 " }
-
   for index = 1, math.min(total_items, 3) do -- Iterate up to a maximum of 3 (whatever is less)
     local hl
     if arrow_files[index] == current_file then
@@ -236,6 +273,7 @@ local function arrow_not()
 
   return table.concat(icon, "")
 end
+
 -- Setup the statusline
 function statusline.active()
 	return table.concat({

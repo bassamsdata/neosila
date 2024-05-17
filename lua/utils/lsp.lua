@@ -1,3 +1,4 @@
+-- Thanks to venom https://github.com/RaafatTurki/venom
 local M = {}
 --- returns a table containing the lsp changes counts from an lsp result
 local function count_lsp_res_changes(lsp_res)

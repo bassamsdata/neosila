@@ -1,7 +1,7 @@
 -- borrowed from
 
 -- time it takes to trigger the `CursorHold` event
-vim.opt.updatetime = 600
+vim.opt.updatetime = 400
 
 local function highlight_symbol(event)
 	local id = vim.tbl_get(event, "data", "client_id")

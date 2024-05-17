@@ -1,5 +1,4 @@
 return {
-	-- TODO: fix this
 	"stevearc/dressing.nvim",
 	lazy = true,
 	init = function()

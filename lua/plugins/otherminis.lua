@@ -1,15 +1,14 @@
 return {
-	-- TODO: change the highlight color of the view map 'MiniMapSymbolView'
 	{
 		"echasnovski/mini.map",
-		cond = function()
-			return not vim.b.large_file
+		cond = not vim.g.vscode,
+		enabled = function()
+			return not vim.b.bigfile
 		end,
-		event = "FileType lua,norg,quarto,py,go,markdown,R",
+		event = "FileType lua,norg,quarto,py,go,markdown,R,v,yaml,toml",
 		config = function()
 			local map = require("mini.map")
 			local gen_integr = map.gen_integration
-			require("core.keymaps").minimap()
 			if map then
 				map.setup({
 					integrations = {
@@ -58,6 +57,7 @@ return {
 
 	{
 		"echasnovski/mini.notify",
+		cond = not vim.g.vscode,
 		event = "VeryLazy",
 		config = function()
 			local mini_notify = require("mini.notify")
@@ -101,8 +101,7 @@ return {
 			{
 				"<leader>ur",
 				function()
-					require("mini.misc").find_root()
-					vim.cmd.edit("%")
+					require("mini.misc").setup_auto_root()
 				end,
 				desc = "[U]I [Root]",
 			},

@@ -7,24 +7,32 @@ vim.g.cmp_enabled = true
 return {
 	{
 		"hrsh7th/cmp-buffer", -- source for text in buffer
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = { "CmdlineEnter", "InsertEnter" },
 		dependencies = "hrsh7th/nvim-cmp",
 	},
 	{
 		"hrsh7th/cmp-nvim-lsp",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = "LspAttach",
 	},
 	{
 		"hrsh7th/cmp-cmdline",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = "CmdlineEnter",
 		dependencies = "hrsh7th/nvim-cmp",
 	},
 	{
 		"hrsh7th/nvim-cmp",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		event = { "LspAttach", "BufReadPost" },
 		dependencies = {
 			"hrsh7th/cmp-path", -- source for file system paths
@@ -50,19 +58,14 @@ return {
 			cmp.setup({
 				-- Other configurations...
 				enabled = function()
-					return vim.bo.ft ~= "" and not vim.b.bigfile
+					return not vim.b.bigfile
 				end,
-				-- enabled = function()
-				-- 	return vim.g.cmp_enabled
-				-- end,
-				-- completion = {
-				-- 	completeopt = "menu,menuone,preview,noinsert",
+				-- snippet = { -- configure how nvim-cmp interacts with snippet engine
+				-- 	expand = function(args)
+				-- 		luasnip.lsp_expand(args.body)
+				-- 	end,
 				-- },
-				snippet = { -- configure how nvim-cmp interacts with snippet engine
-					expand = function(args)
-						-- luasnip.lsp_expand(args.body)
-					end,
-				},
+				preselect = cmp.PreselectMode.None,
 				view = {
 					entries = {
 						follow_cursor = true,
@@ -82,11 +85,9 @@ return {
 							},
 						},
 					}),
-					-- TODO: I should add invoke codeium to use it and remove it from `ai.lua` file
 					["<C-e>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.abort()
-							--TODO: add if statment
 							return vim.fn["codeium#Complete"]()
 						else
 							fallback()
@@ -97,7 +98,6 @@ return {
 					-- 	cmp.close()()
 					-- end,
 					["<C-y>"] = cmp.mapping.confirm({ select = true }),
-					-- TODO: if statement to accept codeium suggestions.
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
@@ -133,32 +133,57 @@ return {
 							get_bufnrs = get_bufnrs,
 						},
 					}, -- text within current buffer
-					{ name = "path" }, -- file system paths
+					{ name = "path", priority = 50 }, -- file system paths
 				}),
 				-- configure lspkind for vs-code like pictograms in completion menu
 				formatting = {
-					format = lspkind.cmp_format({
-						-- mode = "symbol",
-						maxwidth = 50,
-						ellipsis_char = "...",
-						symbol_map = {
-							Codeium = "",
-							otter = "🦦",
-							Cody = "",
-							cmp_nvim_r = "R",
-						},
-					}),
+					fields = { "kind", "abbr", "menu" },
+					format = function(entry, vim_item)
+						local function commom_format(e, item)
+							local kind = require("lspkind").cmp_format({
+								-- mode = "symbol_text",
+								maxwidth = 50,
+								ellipsis_char = "...",
+								symbol_map = {
+									Codeium = "",
+									otter = "🦦",
+									Cody = "",
+									cmp_r = "R",
+								},
+								-- show_labelDetails = true, -- show labelDetails in menu. Disabled by default
+							})(e, item)
+							local strings = vim.split(kind.kind, "%s", { trimempty = true })
+							kind.kind = " " .. (strings[1] or "") .. " "
+							kind.menu = ""
+							kind.concat = kind.abbr
+							return kind
+						end
+						return commom_format(entry, vim_item)
+					end,
+					-- format = lspkind.cmp_format({
+					-- 	-- mode = "symbol_text",
+					-- 	maxwidth = 50,
+					-- 	ellipsis_char = "...",
+					-- 	symbol_map = {
+					-- 		Codeium = "",
+					-- 		otter = "🦦",
+					-- 		Cody = "",
+					-- 		cmp_nvim_r = "R",
+					-- 	},
+					-- }),
 				},
 				window = {
-					-- completion = cmp.config.window.bordered(),
+					-- completion = {
+					-- 	winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+					-- },
 					---@diagnostic disable-next-line: missing-fields
 					completion = {
+						col_offset = -3,
+						side_padding = 0,
 						border = "rounded",
 						winhighlight = "",
-						-- winhighlight = 'CursorLine:Normal',
-						scrollbar = "║",
 					},
-					---@diagnostic disable-next-line: missing-fields
+					-- ---@diagnostic disable-next-line: missing-fields
 					documentation = {
 						border = "rounded",
 						winhighlight = "", -- or winhighlight
@@ -171,9 +196,9 @@ return {
 				-- },
 			})
 			cmp.setup.cmdline({ "/", "?" }, {
-				view = {
-					entries = { name = "wildmenu", separator = "|" },
-				},
+				-- view = {
+				-- 	entries = { name = "wildmenu", separator = "|" },
+				-- },
 				sources = {
 					{
 						name = "buffer",
@@ -183,11 +208,10 @@ return {
 					},
 				},
 			})
-			-- TODO: implement exceptions: https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-cmdline-completion-for-certain-commands-such-as-increname
 			cmp.setup.cmdline(":", {
-				view = {
-					entries = { name = "wildmenu", separator = "|" },
-				},
+				-- view = {
+				-- 	entries = { name = "wildmenu", separator = "|" },
+				-- },
 				sources = {
 					{ name = "path", group_index = 1 },
 					{

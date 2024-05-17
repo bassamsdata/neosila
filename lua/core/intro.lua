@@ -65,7 +65,6 @@ intro.splash_screen = vim.schedule_wrap(function()
 	end
 end)
 
--- TODO: add InsertEnter and VimResized autocommands
 vim.api.nvim_create_autocmd(
 	"UIEnter",
 	{ pattern = "*", callback = intro.splash_screen }

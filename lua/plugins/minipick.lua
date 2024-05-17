@@ -150,8 +150,7 @@ return {
 				return MiniPick.registry[chosen_picker_name]()
 			end
 
-			-- TODO: enhance this one by remocving mini.fuzzy dependencies and move things outside loops
-			-- this got it from https://github.com/echasnovski/mini.nvim/discussions/609#
+			-- thanks to https://github.com/echasnovski/mini.nvim/discussions/609#
 			MiniPick.registry.frecency = function()
 				local visit_paths = MiniVisits.list_paths()
 				local current_file = vim.fn.expand("%")

@@ -753,6 +753,7 @@ local hlgroups = {
   StatusLineGitRemoved = { fg = c_scarlet, bg = c_deepsea },
   StatusLineHeader = { fg = c_jeans, bg = c_pigeon ,bold = true },
   StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre , bold = true },
+	StatusLineModified = { fg = c_ochre, bg =c_deepsea , bold = true },
   StatusLineArrow = {fg = c_ochre, bg = c_deepsea, bold = true},
 
   -- glance.nvim

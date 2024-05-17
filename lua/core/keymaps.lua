@@ -43,7 +43,26 @@ map("n", "<localleader>g", u.grepandopen, { desc = "Grep and open quickfix" })
 -- like you can do `daa` to delete entire buffer, `yaa` to yank entire buffer
 -- stylua: ignore start
 map("n", "<BS>", "<C-o>")
-map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
+map("n", "<Plug>(RestoreView)",        ":call winrestview(g:restore_position)<CR>")
+
+-- TODO: Move this out of here
+vim.cmd [[
+  function TextObjectAll()
+    let g:restore_position = winsaveview()
+    normal! ggVG
+
+    if index(['c','d'], v:operator) == 1
+      " For delete/change ALL, we don't wish to restore cursor position.
+    else
+      call feedkeys("\<Plug>(RestoreView)")
+    end
+
+  endfunction
+]]
+
+map("o", "aa",        ":<c-u>call TextObjectAll()<CR>")
+-- map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
+-- map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
 map("n", "<localleader>'", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 map("n", "<C-t>", u.swapBooleanInLine, { desc = "swap boolean" })
 map("n", "<up>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
@@ -130,18 +149,20 @@ setupResizeKeymap("<C-Right>", "h")
 setupResizeKeymap("<C-Up>", "j")
 setupResizeKeymap("<C-Down>", "k")
 
+----------------------- TJ did this, so I need to try
+-- So I did all the function above and below did it naturally
+map("n", "<M-,>", "<C-w>5<")
+map("n", "<M-.>", "<C-w>5>")
+map("n", "<M-t>", "<C-w>+")
+map("n", "<M-s>", "<C-w>-")
+map("n", "<leader>x", "<cmd>.lua<cr>", { desc = "source the current line" })
+
 -- Buffers
 map("n", "L", "<cmd>bn<cr>") -- switch to next buffer
 map("n", "H", "<cmd>bp<cr>") -- switch to previous buffer
 
 -- Make U opposite to u.
 map("n", "U", "<C-r>", { desc = "Redo" })
-
--- TODO: check if this is correct before apply
--- Execute macro over a visual region.
--- map('x', '@', function()
---     return ':norm @' .. vim.fn.getcharstr() .. '<cr>'
--- end, { expr = true })
 
 -- Word navigation in non-normal modes.
 map({ "i", "c" }, "<C-h>", "<C-Left>", { desc = "Move word(s) backwards" })
@@ -155,12 +176,16 @@ map("x", "y", "ygv<ESC>") -- preserve cursor position on visual yank
 map("n", "==", "==_") -- move cursor to the start of the line on format
 map("x", "=", "=gv_")
 map("n", "J", "J_") -- go to end after a join
--- TODO: replace it with treesj or splitjoin mini plugin
 map("n", "S", "T hr<CR>k$") -- split (opposite of J)
+-- map("i", "<C-a>", "r<CR><esc>k$a") -- split (opposite of J)
 -- Add undo break-points
 -- map("i", ",", ", <c-g>u") -- caused some problems
 map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
+
+-- map("n", "S", function()
+-- 	vim.api.nvim_put({ "", "" }, "c", false, false)
+-- end, { silent = true, noremap = true })
 
 map(
 	"n",
@@ -171,9 +196,15 @@ map(
 map("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 map("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
--- TODO: use as ft for this in lua files and packages for go files
-vim.keymap.set("n", "<leader>gx", u.gxhandler, { desc = "Follow link" })
-vim.keymap.set(
+map("n", "<leader>:", function()
+	vim.cmd("normal! ")
+	vim.schedule(function()
+		vim.cmd.startinsert()
+	end)
+end, { desc = "Insert mode" })
+
+map("n", "<leader>gx", u.gxhandler, { desc = "Follow link" })
+map(
 	"n",
 	"<leader>fd",
 	"<cmd>lua require('utils').gxdotfyle()<cr>",
@@ -211,16 +242,6 @@ map("n", "<leader>cd",      "<cmd>Pick diagnostic scope='all'<cr>",       { desc
 map("n", "<leader>cD",      "<cmd>Pick diagnostic scope='current'<cr>",   { desc = "Diagnostic buffer" })
 map("n", "<localleader>mn",      "<cmd>15sp | lua MiniNotify.show_history()<cr>",   { desc = "Diagnostic buffer" })
 -- stylua: ignore end
-
--- useful for scrolling long files
-function M.minimap()
-	vim.keymap.set(
-		"n",
-		"<leader>ms",
-		"<cmd>lua Minimap.toggle_focus()<cr>",
-		{ desc = "scroll by minimap" }
-	)
-end
 
 -- I got this from reddit - wow, look how simple it is
 M.mini_files_key = {
@@ -287,7 +308,7 @@ local function clear_registers()
 	end
 end
 map("n", "<leader>rg", clear_registers, { desc = "Clear registers" })
-vim.keymap.set(
+map(
 	"n",
 	"ghy",
 	require("utils.git").copy_hunk_ref_text,
@@ -299,7 +320,9 @@ map("x", "<Space>dC", u.diff_with_clipboard2, { desc = "Diff with clipboard" })
 if vim.fn.has("nvim-0.10") == 1 then
 	map("!a", "sis", "-- stylua: ignore start")
 	map("!a", "sie", "-- stylua: ignore end")
+	-- map("c", "lazy", "Lazy")
 end
+vim.cmd([[cnoreabbrev laz Lazy]])
 
 -- ── run Stuff ─────────────────────────────────────────────────────
 map("n", "<leader>cg", f.run_file, { desc = "[C]ode [G]o mode" })
@@ -359,6 +382,13 @@ end
 map("n", "R", Gat("v:lua.Substitute"), { desc = "Substitute", silent = true })
 -- map("v", "T", Gat("v:lua.Substitute2"), { silent = true })
 -- map( "n", "R", "m'<cmd>set opfunc=v:lua.Substitute<CR>g@", { desc = "Substitute", silent = true })
+
+map(
+	"n",
+	"<localleader>sr",
+	require("functions.scratch").toggle,
+	{ desc = "Replace all", silent = true }
+)
 
 map(
 	"n",

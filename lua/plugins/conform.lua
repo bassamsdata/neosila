@@ -32,13 +32,12 @@ return {
 						end
 					end,
 				},
-				format_on_save = {
+				format_after_save = {
 					lsp_fallback = true,
-					async = false,
-					timeout_ms = 1000,
+					async = true,
+					timeout_ms = 2000,
 				},
 			})
-			-- TODO: move it to the keymaps file
 			vim.keymap.set({ "n", "v" }, "<leader>mp", function()
 				conform.format({
 					lsp_fallback = true,

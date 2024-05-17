@@ -42,16 +42,26 @@ function M.swapBooleanInLine()
 	local line = vim.api.nvim_get_current_line()
 	for _, pair in ipairs(swap_pairs) do
 		local a, b = unpack(pair)
-		if line:find(a) then
-			line = line:gsub(a, b)
-			break
-		elseif line:find(b) then
-			line = line:gsub(b, a)
-			break
-		end
+		line = line:find(a) and line:gsub(a, b)
+			or line:find(b) and line:gsub(b, a)
+			or line
 	end
 	vim.api.nvim_set_current_line(line)
 end
+
+--- A simple and clean fold function, thanks https://github.com/tamton-aquib/essentials.nvim
+---@return string: foldtext
+M.simple_fold = function()
+	local fs, fe = vim.v.foldstart, vim.v.foldend
+	local start_line = vim.fn.getline(fs):gsub("\t", ("\t"):rep(vim.opt.ts:get()))
+	local end_line = vim.trim(vim.fn.getline(fe))
+	local spaces = (" "):rep(
+		vim.o.columns - start_line:len() - end_line:len() - 7
+	)
+
+	return start_line .. "  " .. end_line .. spaces
+end
+-- set this: vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 
 M.file_path = vim.fn.stdpath("config") .. "/plugin/colorswitch.lua"
 
@@ -66,7 +76,6 @@ function M.replace_word(old, new)
 	end
 	local content = file:read("*all")
 	file:close()
-	-- TODO: vim.g.colors_name only output the first word - try to implemtnt vim.fn.getcompletion('', 'color')
 	-- local added_pattern = string.gsub(old, "-", "%%-") -- add % before - if exists
 	local new_content = content:gsub(old, new)
 	file, err = io.open(M.file_path, "w")
@@ -131,7 +140,6 @@ function M.diff_with_clipboard()
 	vim.api.nvim_exec2(cmd, {})
 end
 
--- TODO: need to figure out how to improve it
 function M.diff_with_clipboard2()
 	local selected_text = vim.fn.getreg('"')
 	local _, diff = pcall(require, "mini.diff")
@@ -173,7 +181,6 @@ function M.read_file(path)
 	return content or ""
 end
 
--- TODO: organize that
 function M.grepandopen()
 	vim.ui.input({ prompt = "Enter pattern: " }, function(pattern)
 		if pattern ~= nil then

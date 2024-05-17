@@ -1,11 +1,9 @@
-if vim.loader then
-	vim.loader.enable()
-end
+vim.loader.enable()
 require("core.options")
-require("core.keymaps")
-require("core.lazy")
-require("core.intro")
 require("core.autcommands")
+require("core.lazy")
+require("core.keymaps")
+require("core.intro")
 if vim.fn.has("nvim-0.10") == 1 then -- remove this when stable
 	pcall(require, "core.mystatusline")
 end

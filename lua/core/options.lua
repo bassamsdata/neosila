@@ -1,5 +1,5 @@
 local M = {}
-local opt = vim.opt -- for concisenes
+local opt = vim.opt
 
 vim.cmd([[
 function! Grep(...)
@@ -49,12 +49,14 @@ opt.undolevels = 10000
 -- Cursor settings
 opt.cursorline = true
 
+opt.guicursor = {
+	"n-v:block-Cursor/lCursor",
+	"i-c-ci-ve:blinkoff500-blinkon1000-block-TermCursor",
+}
 if not vim.g.neovide then
-	opt.guicursor = "a:block-Cursor/lCursor,v:block,i:ver25-TermCursor"
 	-- it has a bug with neovide currently
 	opt.inccommand = "split" -- split window for substitute - nice to have
 end
-
 -- view and session options
 opt.viewoptions = "cursor,folds"
 opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize"
@@ -69,6 +71,7 @@ vim.opt.listchars:append({
 	tab = "│ ",
 	-- space = "⋅",
 })
+opt.showbreak = "↪ "
 
 -- UI characters.
 opt.fillchars:append({
@@ -84,7 +87,6 @@ opt.fillchars:append({
 -- opt.splitkeep = "screen"
 opt.laststatus = 3
 opt.pumheight = 10 -- Maximum number of entries in a popup
-opt.scrolloff = 8
 opt.sidescrolloff = 4
 --spli windows
 opt.splitright = true
@@ -111,7 +113,7 @@ opt.foldcolumn = "1"
 if vim.fn.has("nvim-0.10") == 1 then
 	opt.smoothscroll = true
 	-- vim.opt.foldmethod = "expr"
-	vim.opt.foldtext = 'v:lua.require("utils").simple_fold()'
+	-- vim.opt.foldtext = 'v:lua.require("utils").simple_fold()'
 	-- vim.wo.foldtext = "v:lua.vim.treesitter.foldtext()"
 	-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 	-- else
@@ -122,14 +124,15 @@ end
 -- backsapace
 -- opt.backspace = "indent,eol,start"
 
--- opt.formatoptions = "jcroqlnt" -- tcqj
+-- format respect list
+opt.formatoptions:append("n")
 -- this drove me crzy - it controll how vertical movement behave when tab is used
 
 if not vim.g.vscode then
+	opt.scrolloff = 4
 	opt.showmode = false
 end
 
---
 -- Disable health checks for these providers.
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
@@ -138,6 +141,7 @@ vim.g.loaded_node_provider = 0
 if vim.g.neovide then
 	-- vim.o.guifont = "Iosevka Comfy:h15:w1" -- text below applies for VimScript
 	vim.g.neovide_transparency = 1
+	-- vim.g.neovide_window_blurred = true
 	vim.g.neovide_input_macos_alt_is_meta = true
 	vim.g.neovide_cursor_animation_length = 0.1
 	-- vim.g.neovide_scroll_animation_length = 0.15

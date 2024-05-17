@@ -1,7 +1,9 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		-- enabled = function()
+		-- 	return not vim.b.bigfile
+		-- end,
 		version = false, -- last release is way too old
 		cmd = {
 			"TSInstall",
@@ -12,10 +14,7 @@ return {
 		},
 		build = ":TSUpdate",
 		event = {
-			-- "VeryLazy",
-			-- "FileType", --testing this new one
-			"BufReadPre",
-			"BufNewFile",
+			"BufReadPost",
 		},
 		keys = {
 			{ "<C-cr>", desc = "Increment selection" },
@@ -23,126 +22,155 @@ return {
 		},
 
 		dependencies = {
-			{ "nvim-treesitter/nvim-treesitter-textobjects" },
-			{ "nvim-treesitter/nvim-treesitter-context" },
+			{
+				"nvim-treesitter/nvim-treesitter-textobjects",
+			},
+			{
+				"nvim-treesitter/nvim-treesitter-context",
+			},
 		},
 		config = function()
-			local function dd(bufnr) -- Disable in files with more than 5K
-				return vim.api.nvim_buf_line_count(bufnr) > 5000
-			end
-			vim.schedule(function()
-				require("nvim-treesitter.configs").setup({
-					highlight = { enable = not vim.g.vscode or not vim.b.bigfile },
-					indent = { enable = true },
-					ensure_installed = {
-						"c",
-						"bash",
-						"json",
-						"lua",
-						"luadoc",
-						"markdown",
-						"markdown_inline",
-						"python",
-						"query",
-						"toml",
-						"vim",
-						"vimdoc",
-						"r",
-						"query",
-						"sql",
-						"go",
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = {
+					"c",
+					"bash",
+					"json",
+					"lua",
+					"luadoc",
+					"markdown",
+					"markdown_inline",
+					"python",
+					"query",
+					"toml",
+					"vim",
+					"vimdoc",
+					"r",
+					"query",
+					"sql",
+					"go",
+					"rnoweb",
+				},
+				sync_install = false,
+				ignore_install = {},
+				highlight = {
+					enable = not vim.g.vscode,
+					disable = function(ft, buf)
+						return ft == "latex"
+							or vim.b[buf].bigfile == true
+							or vim.fn.win_gettype() == "command"
+					end,
+					-- Enable additional vim regex highlighting
+					-- in markdown files to get vimtex math conceal
+					additional_vim_regex_highlighting = { "markdown" },
+				},
+				endwise = {
+					enable = true,
+				},
+				incremental_selection = {
+					enable = true,
+					keymaps = {
+						init_selection = false,
+						node_incremental = "an",
+						scope_incremental = "aN",
+						node_decremental = "in",
 					},
-					additional_vim_regex_highlighting = false,
-					incremental_selection = {
+				},
+				textobjects = {
+					select = {
 						enable = true,
+						lookahead = true, -- Automatically jump forward to textobj
 						keymaps = {
-							init_selection = "<C-cr>",
-							node_incremental = "<C-cr>",
-							scope_incremental = "<localleader>s",
-							node_decremental = "<bs>",
-						},
-					},
-					textobjects = {
-						select = {
-							enable = true,
-							-- Automatically jump forward to textobj, similar to targets.vim
-							lookahead = true,
-
-							keymaps = {
-								-- You can use the capture groups defined in textobjects.scm
-								["af"] = "@function.outer",
-								["if"] = "@function.inner",
-								["al"] = "@loop.outer",
-								["il"] = "@loop.inner",
-								["ac"] = "@conditional.outer",
-								-- You can optionally set descriptions to the mappings (used in the desc parameter of
-								-- nvim_buf_set_keymap) which plugins like which-key display
-								["ic"] = {
-									query = "@conditional.inner",
-									desc = "Select inner part of a class region",
-								},
-								-- You can also use captures from other query groups like `locals.scm`
-								["as"] = {
-									query = "@scope",
-									query_group = "locals",
-									desc = "Select language scope",
-								},
-							},
-							-- You can choose the select mode (default is charwise 'v')
-							--
-							-- Can also be a function which gets passed a table with the keys
-							-- * query_string: eg '@function.inner'
-							-- * method: eg 'v' or 'o'
-							-- and should return the mode ('v', 'V', or '<c-v>') or a table
-							-- mapping query_strings to modes.
-							selection_modes = {
-								["@parameter.outer"] = "v", -- charwise
-								["@function.outer"] = "V", -- linewise
-								["@class.outer"] = "<c-v>", -- blockwise
-							},
-							-- If you set this to `true` (default is `false`) then any textobject is
-							-- extended to include preceding or succeeding whitespace. Succeeding
-							-- whitespace has priority in order to act similarly to eg the built-in
-							-- `ap`.
-							--
-							-- Can also be a function which gets passed a table with the keys
-							-- * query_string: eg '@function.inner'
-							-- * selection_mode: eg 'v'
-							-- and should return true of false
-							include_surrounding_whitespace = true,
+							-- You can use the capture groups defined in textobjects.scm
+							["am"] = "@function.outer",
+							["im"] = "@function.inner",
+							["al"] = "@loop.outer",
+							["il"] = "@loop.inner",
+							["ak"] = "@class.outer",
+							["ik"] = "@class.inner",
+							-- ["aa"] = "@parameter.outer",
+							["ia"] = "@parameter.inner",
+							["a/"] = "@comment.outer",
+							["a*"] = "@comment.outer",
+							["ao"] = "@block.outer",
+							["io"] = "@block.inner",
+							["a?"] = "@conditional.outer",
+							["i?"] = "@conditional.inner",
 						},
 					},
 					move = {
 						enable = true,
+						set_jumps = true, -- whether to set jumps in the jumplist
 						goto_next_start = {
-							["]f"] = "@function.outer",
-							["]c"] = "@class.outer",
+							["]m"] = "@function.outer",
+							["]l"] = "@loop.outer",
+							["]]"] = "@function.outer",
+							["]k"] = "@class.outer",
+							["]a"] = "@parameter.outer",
+							["]o"] = "@block.outer",
+							["]?"] = "@conditional.outer",
 						},
 						goto_next_end = {
-							["]F"] = "@function.outer",
-							["]C"] = "@class.outer",
+							["]M"] = "@function.outer",
+							["]L"] = "@loop.outer",
+							["]["] = "@function.outer",
+							["]K"] = "@class.outer",
+							["]A"] = "@parameter.outer",
+							["]/"] = "@comment.outer",
+							["]*"] = "@comment.outer",
+							["]O"] = "@block.outer",
 						},
 						goto_previous_start = {
-							["[f"] = "@function.outer",
-							["[c"] = "@class.outer",
+							["[m"] = "@function.outer",
+							["[l"] = "@loop.outer",
+							["[["] = "@function.outer",
+							["[k"] = "@class.outer",
+							["[a"] = "@parameter.outer",
+							["[/"] = "@comment.outer",
+							["[*"] = "@comment.outer",
+							["[o"] = "@block.outer",
+							["[?"] = "@conditional.outer",
 						},
 						goto_previous_end = {
-							["[F"] = "@function.outer",
-							["[C"] = "@class.outer",
+							["[M"] = "@function.outer",
+							["[L"] = "@loop.outer",
+							["[]"] = "@function.outer",
+							["[K"] = "@class.outer",
+							["[A"] = "@parameter.outer",
+							["[O"] = "@block.outer",
 						},
 					},
-				})
-			end, 0)
+					swap = {
+						enable = true,
+						swap_next = {
+							["<M-C-L>"] = "@parameter.inner",
+						},
+						swap_previous = {
+							["<M-C-H>"] = "@parameter.inner",
+						},
+					},
+					lsp_interop = {
+						enable = true,
+						border = "solid",
+						peek_definition_code = {
+							["<M-e>"] = "@fuNction.outer",
+						},
+					},
+				},
+			})
 		end,
 	},
 	{ "nvim-treesitter/nvim-treesitter-textobjects", lazy = true },
+	enabled = function()
+		return not vim.b.bigfile
+	end,
 	{
 		"nvim-treesitter/nvim-treesitter-context",
-		cond = not vim.g.vscode or not vim.b.bigfile,
+		enabled = function()
+			return not vim.b.bigfile
+		end,
 		-- Match the context lines to the source code.
 		-- multiline_threshold = 1,
 		lazy = true,
-		enabled = true,
 		opts = { mode = "cursor", max_lines = 3, separator = "─" },
 		keys = {
 			{

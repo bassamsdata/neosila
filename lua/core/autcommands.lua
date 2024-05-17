@@ -7,35 +7,54 @@ local function augroup(name)
 	return vim.api.nvim_create_augroup("sila_" .. name, { clear = true })
 end
 
-if vim.fn.has("nvim-0.10") == 1 then
-	autocmd("BufReadPre", {
-		group = augroup("largefilesettings"),
-		desc = "Set settings for large files.",
-		callback = function(info)
-			if vim.b.large_file ~= nil then
-				return
+-- Thanks to bekaboo for the initial autocmd
+autocmd({ "BufLeave", "WinLeave", "FocusLost" }, {
+	group = augroup("autosave"),
+	nested = true,
+	desc = "Autosave on focus change.",
+	callback = function(info)
+		if vim.bo[info.buf].bt ~= "" then
+			return
+		end
+		-- nvim-0.10 specific thing
+		if vim.fn.has("nvim-0.10") == 1 then
+			local diagnostics = vim.diagnostic.count(info.buf)
+			-- Check if there are no errors or warnings
+			if diagnostics[2] == nil and diagnostics[3] == nil then
+				vim.cmd.update({
+					mods = { emsg_silent = true },
+				})
 			end
-			vim.b.large_file = false
-			local stat = vim.uv.fs_stat(info.match)
-			if stat and stat.size > 1000000 then
-				vim.b.large_file = true
-				vim.opt_local.spell = false
-				vim.opt_local.swapfile = false
-				vim.opt_local.undofile = false
-				vim.opt_local.breakindent = false
-				vim.opt_local.colorcolumn = ""
-				vim.opt_local.statuscolumn = ""
-				vim.opt_local.signcolumn = "no"
-				vim.opt_local.foldcolumn = "0"
-				vim.opt_local.winbar = ""
-				vim.cmd.syntax("off")
-			end
-		end,
-	})
-end
+		end
+	end,
+})
+
+autocmd("BufReadPre", {
+	group = augroup("largefilesettings"),
+	desc = "Set settings for large files.",
+	callback = function(info)
+		vim.b.bigfile = false
+		---@diagnostic disable-next-line: undefined-field
+		local stat = vim.uv.fs_stat(info.match)
+		if stat and stat.size > 52420 then
+			vim.b.bigfile = true
+			vim.opt_local.spell = false
+			vim.opt_local.swapfile = false
+			vim.opt_local.undofile = false
+			vim.opt_local.breakindent = false
+			vim.opt_local.colorcolumn = ""
+			vim.opt_local.statuscolumn = ""
+			vim.opt_local.signcolumn = "no"
+			vim.opt_local.foldcolumn = "0"
+			vim.opt_local.winbar = ""
+			vim.cmd.syntax("off")
+		end
+	end,
+})
 
 local mygroup =
 	vim.api.nvim_create_augroup("MyCommentSettings", { clear = true })
+
 autocmd({ "FileType" }, {
 	group = mygroup,
 	pattern = { "v", "vsh", "vv", "json" },
@@ -57,6 +76,13 @@ autocmd("QuickFixCmdPost", {
 	command = "cwindow",
 })
 
+-- TODO: make it like keep ratio instead of equal resizing
+autocmd("VimResized", {
+	desc = "auto resize splited windows",
+	pattern = "*",
+	command = "tabdo wincmd =",
+})
+
 -- Autocommand to clear the Git branch cache when the directory changes
 autocmd({ "DirChanged", "FileChangedShellPost" }, {
 	callback = git.clear_git_branch_cache,
@@ -69,32 +95,16 @@ autocmd("BufWinEnter", {
 autocmd({ "BufWinLeave", "BufWritePost" }, {
 	group = augroup("save_view"),
 	callback = function()
-		vim.cmd([[silent! mkview]])
+		vim.cmd("silent! mkview")
 	end,
 })
 
 autocmd({ "BufWinEnter" }, {
 	group = augroup("load_view"),
 	callback = function()
-		vim.cmd([[silent! loadview]])
+		vim.cmd("silent! loadview")
 	end,
 })
-
--- -- Open Mini.map omn certain filetypes
-local function openclose()
-	local enable = { "lua", "python", "r" }
-	local ft = vim.bo.filetype
-	if ft == "" then
-		return
-	else
-		for _, v in ipairs(enable) do
-			if ft == v then
-				require("mini.map").open()
-				break
-			end
-		end
-	end
-end
 
 autocmd("FileType", {
 	group = augroup("yanking"),
@@ -109,15 +119,6 @@ autocmd("FileType", {
 		)
 	end,
 })
-
-vim.api.nvim_create_user_command("Mess", function()
-	local scratch_buffer = vim.api.nvim_create_buf(false, true)
-	vim.bo[scratch_buffer].filetype = "vim"
-	local messages = vim.split(vim.fn.execute("messages", "silent"), "\n")
-	vim.api.nvim_buf_set_text(scratch_buffer, 0, 0, 0, 0, messages)
-	vim.cmd.sbuffer(scratch_buffer)
-	vim.cmd("$")
-end, {})
 
 -- Highlight on yank
 autocmd("TextYankPost", {
@@ -199,36 +200,28 @@ autocmd({ "ModeChanged" }, {
 		-- make it work on statuscolumn custom numbering (with ranges over visual selection)
 		local hl = vim.api.nvim_get_hl(0, { name = u.get_mode_hl() })
 		-- local curline_hl = vim.api.nvim_get_hl(0, { name = "CursorLine" })
-		vim.api.nvim_set_hl(0, "CursorLineNr", {
-			fg = hl.fg,
-			-- bg = curline_hl.bg
-		})
+		vim.schedule(function()
+			vim.api.nvim_set_hl(0, "CursorLineNr", {
+				fg = hl.fg,
+				-- bg = curline_hl.bg
+			})
+		end)
 	end,
 })
 
--- TODO: move tihs function to helpers
--- =====** HELP_GREP function **==========================================
+-- Redir output -> new buffer
+vim.api.nvim_create_user_command("Redir", function(ctx)
+	local result = vim.api.nvim_exec2(ctx.args, { output = true })
+	if result.error then
+		vim.notify(result.error, vim.log.levels.ERROR)
+		return
+	end
+	local lines = vim.split(result.output, "\n", { plain = true })
+	vim.cmd("new")
+	vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+	vim.opt_local.modified = false
+end, { nargs = "+", complete = "command" })
 
--- -- Load the 'mini.pick' module
--- local MiniPick = require("mini.pick")
---
--- -- Define a function to search the help documentation and open the results in the quickfix list picker
--- local function help_grep(args)
--- 	-- Construct the pattern from the arguments
--- 	local pattern = table.concat(args.fargs, " ")
---
--- 	-- Search the help documentation
--- 	vim.api.nvim_command("helpgrep " .. pattern)
---
--- 	-- Open the results in the quickfix list picker
--- 	MiniPick.start({ source = MiniPick.registry.quickfix() })
--- end
---
--- -- Define a new command
--- vim.api.nvim_create_user_command("HelpGrep", help_grep, { nargs = "*", complete = "shellcmd" })
---========================================================================
---
---
 -- close some filetypes with <q>
 autocmd("FileType", {
 	group = augroup("close_with_q"),
@@ -262,7 +255,8 @@ autocmd({ "BufWritePre" }, {
 		if event.match:match("^%w%w+://") then
 			return
 		end
-		local file = vim.loop.fs_realpath(event.match) or event.match
+		---@diagnostic disable-next-line: undefined-field
+		local file = (vim.uv or vim.loop).fs_realpath(event.match) or event.match
 		vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
 	end,
 })
