@@ -4,10 +4,8 @@ require("core.autcommands")
 require("core.lazy")
 require("core.keymaps")
 require("core.intro")
-if vim.fn.has("nvim-0.10") == 1 then -- remove this when stable
-	pcall(require, "core.mystatusline")
-end
+require("core.mystatusline")
 
 if vim.g.vscode ~= nil then
-	require("core.vscode")
+  require("core.vscode")
 end
