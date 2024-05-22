@@ -1,3 +1,4 @@
+---@diagnostic disable: deprecated
 local M = {}
 
 function M.custom_notify(message, level)
