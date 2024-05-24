@@ -1,6 +1,5 @@
 return {
 	"Bekaboo/deadcolumn.nvim",
-	-- dev = true,
 	enabled = function()
 		return not vim.b.bigfile
 	end,

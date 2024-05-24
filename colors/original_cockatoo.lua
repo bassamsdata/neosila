@@ -755,6 +755,10 @@ local hlgroups = {
   StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre , bold = true },
 	StatusLineModified = { fg = c_ochre, bg =c_deepsea , bold = true },
   StatusLineArrow = {fg = c_ochre, bg = c_deepsea, bold = true},
+  -- There is no default value.
+  IndentLine= {link = 'Whitespace' },
+  -- Current indent line highlight
+  IndentLineCurrent={ link = 'Comment'  },
 
   -- glance.nvim
   GlanceBorderTop = { link = 'WinSeparator' },

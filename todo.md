@@ -2,10 +2,11 @@
 - choose custom random colorschem every time nvim starts
 - check wich plugin makes the crolling bad
 
+
 # make this modules:
-- usage time
-- snowflakes
-- Auto save if diagnostics.count() is nil. (see n-macro for this)
+- [ ] usage time
+- [ ] snowflakes
+- [x] Auto save if diagnostics.count() is nil. (see n-macro for this)
 
 ## make this into small module:
 https://stackoverflow.com/questions/11634804/vim-auto-resize-focused-window

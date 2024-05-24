@@ -28,6 +28,16 @@ return {
 				return not vim.g.vscode or not vim.b.bigfile
 			end,
 		},
+		opts = {
+			-- provide the code lenses.
+			codelens = {
+				enabled = true,
+			},
+			-- Enable lsp cursor word highlighting
+			document_highlight = {
+				enabled = true,
+			},
+		},
 
 		config = function()
 			-- I took this fn as is from Maria.
@@ -178,6 +188,7 @@ return {
 				capabilities = capabilities,
 				on_attach = on_attach,
 			})
+
 			lspconfig["gopls"].setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
@@ -193,6 +204,17 @@ return {
 							functionTypeParameters = true,
 							-- parameterNames = true,
 							rangeVariableTypes = true,
+						},
+						-- codelens
+						codelenses = {
+							gc_details = false,
+							generate = true,
+							regenerate_cgo = true,
+							run_govulncheck = true,
+							test = true,
+							tidy = true,
+							upgrade_dependency = true,
+							vendor = true,
 						},
 						semanticTokens = false,
 						experimentalPostfixCompletions = false,
@@ -282,6 +304,9 @@ return {
 					Lua = {
 						-- Using stylua for formatting.
 						format = { enable = false },
+						codeLens = {
+							enable = true,
+						},
 						hint = {
 							enable = true,
 							arrayIndex = "Disable",

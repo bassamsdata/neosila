@@ -317,11 +317,9 @@ map(
 map("x", "<Space>dc", u.diff_with_clipboard, { desc = "Diff with clipboard" })
 map("x", "<Space>dC", u.diff_with_clipboard2, { desc = "Diff with clipboard" })
 -- ── Abbreviations ─────────────────────────────────────────────────────
-if vim.fn.has("nvim-0.10") == 1 then
-	map("!a", "sis", "-- stylua: ignore start")
-	map("!a", "sie", "-- stylua: ignore end")
-	-- map("c", "lazy", "Lazy")
-end
+map("!a", "sis", "-- stylua: ignore start")
+map("!a", "sie", "-- stylua: ignore end")
+-- map("c", "lazy", "Lazy")
 vim.cmd([[cnoreabbrev laz Lazy]])
 
 -- ── run Stuff ─────────────────────────────────────────────────────

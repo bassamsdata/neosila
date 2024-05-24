@@ -15,16 +15,15 @@ fifth main color (#82d5d0)
 sixth main color (#11222b)
 seventh main color (#3da8dd)#228ec3
 eight main color (#3f6a87)
-f3c85b
 ----------------------
---color-base-00:                       #070B0D;
---color-base-10:                       #0C1417;
---color-base-20:                       #0E161B;
---color-base-25:                       #121C21;
---color-base-30:                       #141F25;
---color-base-35:                       #19272E;
---color-base-40:                       #1E3038;
---color-base-50:                       #243842;
---color-base-60:                       #355464;
---color-base-70:                       #7AA3B8;
---color-base-100:                      #BDD1DB;
+--color-base-00 : #070B0D;
+--color-base-10 : #0C1417;
+--color-base-20 : #0E161B;
+--color-base-25 : #121C21;
+--color-base-30 : #141F25;
+--color-base-35 : #19272E;
+--color-base-40 : #1E3038;
+--color-base-50 : #243842;
+--color-base-60 : #355464;
+--color-base-70 : #7AA3B8;
+--color-base-100: #BDD1DB;

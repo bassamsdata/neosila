@@ -202,9 +202,6 @@ return {
 				sources = {
 					{
 						name = "buffer",
-						option = {
-							get_bufnrs = get_bufnrs,
-						},
 					},
 				},
 			})
@@ -216,9 +213,6 @@ return {
 					{ name = "path", group_index = 1 },
 					{
 						name = "cmdline",
-						option = {
-							ignore_cmds = {},
-						},
 						group_index = 2,
 					},
 				},
