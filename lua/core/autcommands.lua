@@ -73,6 +73,16 @@ autocmd("QuickFixCmdPost", {
   command = "cwindow",
 })
 
+autocmd({ "TermOpen", "BufEnter" }, {
+  group = augroup("terminal"),
+  pattern = { "*" },
+  callback = function()
+    if vim.opt.buftype:get() == "terminal" then
+      vim.cmd(":startinsert")
+    end
+  end,
+})
+
 -- TODO: make it like keep ratio instead of equal resizing
 autocmd("VimResized", {
   desc = "auto resize splited windows",
@@ -235,6 +245,7 @@ autocmd("FileType", {
     "checkhealth",
     "mininotify-history",
     "git",
+    "grug-far",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
@@ -257,5 +268,13 @@ autocmd({ "BufWritePre" }, {
     ---@diagnostic disable-next-line: undefined-field
     local file = (vim.uv or vim.loop).fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+})
+
+autocmd("BufReadPost", {
+  once = true,
+  group = augroup("Globalfunction"),
+  callback = function()
+    require("utils.vimFunctions")
   end,
 })

@@ -58,7 +58,7 @@ end
 opt.viewoptions = "cursor,folds"
 opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize"
 -- clipoboard
--- opt.clipboard:append("unnamedplus")
+opt.clipboard:append("unnamedplus")
 opt.showbreak = "↪ "
 
 -- UI characters.
@@ -94,10 +94,10 @@ opt.wrap = false
 opt.cpoptions:append(">")
 -- completion
 vim.opt.wildignore:append({ ".DS_Store" })
-opt.conceallevel = 2 -- Hide * markup for bold and italic
+-- opt.conceallevel = 2 -- Hide * markup for bold and italic
 opt.foldcolumn = "1"
--- opt.foldlevel = 999
--- opt.foldmethod = "indent"
+opt.foldlevel = 999
+opt.foldmethod = "indent"
 -- opt.foldtext = "v:lua.require'utils'.foldtext()"
 opt.smoothscroll = true
 opt.foldtext = 'v:lua.require("utils").simple_fold()'
@@ -107,7 +107,7 @@ opt.foldtext = 'v:lua.require("utils").simple_fold()'
 
 -- format respect list
 -- opt.formatoptions:append("n")
-opt.formatoptions = "jcroqlnt" -- tcqj
+opt.formatoptions = "jcqlnt" -- tcqj
 -- this drove me crzy - it controll how vertical movement behave when tab is used
 
 if not vim.g.vscode then
@@ -136,6 +136,24 @@ if vim.g.neovide then
   vim.g.neovide_padding_left = 0
 end
 
+vim.g.firenvim_config = {
+  localSettings = {
+    [ [[.*]] ] = {
+      cmdline = "firenvim",
+      priority = 0,
+      selector = "textarea",
+      takeover = "never",
+    },
+    [ [[.*notion\.so.*]] ] = {
+      priority = 9,
+      takeover = "never",
+    },
+    [ [[.*docs\.google\.com.*]] ] = {
+      priority = 9,
+      takeover = "never",
+    },
+  },
+}
 -- Thanks to Bekaboo for this https://github.com/Bekaboo/nvim
 ---Lazy-load runtime files
 local g = vim.g

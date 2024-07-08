@@ -1,3 +1,6 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 local ft =
   { "lua", "norg", "quarto", "py", "go", "markdown", "R", "v", "yaml", "toml" }
 return {

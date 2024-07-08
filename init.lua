@@ -5,6 +5,7 @@ require("core.lazy")
 require("core.keymaps")
 require("core.intro")
 require("core.mystatusline")
+require("nvterminal")
 
 if vim.g.vscode ~= nil then
   require("core.vscode")

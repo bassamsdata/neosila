@@ -1,6 +1,7 @@
 - Reorganize the configuration files
 - choose custom random colorschem every time nvim starts
 - check wich plugin makes the crolling bad
+- average age for managers in each year and see how it changes over time
 
 
 # make this modules:

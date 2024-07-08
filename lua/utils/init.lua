@@ -37,6 +37,7 @@ local swap_pairs = {
   { "True", "False" },
   { "fg", "bg" },
   { "open", "close" },
+  { "always", "never" },
 }
 
 function M.swapBooleanInLine()
@@ -77,8 +78,11 @@ function M.replace_word(old, new)
   end
   local content = file:read("*all")
   file:close()
+  -- Escape dashes in both old and new strings
+  local escaped_old = string.gsub(old, "([%-])", "%%%1")
+  local escaped_new = string.gsub(new, "([%-])", "%%%1")
   -- local added_pattern = string.gsub(old, "-", "%%-") -- add % before - if exists
-  local new_content = content:gsub(old, new)
+  local new_content = content:gsub(escaped_old, escaped_new)
   file, err = io.open(M.file_path, "w")
   if not file then
     vim.notify("Failed to open file for writing: " .. err, vim.log.levels.ERROR)
@@ -205,11 +209,15 @@ vim.keymap.set("n", "<leader>ug", M.helpgrepnopen)
 --This code below regarding statuscolumn was borrowed from LazyVim.
 --credit to folke/LazyVim https://github.com/LazyVim/LazyVim
 -- Returns a list of regular and extmark signs sorted by priority (low to high)
--- -@return Sign[]
+---@alias Sign {name:string, text:string, texthl:string, priority:number}
+
+-- Returns a list of regular and extmark signs sorted by priority (low to high)
+---@return Sign[]
 ---@param buf number
 ---@param lnum number
 function M.get_signs(buf, lnum)
   -- Get regular signs
+  ---@type Sign[]
   local signs = {}
 
   -- Get extmark signs
@@ -222,7 +230,7 @@ function M.get_signs(buf, lnum)
   )
   for _, extmark in pairs(extmarks) do
     signs[#signs + 1] = {
-      name = extmark[4].sign_hl_group or "",
+      name = extmark[4].sign_hl_group or extmark[4].sign_name or "",
       text = extmark[4].sign_text,
       texthl = extmark[4].sign_hl_group,
       priority = extmark[4].priority,
@@ -237,6 +245,9 @@ function M.get_signs(buf, lnum)
   return signs
 end
 
+---@return Sign?
+---@param buf number
+---@param lnum number
 function M.get_mark(buf, lnum)
   local marks = vim.fn.getmarklist(buf)
   vim.list_extend(marks, vim.fn.getmarklist())
@@ -251,7 +262,7 @@ function M.get_mark(buf, lnum)
   end
 end
 
--- -@param sign? Sign
+---@param sign? Sign
 ---@param len? number
 function M.icon(sign, len)
   sign = sign or {}
@@ -291,26 +302,18 @@ function M.statuscolumn()
   local components = { "", "", "" } -- left, middle, right
 
   if show_signs then
-    -- -@type Sign?,Sign?,Sign?
-    local left, right, fold
-    for _, s in ipairs(M.get_signs(buf, vim.v.lnum)) do
+    local signs = M.get_signs(buf, vim.v.lnum)
+
+    ---@type Sign?,Sign?,Sign?
+    local left, right, fold, githl
+    for _, s in ipairs(signs) do
       if s.name and (s.name:find("GitSign") or s.name:find("MiniDiffSign")) then
         right = s
       else
         left = s
       end
     end
-    if vim.v.virtnum ~= 0 then
-      left = nil
-    end
-    vim.api.nvim_win_call(win, function()
-      if vim.fn.foldclosed(vim.v.lnum) >= 0 then
-        fold = {
-          text = vim.opt.fillchars:get().foldclose or "",
-          texthl = "Folded",
-        }
-      end
-    end)
+
     -- Left: mark or non-git sign
     components[1] = M.icon(M.get_mark(buf, vim.v.lnum) or left)
     -- Right: fold icon or git sign (only if file)
@@ -322,10 +325,14 @@ function M.statuscolumn()
   local is_num = vim.wo[win].number
   local is_relnum = vim.wo[win].relativenumber
   if (is_num or is_relnum) and vim.v.virtnum == 0 then
-    if vim.v.relnum == 0 then
-      components[2] = is_num and "%l" or "%r" -- the current line
+    if vim.fn.has("nvim-0.11") == 1 then
+      components[2] = "%l" -- 0.11 handles both the current and other lines with %l
     else
-      components[2] = is_relnum and "%r" or "%l" -- other lines
+      if vim.v.relnum == 0 then
+        components[2] = is_num and "%l" or "%r" -- the current line
+      else
+        components[2] = is_relnum and "%r" or "%l" -- other lines
+      end
     end
     components[2] = "%=" .. components[2] .. " " -- right align
   end

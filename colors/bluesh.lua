@@ -8,12 +8,12 @@
 
 -- TODO: correct inlay hints colors
 
--- Clear hlgroups and set colors_name {{{
+-- Clear hlgroups and set colors_name
 vim.cmd.hi("clear")
 vim.g.colors_name = "bluesh"
--- }}}
+-- 
 
--- Palette {{{
+-- Palette 
 -- stylua: ignore start
 local c_foreground
 local c_background
@@ -100,9 +100,9 @@ else
   c_black      = '#5b6c75'
 end
 -- stylua: ignore end
--- }}}
+-- 
 
--- Set terminal colors {{{
+-- Set terminal colors 
 -- stylua: ignore start
 if vim.go.bg == 'dark' then
   vim.g.terminal_color_0  = c_subtle
@@ -140,11 +140,11 @@ else
   vim.g.terminal_color_15 = c_faded
 end
 -- stylua: ignore end
--- }}}
+--
 
--- Highlight groups {{{1
+-- Highlight groups 1
 local hlgroups = {
-  -- Common {{{2
+  -- Common 2
   ColorColumn = { bg = c_highlight },
   Conceal = { fg = c_foreground },
   CurSearch = { link = "IncSearch" },
@@ -210,9 +210,9 @@ local hlgroups = {
   WinBarNC = { fg = c_faded },
   WinSeparator = { link = "VertSplit" },
   lCursor = { link = "Cursor" },
-  -- }}}2
+  -- 2
 
-  -- Syntax {{{2
+  -- Syntax 2
   Comment = { fg = c_faint, italic = true },
   Constant = { fg = c_faded },
   String = { fg = c_faded },
@@ -249,7 +249,7 @@ local hlgroups = {
   Typedef = { fg = c_salient },
   Special = { fg = c_salient },
   SpecialChar = { link = "Special" },
-  Tag = { fg = c_pine, underline = true },
+  Tag = { fg = c_pine },
   Delimiter = { fg = c_foreground },
   Bracket = { fg = c_foreground },
   SpecialComment = { link = "SpecialChar" },
@@ -259,9 +259,9 @@ local hlgroups = {
   Error = { fg = c_popout },
   Todo = { fg = c_background, bg = c_popout, bold = true },
 
-  -- }}}2
+  -- 2
 
-  -- Treesitter syntax {{{2
+  -- Treesitter syntax 2
   ["@variable.member"] = { link = "Field" },
   ["@property"] = { link = "Field" },
   ["@annotation"] = { link = "Operator" },
@@ -345,9 +345,9 @@ local hlgroups = {
   ["@markup.emphasis"] = { fg = c_popout, bold = true },
   ["@markup.underline"] = { underline = true },
   ["@keyword.operator"] = { link = "Operator" },
-  -- }}}2
+  -- 2
 
-  -- LSP semantic {{{2
+  -- LSP semantic 2
   ["@lsp.type.enum"] = { link = "Type" },
   ["@lsp.type.type"] = { link = "Type" },
   ["@lsp.type.class"] = { link = "Structure" },
@@ -368,17 +368,17 @@ local hlgroups = {
   ["@lsp.typemod.function.defaultLibrary"] = { link = "Function" },
   ["@lsp.typemod.variable.defaultLibrary"] = { link = "Builtin" },
   ["@lsp.typemod.variable.global"] = { link = "Identifier" },
-  -- }}}2
+  -- 2
 
-  -- LSP {{{2
+  -- LSP 2
   LspReferenceText = { link = "Identifier" },
   LspReferenceRead = { link = "LspReferenceText" },
   LspReferenceWrite = { link = "LspReferenceText" },
   LspSignatureActiveParameter = { link = "IncSearch" },
   LspInfoBorder = { link = "FloatBorder" },
-  -- }}}2
+  -- 2
 
-  -- Diagnostic {{{2
+  -- Diagnostic 2
   DiagnosticOk = { fg = c_pine },
   DiagnosticError = { fg = c_critical },
   DiagnosticWarn = { fg = c_popout },
@@ -404,9 +404,9 @@ local hlgroups = {
   DiagnosticSignWarn = { link = "DiagnosticWarn" },
   DiagnosticSignInfo = { link = "DiagnosticInfo" },
   DiagnosticSignHint = { link = "DiagnosticHint" },
-  -- }}}2
+  -- 2
 
-  -- Filetype {{{2
+  -- Filetype 2
   -- HTML
   htmlArg = { fg = c_foreground },
   htmlBold = { bold = true },
@@ -464,9 +464,9 @@ local hlgroups = {
   manReference = { link = "htmlLink" },
   manSectionHeading = { link = "manBold" },
   manUnderline = { fg = c_popout },
-  -- }}}2
+  -- 2
 
-  -- Plugins {{{2
+  -- Plugins 2
   -- netrw
   netrwClassify = { link = "Directory" },
 
@@ -748,7 +748,7 @@ local hlgroups = {
   -- HiPatternsERROR = { link = "DiagnosticError" },
   -- HiPatternsLOVE = { link = c_vermillion },
   -- HiPatternsFIX = { link = "DiagnosticWarn" },
-  -- }}}2
+  -- 2
 
   -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
   -- Modes Colors
@@ -757,9 +757,9 @@ local hlgroups = {
   InsertMode = { fg = c_pine, bold = true },
   CommandMode = { fg = "#ffc73d", bold = true },
 }
--- }}}1
+-- 1
 
--- Highlight group overrides {{{1
+-- Highlight group overrides 1
 if vim.go.bg == "dark" then
   hlgroups.String = { fg = c_popout }
   hlgroups.CmpItemAbbrMatch = { fg = c_critical }
@@ -767,12 +767,12 @@ if vim.go.bg == "dark" then
   hlgroups.TelescopePreviewMatch = { fg = c_critical, bold = true }
   hlgroups.TelescopeMatching = { fg = c_critical, bold = true }
 end
--- }}}1
+-- 1
 
--- Set highlight groups {{{1
+-- Set highlight groups 1
 for hlgroup_name, hlgroup_attr in pairs(hlgroups) do
   vim.api.nvim_set_hl(0, hlgroup_name, hlgroup_attr)
 end
--- }}}1
+-- 1
 
 -- vim:ts=2:sw=2:sts=2:fdm=marker:fdl=0

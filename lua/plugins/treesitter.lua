@@ -62,7 +62,7 @@ return {
           end,
           -- Enable additional vim regex highlighting
           -- in markdown files to get vimtex math conceal
-          additional_vim_regex_highlighting = { "markdown" },
+          -- additional_vim_regex_highlighting = { "markdown" },
         },
         endwise = {
           enable = true,

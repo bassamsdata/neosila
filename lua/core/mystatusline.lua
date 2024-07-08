@@ -9,22 +9,22 @@ local statusline_hls = {}
 ---@param hl string
 ---@return string
 local function get_or_create_hl(hl)
-	local hl_name = "Statusline" .. hl
+  local hl_name = "Statusline" .. hl
 
-	if not statusline_hls[hl] then
-		-- If not in the cache, create the highlight group using the icon's foreground color
-		-- and the statusline's background color.
-		local bg_hl = vim.api.nvim_get_hl(0, { name = "StatusLine" })
-		local fg_hl = vim.api.nvim_get_hl(0, { name = hl })
-		vim.api.nvim_set_hl(
-			0,
-			hl_name,
-			{ bg = ("#%06x"):format(bg_hl.bg), fg = ("#%06x"):format(fg_hl.fg) }
-		)
-		statusline_hls[hl] = true
-	end
+  if not statusline_hls[hl] then
+    -- If not in the cache, create the highlight group using the icon's foreground color
+    -- and the statusline's background color.
+    local bg_hl = vim.api.nvim_get_hl(0, { name = "StatusLine" })
+    local fg_hl = vim.api.nvim_get_hl(0, { name = hl })
+    vim.api.nvim_set_hl(
+      0,
+      hl_name,
+      { bg = ("#%06x"):format(bg_hl.bg), fg = ("#%06x"):format(fg_hl.fg) }
+    )
+    statusline_hls[hl] = true
+  end
 
-	return hl_name
+  return hl_name
 end
 
 -- Function to get the current mode text
@@ -79,7 +79,7 @@ local function get_cwd()
 end
 
 -- Function to get the current file path relative to CWD and modified status
-local function get_filename()-- {{{
+local function get_filename()
 	local file = vim.fn.expand("%:p") -- Get the full path of the current file
 	local cwd = vim.fn.getcwd() -- Get the current working directory{{{
 	local modified = vim.bo.modified and "  " or ""-- }}}
@@ -94,7 +94,7 @@ local function get_filename()-- {{{
 	end
 
 	return string.format("%%#StatusLineFile# %s%%#StatusLineModified#%s ", relative_path, modified)
-end-- }}}
+end
 
 ---@return string
 local function get_git_status()
@@ -280,8 +280,10 @@ function statusline.active()
 		get_mode(),
 		get_cwd(),
 		get_git_status(),
+    " %<",
 		"%=",
 		get_filename(),
+    "%<",
 		"%=",
 		arrow_not(),
 		get_diagnostics(),

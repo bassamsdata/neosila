@@ -283,7 +283,7 @@ local hlgroups = {
   Typedef = { fg = c_beige },
   Special = { fg = c_orange },
   SpecialChar = { link = 'Special' },
-  Tag = { fg = c_flashlight, underline = true },
+  Tag = { fg = c_flashlight},
   Delimiter = { fg = c_orange },
   Bracket = { fg = c_cumulonimbus },
   SpecialComment = { link = 'SpecialChar' },
