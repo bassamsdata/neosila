@@ -1,4 +1,3 @@
-local M = {}
 local opt = vim.opt
 
 -- set leader key to space
@@ -75,7 +74,7 @@ opt.fillchars:append({
 -- opt.splitkeep = "screen"
 opt.laststatus = 3
 opt.pumheight = 10 -- Maximum number of entries in a popup
-opt.sidescrolloff = 4
+-- opt.sidescrolloff = 4
 --spli windows
 opt.splitright = true
 opt.splitbelow = true
@@ -95,7 +94,8 @@ opt.cpoptions:append(">")
 -- completion
 vim.opt.wildignore:append({ ".DS_Store" })
 -- opt.conceallevel = 2 -- Hide * markup for bold and italic
-opt.foldcolumn = "1"
+opt.foldcolumn = "0"
+opt.foldenable = false
 opt.foldlevel = 999
 opt.foldmethod = "indent"
 -- opt.foldtext = "v:lua.require'utils'.foldtext()"
@@ -177,5 +177,8 @@ end
 _load("plugin/rplugin.vim", "loaded_remote_plugins", "FileType")
 _load("provider/python3.vim", "loaded_python3_provider", "FileType")
 _load("plugin/matchit.vim", "loaded_matchit", "FileType")
-
-return M
+_load("plugin/matchparen.vim", "loaded_matchparen", "FileType")
+_load("plugin/tohtml.lua", "loaded_tohtml", "FileType")
+_load("plugin/tutor.lua", "loaded_tutor_mode", "FileType")
+_load("plugin/man.lua", "loaded_man", "FileType")
+_load("plugin/spellfile.vim", "loaded_spellfile", "FileType")

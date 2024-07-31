@@ -2,54 +2,132 @@ if vim.env.NVIM_TESTING then
   return {}
 end
 return {
-  -- lua with lazy.nvim
   {
-    "max397574/better-escape.nvim",
-    event = "InsertEnter",
+    "AlexvZyl/nordic.nvim",
+    lazy = false,
+    -- priority = 1000,
+    config = function()
+      local palette = require("nordic.colors")
+      require("nordic").load()
+      require("nordic").setup({
+        override = {
+          MatchParen = {
+            fg = palette.yellow.dim,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          },
+        },
+      })
+    end,
+  },
+
+  {
+    "vague2k/vague.nvim",
+    config = function()
+      require("vague").setup({
+        -- optional configuration here
+      })
+    end,
+  },
+
+  {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    keys = {
+      {
+        "<leader>-",
+        function()
+          require("oil").open()
+        end,
+        desc = "Open parent directory",
+      },
+    },
     opts = {},
+    -- Optional dependencies
+    dependencies = { "echasnovski/mini.icons" },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   },
   {
-    "EdenEast/nightfox.nvim",
-    lazy = false,
-    priority = 1000,
+    "echasnovski/mini.ai",
+    enabled = function()
+      return not vim.b.bigfile
+    end,
+
+    event = "BufReadPost",
+    opts = function()
+      local ai = require("mini.ai")
+      local gen_ai_spec = require("mini.extra").gen_ai_spec
+      return {
+        n_lines = 500,
+        custom_textobjects = {
+          o = ai.gen_spec.treesitter({ -- code block
+            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+          }),
+          f = ai.gen_spec.treesitter({
+            a = "@function.outer",
+            i = "@function.inner",
+          }), -- function
+          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }), -- class
+          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" }, -- tags
+          d = { "%f[%d]%d+" }, -- digits
+          e = { -- Word with case
+            {
+              "%u[%l%d]+%f[^%l%d]",
+              "%f[%S][%l%d]+%f[^%l%d]",
+              "%f[%P][%l%d]+%f[^%l%d]",
+              "^[%l%d]+%f[^%l%d]",
+            },
+            "^().*()$",
+          },
+          i = gen_ai_spec.indent(),
+          g = gen_ai_spec.buffer(),
+          u = ai.gen_spec.function_call(), -- u for "Usage"
+          U = ai.gen_spec.function_call({ name_pattern = "[%w_]" }), -- without dot in function name
+        },
+      }
+    end,
+  },
+  {
+
+    "max397574/better-escape.nvim",
+    event = "InsertEnter",
     opts = {
-      options = {
-        styles = {
-          comments = "italic",
-          keywords = "bold",
-          types = "italic,bold",
+      default_mappings = false,
+      mappings = {
+        i = {
+          j = {
+            -- These can all also be functions
+            k = "<Esc>",
+            j = "<Esc>",
+          },
         },
-      },
-      -- TODO: need to change the statusline higlights
-      -- change minidiff amd minimap colors
-      groups = {
-        all = {
-          NormalFloat = { link = "Normal" },
+        c = {
+          j = {
+            k = "<Esc>",
+            j = "<Esc>",
+          },
         },
-        -- orignial colors
-        -- hi Normal guifg=#cdcecf guibg=#2e3440
-        -- hi NormalFloat guifg=#cdcecf guibg=#232831
+        t = {
+          j = {
+            k = "<Esc>",
+            j = "<Esc>",
+          },
+        },
+        s = {
+          j = {
+            k = "<Esc>",
+          },
+        },
       },
     },
   },
   {
     "2kabhishek/nerdy.nvim",
     dependencies = { "echasnovski/mini.pick" },
-    cmd = "Nerdy",
-  },
 
-  {
-    "chrisgrieser/nvim-rip-substitute",
-    keys = {
-      {
-        "<leader>sf",
-        function()
-          require("rip-substitute").sub()
-        end,
-        mode = { "n", "x" },
-        desc = " rip substitute",
-      },
-    },
+    cmd = "Nerdy",
   },
 
   {
@@ -63,19 +141,12 @@ return {
       )
       vim.g.matchup_matchparen_offscreen = {
         method = "popup",
+
         highlight = "OffScreenPopup",
       }
     end,
   },
 
-  {
-    "sho-87/kanagawa-paper.nvim",
-    lazy = false,
-    priority = 500,
-    opts = {},
-  },
-
-  { "catppuccin/nvim", name = "catppuccin", event = "VeryLazy" },
   {
     "lewis6991/hover.nvim",
     event = "BufReadPost",
@@ -150,46 +221,11 @@ return {
   },
 
   {
-    "otavioschwanck/arrow.nvim",
-    event = "BufReadPost",
-    cmd = "Arrow open",
-    keys = {
-      { "<C-,>" },
-      { "," },
-    },
-    config = function()
-      vim.g.arrow_enabled = true
-      require("arrow").setup({
-        show_icons = true,
-        leader_key = "<C-,>",
-        buffer_leader_key = ",", -- Per Buffer Mappings
-        separate_save_and_remove = true, -- if true, will remove the toggle and create the save/remove keymaps.
-        always_show_path = true,
-        window = {
-          border = "rounded",
-        },
-      })
-    end,
-  },
-
-  {
     "dstein64/vim-startuptime",
     cmd = "StartupTime",
     config = function()
       vim.g.startuptime_tries = 10
     end,
-  },
-
-  {
-    "brenoprata10/nvim-highlight-colors",
-    enabled = function()
-      return not vim.b.bigfile
-    end,
-    event = "BufReadPost",
-    opts = {
-      render = "virtual",
-      virtual_symbol = "",
-    },
   },
 
   {
@@ -206,22 +242,6 @@ return {
           SymbolKind.Struct,
         },
       })
-    end,
-  },
-
-  {
-    "sam4llis/nvim-tundra",
-    event = "VeryLazy",
-    opts = {},
-    config = function(_, opts)
-      local hlgroups = {
-        TermCursor = { fg = "#111827", bg = "#fca5a5" },
-        MiniIndentscopeSymbol = { link = "Whitespace" },
-      }
-
-      for hlgroup_name, hlgroup_attr in pairs(hlgroups) do
-        vim.api.nvim_set_hl(0, hlgroup_name, hlgroup_attr)
-      end
     end,
   },
 
@@ -250,22 +270,6 @@ return {
   --  },
   -- },
 
-  {
-    "echasnovski/mini.icons",
-    opts = {},
-    lazy = true,
-    -- specs = {
-    --   { "nvim-tree/nvim-web-devicons", enabled = false, optional = true },
-    -- },
-    init = function()
-      package.preload["nvim-web-devicons"] = function()
-        -- needed since it will be false when loading and mini will fail
-        -- package.loaded["nvim-web-devicons"] = {}
-        require("mini.icons").mock_nvim_web_devicons()
-        return package.loaded["nvim-web-devicons"]
-      end
-    end,
-  },
   {
     "bfredl/nvim-miniyank",
     -- stylua: ignore start

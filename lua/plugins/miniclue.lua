@@ -103,6 +103,7 @@ return {
           { mode = "n", keys = "]" },
           -- R and Python
           { mode = "n", keys = "\\" },
+          { mode = "v", keys = "\\" },
         },
         window = {
           -- Delay before showing clue window

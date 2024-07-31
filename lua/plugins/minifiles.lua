@@ -6,11 +6,12 @@ local autocmd = vim.api.nvim_create_autocmd
 return {
   {
     "echasnovski/mini.files",
+    dependencies = { "echasnovski/mini.icons" },
     -- Thanks  to Bekaboo for the init function https://github.com/Bekaboo/nvim
     init = function() -- Load files on startup only when editing a directory
-      -- vim.g.loaded_fzf_file_explorer = 1
-      -- vim.g.loaded_netrw = 1
-      -- vim.g.loaded_netrwPlugin = 1
+      vim.g.loaded_fzf_file_explorer = 1
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
       vim.api.nvim_create_autocmd("BufWinEnter", {
         nested = true,
         callback = function(info)

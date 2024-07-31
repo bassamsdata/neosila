@@ -40,10 +40,6 @@ return {
     event = { "LspAttach", "BufReadPost" },
     dependencies = {
       "hrsh7th/cmp-path", -- source for file system paths
-      -- "L3MON4D3/LuaSnip", -- snippet engine
-      -- "saadparwaiz1/cmp_luasnip", -- for autocompletion
-      "rafamadriz/friendly-snippets", -- useful snippets
-      "onsails/lspkind.nvim", -- vs-code like pictograms
     },
     config = function()
       local cmp = require("cmp")
@@ -59,16 +55,20 @@ return {
         end
       end)
 
+      local kind_icons = {
+        ellipsis_char = "...",
+        Copilot = "",
+        Supermaven = "",
+        Codeium = "",
+        Otter = "🦦",
+        Cody = "",
+        Cmp_r = "R",
+      }
+
       cmp.setup({
-        -- Other configurations...
         enabled = function()
           return not vim.b.bigfile
         end,
-        -- snippet = { -- configure how nvim-cmp interacts with snippet engine
-        -- 	expand = function(args)
-        -- 		luasnip.lsp_expand(args.body)
-        -- 	end,
-        -- },
         preselect = cmp.PreselectMode.None,
         view = {
           entries = {
@@ -76,8 +76,12 @@ return {
           },
         },
         mapping = cmp.mapping.preset.insert({
-          ["<C-p>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-          ["<C-n>"] = cmp.mapping.select_next_item(), -- next suggestion
+          ["<C-p>"] = cmp.mapping.select_prev_item({
+            behavior = cmp.SelectBehavior.Select,
+          }),
+          ["<C-n>"] = cmp.mapping.select_next_item({
+            behavior = cmp.SelectBehavior.Select,
+          }),
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-,>"] = cmp.mapping.complete(), -- show completion suggestions
@@ -98,10 +102,14 @@ return {
             end
           end),
           ["<C-l>"] = cmp.mapping.close(),
-          -- ["<Down>"] = function(fb)
-          -- 	cmp.close()()
-          -- end,
           ["<C-y>"] = cmp.mapping.confirm({ select = true }),
+          ["<C-m>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.confirm({ select = true })
+            else
+              fallback()
+            end
+          end),
           ["<Tab>"] = cmp.mapping(function(fallback)
             if neocodeium.visible() then
               neocodeium.accept()
@@ -127,8 +135,6 @@ return {
           { name = "otter" },
           { name = "cmp_r" },
           { name = "nvim_lsp" },
-          -- { qame = "cmp_tabnine" },
-          -- { name = "luasnip" }, -- snippets
           {
             name = "buffer",
             max_item_count = 8,
@@ -138,43 +144,21 @@ return {
           }, -- text within current buffer
           { name = "path", priority = 50 }, -- file system paths
         }),
-        -- configure lspkind for vs-code like pictograms in completion menu
+
         formatting = {
-          fields = { "kind", "abbr", "menu" },
-          format = function(entry, vim_item)
-            local function commom_format(e, item)
-              local kind = require("lspkind").cmp_format({
-                -- mode = "symbol_text",
-                maxwidth = 50,
-                ellipsis_char = "...",
-                symbol_map = {
-                  Supermaven = "",
-                  Codeium = "",
-                  otter = "🦦",
-                  Cody = "",
-                  cmp_r = "R",
-                },
-                -- show_labelDetails = true, -- show labelDetails in menu. Disabled by default
-              })(e, item)
-              local strings = vim.split(kind.kind, "%s", { trimempty = true })
-              kind.kind = " " .. (strings[1] or "") .. " "
-              kind.menu = ""
-              kind.concat = kind.abbr
-              return kind
+          format = function(_, vim_item)
+            local icon, hl, is_default =
+              require("mini.icons").get("lsp", vim_item.kind)
+            -- If the icon is not found in mini.icons (is_default is true), use the fallback
+            if is_default then
+              icon = kind_icons[vim_item.kind] or "󰞋"
+              hl = "CmpItemKind" .. vim_item.kind
             end
-            return commom_format(entry, vim_item)
+            vim_item.kind = icon -- .. " " .. vim_item.kind
+            vim_item.kind_hl_group = hl
+            return vim_item
           end,
-          -- format = lspkind.cmp_format({
-          -- 	-- mode = "symbol_text",
-          -- 	maxwidth = 50,
-          -- 	ellipsis_char = "...",
-          -- 	symbol_map = {
-          -- 		Codeium = "",
-          -- 		otter = "🦦",
-          -- 		Cody = "",
-          -- 		cmp_nvim_r = "R",
-          -- 	},
-          -- }),
+          fields = { "kind", "abbr" }, -- "menu",
         },
         window = {
           -- completion = {

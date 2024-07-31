@@ -17,10 +17,7 @@ return {
         -- Conform can also run multiple formatters sequentially
         python = { "isort", "black" },
         quarto = { "injected" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        go = { "goimports", "gofumpt", "gomodifytags" },
       },
       formatters = {
         injected = {

@@ -404,8 +404,8 @@ end
 --- @return string
 function M.get_mode_hl()
   local mode_hls = {
-    n = "NormalMode",
-    i = "InsertMode",
+    n = "NormalMode" and "NormalMode" or "CursorLineNr",
+    i = "InsertMode" and "InsertMode" or "TermCursor",
     v = "VisualMode",
     V = "VisualMode",
     ["\22"] = "VisualMode",

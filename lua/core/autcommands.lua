@@ -44,7 +44,16 @@ autocmd("BufReadPre", {
       vim.opt_local.signcolumn = "no"
       vim.opt_local.foldcolumn = "0"
       vim.opt_local.winbar = ""
+      vim.opt_local.syntax = ""
       vim.cmd.syntax("off")
+      autocmd("BufReadPost", {
+        once = true,
+        buffer = info.buf,
+        callback = function()
+          vim.opt_local.syntax = ""
+          return true
+        end,
+      })
     end
   end,
 })
@@ -152,13 +161,25 @@ local function save_cursorline_colors()
 end
 
 local function update_cursorline_colors(is_recording)
-  local gui = vim.o.background == "dark" and "#223322" or "#aaffaa"
+  -- get TermCursor highlight
+  local TermCur_colors = vim.api.nvim_get_hl(0, { name = "TermCursor" })
+  local TermCurhl_bg = ("#%06x"):format(TermCur_colors.bg)
+  local TermCurhl_fg = ("#%06x"):format(TermCur_colors.fg)
+  vim.notify("TermCur_hl: " .. TermCurhl_fg, vim.log.levels.INFO)
+  local gui_bg = vim.o.background == "dark" and TermCurhl_bg or "#aaffaa"
+  local gui_fg = vim.o.background == "dark" and TermCurhl_fg or "#aaffaa"
   local cterm = vim.o.background == "dark" and "2" or "10"
   if not is_recording then
-    gui = _G.cursorline_bg_orig_gui
+    gui_bg = _G.cursorline_bg_orig_gui
+    -- gui_fg = _G.cursorline_bg_orig_gui
     cterm = _G.cursorline_bg_orig_cterm
   end
-  vim.cmd(string.format("hi CursorLine guibg=%s ctermbg=%s", gui, cterm))
+  vim.cmd(string.format(
+    "hi CursorLine  guibg=%s ctermbg=%s",
+    -- gui_fg,
+    gui_bg,
+    cterm
+  ))
 end
 
 vim.api.nvim_create_augroup("macro_visual_indication", {})

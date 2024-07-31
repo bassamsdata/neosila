@@ -23,6 +23,7 @@ function M.config()
     "gopls",
   }
   require("mason").setup({
+    ensure_installed = { "goimports", "gofumpt", "gomodifytags" },
     ui = {
       border = "rounded",
       width = 0.7,

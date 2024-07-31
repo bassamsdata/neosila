@@ -10,7 +10,6 @@ vim.cmd.hi("clear")
 vim.g.colors_name = "original_cockatoo"
 -- }}}
 --
--- TODO: add color shades function
 
 -- Palette {{{
 -- stylua: ignore start

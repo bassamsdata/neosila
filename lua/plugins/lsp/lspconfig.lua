@@ -4,6 +4,7 @@ end
 return {
   { -- LSP signature help
     "deathbeam/autocomplete.nvim",
+    dev = true,
     enabled = vim.fn.has("nvim-0.10") == 1,
     ft = { "lua", "r", "python", "sql", "markdown" },
     config = function()
@@ -11,6 +12,7 @@ return {
         border = "rounded", -- Signature help border style
         debounce_delay = 100,
         max_width = 80,
+        keymap = { toggle_signature = "<C-f>" },
       })
     end,
   },
@@ -119,24 +121,17 @@ return {
         -- map("n", "gt", "<cmd>Pick lsp scope='type_definition'<CR>", opts) -- show lsp type definitions
         map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
         map("n", "<leader>rn", require("utils.lsp").lsp_rename, opts) -- smart rename
-        map("i", "<C-k>", function()
-          require("lsp_signature").toggle_float_win()
-        end, opts)
-        -- map("n", "<leader>k", function()
-        -- 	require("lsp_signature").toggle_float_win()
-        -- end, opts)
-        map("n", "<leader>D", "<cmd>Pick diagnostic<CR>", opts) -- show  diagnostics for file
+        map("n", "<leader>D", "<cmd>Pick diagnostic scope='current'<CR>", opts) -- show  diagnostics for file
         map("n", "<leader>ud", function()
-          --TODO: toggle statusline as well
           vim.diagnostic.enable(not vim.diagnostic.is_enabled())
         end, opts)
         map("n", "<leader>ui", function()
+          ---@diagnostic disable-next-line
           vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
         end, { desc = "Toggle inlay hints" })
-        map("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
-        map("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
-        opts.desc = "Restart LSP"
-        map("n", "<leader>rs", "<cmd>LspRestart<cr>", opts) -- mapping to restart lsp if necessary
+        map("n", "<leader>d", vim.diagnostic.open_float) -- show diagnostics for line
+        map("n", "K", vim.lsp.buf.hover) -- show documentation for what is under cursor
+        map("n", "<leader>rs", "<cmd>LspRestart<cr>") -- mapping to restart lsp if necessary
       end
 
       -- Change the Diagnostic symbols in the sign column (gutter)
@@ -197,6 +192,7 @@ return {
         on_attach = on_attach,
         settings = {
           gopls = {
+            gofumpt = true,
             usePlaceholders = true,
             completeFunctionCalls = true,
             hints = {
@@ -205,7 +201,7 @@ return {
               compositeLiteralTypes = true,
               constantValues = true,
               functionTypeParameters = true,
-              -- parameterNames = true,
+              parameterNames = false,
               rangeVariableTypes = true,
             },
             -- codelens
@@ -219,14 +215,20 @@ return {
               upgrade_dependency = true,
               vendor = true,
             },
-            semanticTokens = false,
-            experimentalPostfixCompletions = false,
+            completeUnimported = true,
+            staticcheck = true,
+            directoryFilters = {
+              "-.git",
+              "-.vscode",
+              "-.idea",
+              "-.vscode-test",
+              "-node_modules",
+            },
+            semanticTokens = true,
             analyses = {
               unusedparams = true,
               shadow = true,
             },
-            staticcheck = true,
-            gofumpt = true,
           },
           gofmt = true,
           --[[ init_options = {
@@ -276,7 +278,9 @@ return {
           if
             not path
             or not (
-              (vim.uv or vim.loop).fs_stat(path .. "/.luarc.lua")
+                            ---@diagnostic disable-next-line: undefined-field
+(vim.uv or vim.loop).fs_stat(path .. "/.luarc.lua")
+              ---@diagnostic disable-next-line: undefined-field
               or (vim.uv or vim.loop).fs_stat(path .. "/.luarc")
             )
           then

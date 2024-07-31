@@ -12,6 +12,7 @@ vim.g.colors_name = "cockatoo"
 
 -- Palette {{{
 -- stylua: ignore start
+
 local c_yellow
 local c_earth
 local c_orange

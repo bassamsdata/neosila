@@ -48,9 +48,10 @@ return {
           env = false,
         },
       })
+
       map("i", "<C-y>", neocodeium.accept)
       map("i", "<C-e>", neocodeium.accept)
-      map("i", "<M-f>", neocodeium.accept_line)
+      map("i", "<M-l>", neocodeium.accept_line)
       map("i", "<M-w>", neocodeium.accept_word)
       map("i", "<M-c>", neocodeium.clear)
       map("i", "<M-]>", neocodeium.cycle_or_complete)

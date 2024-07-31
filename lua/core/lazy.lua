@@ -5,7 +5,7 @@ end
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 ---@diagnostic disable-next-line: undefined-field
 if not vim.uv.fs_stat(lazypath) then
-  print("Initializing lazy.nvim for the first")
+  print("Initializing lazy.nvim for the first time...")
   vim.fn.system({
     "git",
     "clone",

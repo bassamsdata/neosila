@@ -1,15 +1,35 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 return {
   {
     "MeanderingProgrammer/markdown.nvim",
-    ft = { "markdown", "rmd", "quarto" },
-    name = "render-markdown",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "echasnovski/mini.icons",
-    },
     opts = {
       file_types = { "markdown", "rmd", "quarto" },
+      code = {
+        sign = false,
+        width = "block",
+        right_pad = 1,
+      },
+      heading = {
+        -- icons = { "󰼏  ", "󰼐  ", "󰼑  ", "󰼒  ", "󰼓  ", "󰼔  " },
+        sign = false,
+        icons = {},
+      },
     },
+    ft = { "markdown", "rmd", "quarto" },
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+      vim.keymap.set("n", "<leader>um", function()
+        local enabled = require("render-markdown.state").enabled
+        local m = require("render-markdown")
+        if enabled then
+          m.enable()
+        else
+          m.disable()
+        end
+      end, { desc = "Toggle markdown rendering" })
+    end,
   },
   {
     "iamcco/markdown-preview.nvim",

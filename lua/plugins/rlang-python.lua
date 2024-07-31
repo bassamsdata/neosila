@@ -72,15 +72,22 @@ return {
     "GCBallesteros/jupytext.nvim",
     lazy = true,
     opts = {
-      style = "markdown",
-      output_extension = "md",
-      force_ft = "markdown",
+      style = "quarto",
+      output_extension = "qmd",
+      force_ft = "quarto",
     },
   },
   {
     "quarto-dev/quarto-nvim",
     dependencies = {
-      { "jmbuhr/otter.nvim", opts = {} }, -- , dev = true },
+      {
+        "jmbuhr/otter.nvim",
+        opts = {
+          buffers = {
+            write_to_disk = true,
+          },
+        },
+      }, -- , dev = true },
       "hrsh7th/nvim-cmp",
       "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter",

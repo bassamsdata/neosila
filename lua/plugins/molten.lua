@@ -19,6 +19,7 @@ return {
       -- vim.g.molten_use_border_highlights = true
       -- vim.g.molten_virt_lines_off_by_0 = false
       vim.g.molten_wrap_output = true
+      vim.g.molten_output_win_max_width = 120
       -- vim.g.molten_tick_rate = 175
       vim.g.molten_auto_image_popup = true
 
@@ -26,6 +27,7 @@ return {
       local map = vim.keymap.set
       -- stylua: ignore start 
       map( "n", "<localleader>im", ":MoltenInit<CR>", { desc = "Initialize Molten", silent = true })
+      map( "n", "<localleader>iir", function() vim.cmd("MoltenInit ir") end, { desc = "Initialize Molten", silent = true })
       map("n",  "<localleader>ir", function() vim.cmd("MoltenInit rust") end,
         { desc = "Initialize Molten for Rust", silent = true })
       -- stylua: ignore end

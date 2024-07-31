@@ -228,7 +228,7 @@ map(
 map("n",  "<leader>ff",      "<cmd>Pick frecency<cr>",                        { desc = "Find [F]iles" })
 map("n",  "<leader>fn",      "<cmd>Pick config<cr>",                          { desc = "Find [N]vim config" })
 map("n",  "<leader>fp",      "<cmd>Pick registry<cr>",                        { desc = "Find [P]icker" })
-map("n",  "<leader>/",      "<cmd>Pick grep_live<cr>",                       { desc = "Find [G]rep_live" })
+map("n",  "<leader>/",       "<cmd>Pick grep_live<cr>",                       { desc = "Find [G]rep_live" })
 map( "n", "<leader>fG",      "<cmd>Pick grep pattern='<cword>'<cr>",          { desc = "Find [C]urrent word" })
 map("n",  "<leader>fo",      "<cmd>Pick oldfiles<cr>",                        { desc = "Find [O]ld files" })
 map("n",  "<leader>fr",      "<cmd>Pick resume<cr>",                          { desc = "Find [R]esume" })

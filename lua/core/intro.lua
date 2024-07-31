@@ -1,3 +1,4 @@
+vim.opt.shortmess:append("I")
 local intro = {}
 
 ---@param dict table

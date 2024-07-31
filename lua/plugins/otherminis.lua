@@ -130,7 +130,7 @@ return {
               anchor = "SE",
               title = "Notification ❰❰",
               title_pos = "right",
-              border = "solid",
+              border = "none",
             }
           end,
           max_width_share = 0.6,

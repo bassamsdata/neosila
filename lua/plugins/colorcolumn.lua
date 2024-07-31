@@ -3,6 +3,7 @@ if vim.env.NVIM_TESTING then
 end
 return {
   "Bekaboo/deadcolumn.nvim",
+  dev = true,
   enabled = function()
     return not vim.b.bigfile
   end,
@@ -10,6 +11,7 @@ return {
   config = function()
     vim.opt.colorcolumn = "80"
     local opts = {
+      enable_toggle = true,
       modes = { "i" }, -- add normal mode when this gets solved: https://github.com/neovim/neovim/issues/27470
       blending = {
         threshold = 0.75,
