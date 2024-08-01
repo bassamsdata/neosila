@@ -191,6 +191,7 @@ function M.grepandopen()
     if pattern ~= nil then
       vim.cmd("silent grep! " .. pattern)
       vim.cmd("copen")
+      vim.fn.matchadd("Search", pattern)
     end
   end)
 end
@@ -201,10 +202,10 @@ function M.helpgrepnopen()
     if pattern ~= nil then
       vim.cmd("silent helpgrep " .. pattern)
       vim.cmd("copen")
+      vim.fn.matchadd("Search", pattern)
     end
   end)
 end
-vim.keymap.set("n", "<leader>ug", M.helpgrepnopen)
 
 --This code below regarding statuscolumn was borrowed from LazyVim.
 --credit to folke/LazyVim https://github.com/LazyVim/LazyVim

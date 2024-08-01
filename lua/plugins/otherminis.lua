@@ -164,10 +164,12 @@ return {
     },
     opts = {},
   },
+
   {
     "folke/todo-comments.nvim",
-    event = "BufRead",
+    event = "BufReadPost",
     dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "TodoTrouble", "TodoQuickFix" },
     opts = {
       keywords = {
         -- stylua: ignore start 
@@ -180,6 +182,7 @@ return {
         TEST = { icon = "󰙨", color = "test", alt = { "TESTING", "PASSED", "FAILED" }, },
         DEL = { icon = " ", color = "error", alt = { "DELETE" } },
         SUG = { icon = "󰭙 ", color = "info", alt = { "SUGGEST" } },
+        SCHE = { icon = "󱫌 ", color = "sche", alt = { "SCHEDULE", "SCHED" } },
         -- stylua: ignore end
       },
       colors = {
@@ -189,6 +192,7 @@ return {
         hint = { "DiagnosticHint", "#10B981" },
         default = { "Identifier", "#7C3AED" },
         test = { "Identifier", "#FF00FF" },
+        sche = { "DiagnosticOk", "WarningMsg", "#fca5a5" },
       },
     },
   },

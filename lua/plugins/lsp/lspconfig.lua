@@ -4,7 +4,7 @@ end
 return {
   { -- LSP signature help
     "deathbeam/autocomplete.nvim",
-    dev = true,
+    dev = true, -- SCHE: next-weekend night, until it's merged
     enabled = vim.fn.has("nvim-0.10") == 1,
     ft = { "lua", "r", "python", "sql", "markdown" },
     config = function()

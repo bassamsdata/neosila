@@ -289,7 +289,6 @@ local hlgroups = {
   Ignore = { fg = c_iron },
   Error = { fg = c_scarlet },
   Todo = { fg = c_black, bg = c_beige, bold = true },
-    -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
   NormalMode = { fg = c_orange, bold =true},
   VisualMode = { fg = "#cb4251", bold =true },
   InsertMode = { fg = c_aqua, bold =true },
@@ -544,7 +543,7 @@ local hlgroups = {
   CmpItemMenu = { link = 'Pmenu' },
   CmpVirtualText = { fg = c_steel, italic = true },
 
-  -- TODO: add minidiff highlights to the colorscheme
+  -- : add minidiff highlights to the colorscheme
   --
   -- MiniDiff
   MiniDiffSignAdd = { fg = c_tea_blend },

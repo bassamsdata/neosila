@@ -6,7 +6,7 @@
 -- Last Updated: Sun 21 Apr 2024
 -- base theme:   nano - Bekaboo https://github.com/Bekaboo/nvim/blob/master/colors/nano.lua
 
--- TODO: correct inlay hints colors
+-- : correct inlay hints colors
 
 -- Clear hlgroups and set colors_name
 vim.cmd.hi("clear")
@@ -224,7 +224,7 @@ local hlgroups = {
   Float = { link = "Number" },
   Identifier = { fg = c_foreground },
   Builtin = { fg = c_foreground },
-  -- TODO: make it light shade
+  -- : make it light shade
   Field = { link = "None" },
   Enum = { fg = c_faded },
   Namespace = { fg = c_foreground },
@@ -503,7 +503,7 @@ local hlgroups = {
   CmpItemMenu = { link = "Pmenu" },
   CmpVirtualText = { fg = c_faint, italic = true },
 
-  -- TODO: add minidiff highlights to the colorscheme
+  -- : add minidiff highlights to the colorscheme
   --
   -- MiniDiff
   MiniDiffSignAdd = { fg = c_tea },
@@ -511,7 +511,7 @@ local hlgroups = {
   MiniDiffSignDelete = { fg = c_vermillion },
   MiniDiffOverAdd = { link = "DiffAdded" },
   MiniDiffOverChange = { fg = c_lavender, bg = c_violet },
-  MiniDiffOverDelete = { fg = c_popout }, -- TODO: add more colors
+  MiniDiffOverDelete = { fg = c_popout }, -- : add more colors
   MiniDiffOverContext = { fg = c_subtle }, -- More colors
 
   -- gitsigns
@@ -750,7 +750,7 @@ local hlgroups = {
   -- HiPatternsFIX = { link = "DiagnosticWarn" },
   -- 2
 
-  -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
+  -- : Organize this - these are used in ModeChanged event for CursorLineNr
   -- Modes Colors
   NormalMode = { fg = c_faded, bold = true },
   VisualMode = { fg = c_vermillion, bold = true },

@@ -45,6 +45,7 @@ end, { expr = true })
 map("n", "<localleader>rf", 'yiw?^[a-z]<CR>gf:<C-r>"<CR>')
 -- open grep directly and then open quickfix with the results
 map("n", "<localleader>g", u.grepandopen, { desc = "Grep and open quickfix" })
+map("n", "<leader>ug", u.helpgrepnopen, { desc = "Grephelp and open quickfix" })
 -- motions -- I really didn't know about such amazing keymaps `:h omap-info`
 -- entire buffer (https://vi.stackexchange.com/a/2321)
 -- like you can do `daa` to delete entire buffer, `yaa` to yank entire buffer
@@ -62,12 +63,12 @@ map("n", "<up>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
 map("n", "<down>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
 map("n", "<C-c>", "<cmd>normal! ciw<cr>i")
 -- stylua: ignore end
-map(
-  "n",
-  "<localleader>mm",
-  u.messages_to_quickfix,
-  { desc = ":Messages to quickfix" }
-)
+-- map(
+--   "n",
+--   "<localleader>mm",
+--   u.messages_to_quickfix,
+--   { desc = ":Messages to quickfix" }
+-- )
 map(
   "n",
   "<Leader>tr",
@@ -410,7 +411,7 @@ map("n", "<C-s>", function() -- Select first file
   end
 end, { desc = "Select first file", silent = true })
 
-map("n", "<C-m>", function() -- Select second file
+map("n", "<C-x>", function() -- Select second file
   local _ = pcall(require, "arrow")
   local arrow_files = vim.g.arrow_filenames
 

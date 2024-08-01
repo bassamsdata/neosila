@@ -197,7 +197,7 @@ local hlgroups = {
   Float = { link = "Number" },
   Identifier = { fg = c_foreground },
   Builtin = { fg = c_foreground },
-  -- TODO: make it light shade
+  -- : make it light shade
   Field = { link = "None" },
   Enum = { fg = c_faded },
   Namespace = { fg = c_foreground },
@@ -476,7 +476,7 @@ local hlgroups = {
   CmpItemMenu = { link = "Pmenu" },
   CmpVirtualText = { fg = c_faint, italic = true },
 
-  -- TODO: add minidiff highlights to the colorscheme
+  -- : add minidiff highlights to the colorscheme
   --
   -- MiniDiff
   -- MiniDiffSignAdd = { fg = c_tea_blend },
@@ -721,7 +721,7 @@ local hlgroups = {
   -- HiPatternsFIX = { link = "DiagnosticWarn" },
   -- }}}2
 
-  -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
+  -- : Organize this - these are used in ModeChanged event for CursorLineNr
   -- Modes Colors
   NormalMode = { fg = c_faded, bold = true },
   VisualMode = { fg = c_vermillion, bold = true },

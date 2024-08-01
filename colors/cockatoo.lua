@@ -293,7 +293,7 @@ local hlgroups = {
   Ignore = { fg = c_iron },
   Error = { fg = c_scarlet },
   Todo = { fg = c_black, bg = c_beige, bold = true },
-  -- TODO: Organize this - these are used in ModeChanged event for CursorLineNr
+  -- : Organize this - these are used in ModeChanged event for CursorLineNr
   NormalMode = { fg = c_magenta},
   VisualMode = { fg = "#cb4251" },
   InsertMode = { fg = c_aqua },

@@ -2,6 +2,7 @@ if vim.env.NVIM_TESTING then
   return {}
 end
 return {
+  { "folke/trouble.nvim", opts = {} },
   {
     "AlexvZyl/nordic.nvim",
     lazy = false,
@@ -13,6 +14,19 @@ return {
         override = {
           MatchParen = {
             fg = palette.yellow.dim,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          },
+          ["@parameter"] = {
+            fg = palette.white_alt,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          },
+          Search = {
+            fg = palette.yellow.dim,
+            bg = palette.black0,
             italic = false,
             underline = false,
             undercurl = false,
