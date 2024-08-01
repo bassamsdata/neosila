@@ -10,3 +10,5 @@ require("nvterminal")
 if vim.g.vscode ~= nil then
   require("core.vscode")
 end
+
+require("functions.calendar")
