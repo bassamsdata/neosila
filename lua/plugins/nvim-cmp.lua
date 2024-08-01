@@ -39,15 +39,11 @@ return {
     cond = not vim.g.vscode,
     event = { "LspAttach", "BufReadPost" },
     dependencies = {
-      "hrsh7th/cmp-path", -- source for file system paths
+      "hrsh7th/cmp-path",
     },
     config = function()
       local cmp = require("cmp")
       local neocodeium = require("neocodeium")
-      -- local luasnip = require("luasnip")
-      -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
-      -- require("luasnip.loaders.from_vscode").lazy_load()
-      -- when cmp completion is loaded, clear the virtual text from codium
 
       cmp.event:on("menu_opened", function()
         if vim.g.codeium_enabled == true then
@@ -55,21 +51,11 @@ return {
         end
       end)
 
-      local kind_icons = {
-        ellipsis_char = "...",
-        Copilot = "",
-        Supermaven = "",
-        Codeium = "",
-        Otter = "🦦",
-        Cody = "",
-        Cmp_r = "R",
-      }
-
       cmp.setup({
         enabled = function()
           return not vim.b.bigfile
         end,
-        preselect = cmp.PreselectMode.None,
+        preselect = cmp.PreselectMode.None, -- this is espically for gopls lsp
         view = {
           entries = {
             follow_cursor = true,
@@ -130,8 +116,8 @@ return {
         -- sources for autocompletion
         sources = cmp.config.sources({
           { name = "supermaven", group_index = 1, priority = 100 },
-          { name = "codeium", group_index = 2, priority = 99 },
-          { name = "cody" },
+          { name = "codeium", group_index = 2, priority = 50 },
+          { name = "cody", group_index = 3, priority = 25 },
           { name = "otter" },
           { name = "cmp_r" },
           { name = "nvim_lsp" },
@@ -142,42 +128,67 @@ return {
               get_bufnrs = get_bufnrs,
             },
           }, -- text within current buffer
-          { name = "path", priority = 50 }, -- file system paths
+          { name = "path", priority = 150 }, -- file system paths
         }),
 
         formatting = {
+          fields = { "kind", "abbr", "menu" },
           format = function(_, vim_item)
-            local icon, hl, is_default =
-              require("mini.icons").get("lsp", vim_item.kind)
-            -- If the icon is not found in mini.icons (is_default is true), use the fallback
-            if is_default then
-              icon = kind_icons[vim_item.kind] or "󰞋"
-              hl = "CmpItemKind" .. vim_item.kind
-            end
+            local icon, hl = require("mini.icons").get("lsp", vim_item.kind)
             vim_item.kind = icon -- .. " " .. vim_item.kind
             vim_item.kind_hl_group = hl
+            -- Thanks to @Bekaboo for the clamp function
+            local function clamp(field, min_width, max_width)
+              if not vim_item[field] or not type(vim_item) == "string" then
+                return
+              end
+              -- In case that min_width > max_width
+              if min_width > max_width then
+                min_width, max_width = max_width, min_width
+              end
+              local field_str = vim_item[field]
+              local field_width = vim.fn.strdisplaywidth(field_str)
+              if field_width > max_width then
+                local former_width = math.floor(max_width * 0.6)
+                local latter_width = math.max(0, max_width - former_width - 1)
+                vim_item[field] = string.format(
+                  "%s…%s",
+                  field_str:sub(1, former_width),
+                  field_str:sub(-latter_width)
+                )
+              elseif field_width < min_width then
+                vim_item[field] =
+                  string.format("%-" .. min_width .. "s", field_str)
+              end
+            end
+            -- stylua: ignore start
+            clamp( "abbr", vim.go.pw, math.max(20, math.ceil(vim.o.columns * 0.4)))
+            -- clamp( "menu", 0,         math.max(16, math.ceil(vim.o.columns * 0.2)))
+            -- stylua: ignore end
             return vim_item
           end,
-          fields = { "kind", "abbr" }, -- "menu",
         },
         window = {
           -- completion = {
           -- 	winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
           -- },
-          ---@diagnostic disable-next-line: missing-fields
           completion = {
             col_offset = -3,
             side_padding = 0,
             border = "rounded",
             winhighlight = "",
           },
-          -- ---@diagnostic disable-next-line: missing-fields
           documentation = {
-            border = "rounded",
-            winhighlight = "", -- or winhighlight
-            max_height = math.floor(vim.o.lines * 0.5),
-            max_width = math.floor(vim.o.columns * 0.4),
+            max_width = 80,
+            max_height = 20,
+            border = "solid",
           },
+          -- documentation = {
+          --   border = "rounded",
+          --   winhighlight = "", -- or winhighlight
+          --   max_height = math.floor(vim.o.lines * 0.5),
+          --   max_width = math.floor(vim.o.columns * 0.4),
+          -- },
         },
         -- experimental = {
         -- 	ghost_text = { hl_group = "LspCodeLens" },
