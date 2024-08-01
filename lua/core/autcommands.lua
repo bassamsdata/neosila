@@ -7,6 +7,44 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("sila_" .. name, { clear = true })
 end
 
+-- Thanks to this post https://www.reddit.com/r/neovim/comments/15c7rk3/quickfix_editing_tips_worth_resharing/
+autocmd("BufWinEnter", {
+  group = augroup("quickfix"),
+  desc = "allow updating quickfix window",
+  pattern = "quickfix",
+  callback = function(ctx)
+    vim.bo.modifiable = true
+    -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
+    vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
+    vim.keymap.set(
+      "n",
+      "<C-s>",
+      '<Cmd>cgetbuffer|set nomodified|echo "quickfix/location list updated"<CR>',
+      {
+        buffer = true,
+        desc = "Update quickfix/location list with changes made in quickfix window",
+      }
+    )
+  end,
+})
+
+-- The next 2 autocommands are for setting the background color of the terminal to match neovim
+-- source: https://www.reddit.com/r/neovim/comments/1ehidxy/you_can_remove_padding_around_neovim_instance/
+autocmd({ "UIEnter", "ColorScheme" }, {
+  callback = function()
+    local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
+    if not normal.bg then
+      return
+    end
+    io.write(string.format("\027]11;#%06x\027\\", normal.bg))
+  end,
+})
+autocmd("UILeave", {
+  callback = function()
+    io.write("\027]111\027\\")
+  end,
+})
+
 -- Thanks to bekaboo for the initial autocmd
 autocmd({ "BufLeave", "WinLeave", "FocusLost" }, {
   group = augroup("autosave"),
@@ -25,7 +63,6 @@ autocmd({ "BufLeave", "WinLeave", "FocusLost" }, {
     end
   end,
 })
-
 autocmd("BufReadPre", {
   group = augroup("largefilesettings"),
   desc = "Set settings for large files.",
@@ -76,11 +113,11 @@ autocmd({ "FileType" }, {
   end,
 })
 
-autocmd("QuickFixCmdPost", {
-  group = augroup("qf"),
-  pattern = { "[^l]*" },
-  command = "cwindow",
-})
+-- autocmd("QuickFixCmdPost", {
+--   group = augroup("qf"),
+--   pattern = { "[^l]*" },
+--   command = "cwindow",
+-- })
 
 autocmd({ "TermOpen", "BufEnter" }, {
   group = augroup("terminal"),
@@ -122,19 +159,19 @@ autocmd({ "BufWinEnter" }, {
   end,
 })
 
-autocmd("FileType", {
-  group = augroup("yanking"),
-  pattern = "qf",
-  desc = "Yank in quickfix with no ||",
-  callback = function()
-    vim.keymap.set(
-      "n",
-      "<leader>y",
-      "<cmd>normal! wy$<cr>",
-      { noremap = true, silent = true }
-    )
-  end,
-})
+-- autocmd("FileType", {
+--   group = augroup("yanking"),
+--   pattern = "qf",
+--   desc = "Yank in quickfix with no ||",
+--   callback = function()
+--     vim.keymap.set(
+--       "n",
+--       "<leader>y",
+--       "<cmd>normal! wy$<cr>",
+--       { noremap = true, silent = true }
+--     )
+--   end,
+-- })
 
 -- Highlight on yank
 autocmd("TextYankPost", {
@@ -160,26 +197,15 @@ local function save_cursorline_colors()
   end
 end
 
+-- TODO: change this
 local function update_cursorline_colors(is_recording)
-  -- get TermCursor highlight
-  local TermCur_colors = vim.api.nvim_get_hl(0, { name = "TermCursor" })
-  local TermCurhl_bg = ("#%06x"):format(TermCur_colors.bg)
-  local TermCurhl_fg = ("#%06x"):format(TermCur_colors.fg)
-  vim.notify("TermCur_hl: " .. TermCurhl_fg, vim.log.levels.INFO)
-  local gui_bg = vim.o.background == "dark" and TermCurhl_bg or "#aaffaa"
-  local gui_fg = vim.o.background == "dark" and TermCurhl_fg or "#aaffaa"
+  local gui = vim.o.background == "dark" and "#223322" or "#aaffaa"
   local cterm = vim.o.background == "dark" and "2" or "10"
   if not is_recording then
-    gui_bg = _G.cursorline_bg_orig_gui
-    -- gui_fg = _G.cursorline_bg_orig_gui
+    gui = _G.cursorline_bg_orig_gui
     cterm = _G.cursorline_bg_orig_cterm
   end
-  vim.cmd(string.format(
-    "hi CursorLine  guibg=%s ctermbg=%s",
-    -- gui_fg,
-    gui_bg,
-    cterm
-  ))
+  vim.cmd(string.format("hi CursorLine guibg=%s ctermbg=%s", gui, cterm))
 end
 
 vim.api.nvim_create_augroup("macro_visual_indication", {})

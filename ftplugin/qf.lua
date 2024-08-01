@@ -2,7 +2,7 @@
 
 -- If is quickfix list, always open it at the bottom of screen
 if vim.fn.win_gettype() == "quickfix" then
-	vim.cmd.wincmd("J")
+  vim.cmd.wincmd("J")
 end
 
 vim.bo.buflisted = false
@@ -19,6 +19,6 @@ vim.keymap.set('n', '<C-p>', 'k<CR>zz<C-w>p', { buffer = true })
 
 -- Provides `:Cfilter` and `:Lfilter` commands
 vim.cmd.packadd({
-	args = { "cfilter" },
-	mods = { emsg_silent = true },
+  args = { "cfilter" },
+  mods = { emsg_silent = true },
 })
