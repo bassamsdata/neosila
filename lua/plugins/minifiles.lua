@@ -130,6 +130,9 @@ return {
       local gitStatusCache = {}
       local cacheTimeout = 2000 -- in milliseconds
 
+      ---@type table<string, {symbol: string, hlGroup: string}>
+      ---@param status string
+      ---@return string symbol, string hlGroup
       local function mapSymbols(status)
         local statusMap = {
             -- stylua: ignore start 
@@ -183,10 +186,11 @@ return {
 
       ---@param buf_id integer
       ---@param gitStatusMap table
+      ---@return nil
       local function updateMiniWithGit(buf_id, gitStatusMap)
         vim.schedule(function()
           local nlines = vim.api.nvim_buf_line_count(buf_id)
-          local cwd = vim.fs.root(vim.env.PWD, ".git")
+          local cwd = vim.fs.root(buf_id, ".git")
           local escapedcwd = escapePattern(cwd)
           if vim.fn.has("win32") == 1 then
             if escapedcwd then
@@ -252,8 +256,9 @@ return {
       end
 
       ---@param buf_id integer
+      ---@return nil
       local function updateGitStatus(buf_id)
-        if not vim.fs.root(vim.env.PWD, ".git") then
+        if not vim.fs.root(vim.uv.cwd(), ".git") then
           return
         end
         local cwd = vim.fn.expand("%:p:h")
@@ -277,6 +282,7 @@ return {
         end
       end
 
+      ---@return nil
       local function clearCache()
         gitStatusCache = {}
       end
