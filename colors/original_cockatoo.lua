@@ -10,7 +10,7 @@ vim.cmd.hi("clear")
 vim.g.colors_name = "original_cockatoo"
 -- }}}
 --
-
+-- TODO: Add miniicons, Arrow, highlights
 -- Palette {{{
 -- stylua: ignore start
 local c_yellow
@@ -172,6 +172,7 @@ else
   vim.g.terminal_color_15 = c_pigeon
 end
 -- }}}
+-- c_pigeon
 
 -- Highlight groups {{{1
 local hlgroups = {
@@ -482,7 +483,12 @@ local hlgroups = {
   markdownH4 = { link = 'htmlH4' },
   markdownH5 = { link = 'htmlH5' },
   markdownH6 = { link = 'htmlH6' },
-
+  RenderMarkdownBullet    = {fg = c_orange}, -- horizontal rule
+  RenderMarkdownCode      = { bg = c_iron },
+  RenderMarkdownDash      = {fg = c_orange}, -- horizontal rule
+  RenderMarkdownTableHead = { fg = c_wine},
+  RenderMarkdownTableRow  = { fg = c_orange},
+  RenderMarkdownCodeInline = {bg = c_cumulonimbus},
   -- Shell
   shDeref = { link = 'Macro' },
   shDerefVar = { link = 'Macro' },
@@ -749,8 +755,8 @@ local hlgroups = {
   StatusLineGitAdded = { fg = c_tea, bg = c_deepsea },
   StatusLineGitChanged = { fg = c_lavender, bg = c_deepsea },
   StatusLineGitRemoved = { fg = c_scarlet, bg = c_deepsea },
-  StatusLineHeader = { fg = c_jeans, bg = c_pigeon ,bold = true },
-  StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre , bold = true },
+  -- StatusLineHeader = { fg = c_jeans, bg = c_pigeon ,bold = true },
+  -- StatusLineHeaderModified = { fg = c_jeans, bg = c_ochre , bold = true },
 	StatusLineModified = { fg = c_ochre, bg =c_deepsea , bold = true },
   StatusLineArrow = {fg = c_ochre, bg = c_deepsea, bold = true},
   -- There is no default value.

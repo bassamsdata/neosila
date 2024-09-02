@@ -39,21 +39,20 @@ local hello
 local c_faint_extra
 
 if hello  == true then
- local bg          = "#1D2433"
- local bg_dim      = "#181E2C"  -- # panels, line highlighting,
- local bg_sel      = "#313847"  -- # selection,
-
- local fg_         = "#BDD9F2"
- local fg_half_dim = "#818DA7"  -- # some menus,
- local fg_dim     = "#606D88"  -- # comments,
- local red        = "#D67C8E"  -- # errors, important stuff,
- local orange     = "#D6A37C"  -- # warnings, less important stuff,
- local yellow     = "#DFD696"  -- # highlighting,
- local green      = "#ACDF96"  -- # strings, good stuff,
- local cyan        = "#96DFC0"  -- # arguments,
- local blue        = "#9BB8F2"  -- # keywords,
- local purple      = "#BBAAF2"  -- # functions and tags,
- local pink        = "#DF96C7" -- # string interpolation, regexps,
+ local base00 = "#1D2433"
+ local base01 = "#181E2C"  -- # panels, line highlighting,
+ local base02 = "#313847"  -- # selection,
+ local base03 = "#BDD9F2"
+ local base04 = "#818DA7"  -- # some menus,
+ local base05 = "#606D88"  -- # comments,
+ local base06 = "#D67C8E"  -- # errors, important stuff,
+ local base07 = "#D6A37C"  -- # warnings, less important stuff,
+ local base08 = "#DFD696"  -- # highlighting,
+ local base09 = "#ACDF96"  -- # strings, good stuff,
+ local base0A = "#96DFC0"  -- # arguments,
+ local base0B = "#9BB8F2"  -- # keywords,
+ local base0C = "#BBAAF2"  -- # functions and tags,
+ local base0D = "#DF96C7" -- # string interpolation, regexps,
 end
 
 
