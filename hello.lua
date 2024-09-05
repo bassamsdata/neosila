@@ -1,28 +1,20 @@
--- local content = vim.g.content
--- for line in content:gmatch("[^\r\n]+") do
--- 	local status, filePath = line:match("^.(.).(.*)")
--- 	print("status: " .. status, "filePath: " .. filePath)
--- end
-
--- local s = "world world from Lua"
--- for w in string.gmatch(s, "%a+") do
--- 	print(w)
--- end
---
--- local t = {}
--- s = "from=world, to=Lua"
--- for k, v in string.gmatch(s, "(%w+)=(%w+)") do
--- 	t[k] = v
--- end
--- print(t.from, t.to)
-
-local root_dir
-for dir in vim.fs.parents(vim.api.nvim_buf_get_name(0)) do
-	if vim.fn.isdirectory(dir .. "/.git") == 1 then
-		root_dir = dir
-		break
-	end
+local content = vim.g.content
+for line in content:gmatch("[^\r\n]+") do
+  local status, filePath = line:match("^.(.).(.*)")
+  print("status: " .. status, "filePath: " .. filePath)
 end
+
+local s = "world world from Lua"
+for w in string.gmatch(s, "%a+") do
+  print(w)
+end
+
+local t = {}
+s = "from=world, to=Lua"
+for k, v in string.gmatch(s, "(%w+)=(%w+)") do
+  t[k] = v
+end
+print(t.from, t.to)
 
 if root_dir then
 	print("Found git repository at", root_dir)
