@@ -52,8 +52,8 @@ return {
         "-",
         function()
           local MiniFiles = require("mini.files")
-          local current_file = vim.fn.expand("%")
-          local _ = MiniFiles.close() or MiniFiles.open(current_file, false)
+          local _ = MiniFiles.close()
+            or MiniFiles.open(vim.api.nvim_buf_get_name(0), false)
           vim.defer_fn(function()
             MiniFiles.reveal_cwd()
           end, 30)
@@ -166,7 +166,7 @@ return {
         local function on_exit(content)
           if content.code == 0 then
             callback(content.stdout)
-            vim.g.content = content.stdout
+            -- vim.g.content = content.stdout
           end
         end
         ---@see vim.system
@@ -191,6 +191,7 @@ return {
         vim.schedule(function()
           local nlines = vim.api.nvim_buf_line_count(buf_id)
           local cwd = vim.fs.root(buf_id, ".git")
+          -- vim.notify("function updateMiniWithGit: " .. cwd, vim.log.levels.INFO)
           local escapedcwd = escapePattern(cwd)
           if vim.fn.has("win32") == 1 then
             if escapedcwd then
@@ -258,11 +259,14 @@ return {
       ---@param buf_id integer
       ---@return nil
       local function updateGitStatus(buf_id)
-        if not vim.fs.root(vim.uv.cwd(), ".git") then
+        if not vim.fs.root(buf_id, ".git") then
           return
         end
         local cwd = vim.fn.expand("%:p:h")
-        -- local cwd = vim.fs.root(vim.uv.cwd(), ".git")
+        -- local cwd = vim.fn.fnamemodify(current_file, ":h")
+        -- local cwd = vim.fn.expand("%:p:h")
+        -- local cwd = vim.fs.root(buf_id, ".git")
+        -- vim.notify("function updateGitStatus: " .. cwd, vim.log.levels.INFO)
         local currentTime = os.time()
 
         if
@@ -316,6 +320,7 @@ return {
         pattern = "MiniFilesBufferUpdate",
         callback = function(args)
           local bufnr = args.data.buf_id
+          -- local cwd = vim.fs.root(bufnr, ".git")
           local cwd = vim.fn.expand("%:p:h")
           if gitStatusCache[cwd] then
             updateMiniWithGit(bufnr, gitStatusCache[cwd].statusMap)

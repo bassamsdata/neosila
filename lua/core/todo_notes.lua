@@ -1,6 +1,5 @@
--- Total rewrite - idea from this post https://www.reddit.com/r/neovim/comments/1bl8wug/comment/kw5og55/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-
 local M = {}
+-- Total rewrite - idea from this post https://www.reddit.com/r/neovim/comments/1bl8wug/comment/kw5og55/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 M.open = function()
   local height, width, buf, win, cwd, buf_options, setupKeymap
   -- relative height and width
@@ -15,9 +14,10 @@ M.open = function()
     row = math.floor(0.5 * (vim.o.lines - height)),
     col = math.floor(0.5 * (vim.o.columns - width)),
     style = "minimal",
+    title = " " .. " TODO",
     border = "rounded",
   })
-  cwd = vim.fn.getcwd()
+  cwd = vim.uv.cwd()
   vim.cmd.edit(cwd .. "/TODO.md")
   buf_options = {
     number = false,

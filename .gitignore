@@ -12,3 +12,6 @@
 
 sesstion.vim
 *.nvim
+
+.codeCompanion
+.avante_chat_history

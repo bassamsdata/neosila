@@ -42,7 +42,7 @@ map("n", "dd", function()
 end, { expr = true })
 
 -- Ripgrep go to file by line number - this for search results
-map("n", "<localleader>rf", 'yiw?^[a-z]<CR>gf:<C-r>"<CR>')
+map("n", "<leader>rf", 'yiw?^[a-z]<CR>gf:<C-r>"<CR>')
 -- open grep directly and then open quickfix with the results
 map("n", "<localleader>g", u.grepandopen, { desc = "Grep and open quickfix" })
 map("n", "<leader>ug", u.helpgrepnopen, { desc = "Grephelp and open quickfix" })
@@ -58,9 +58,9 @@ map("o", "aa", ":<c-u>call TextObjectAll()<CR>")
 -- map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
 -- map("o", "aa", ":<c-u>normal! mzggVG<cr>`z")
 map("n", "<localleader>'", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
-map("n", "<C-t>", u.swapBooleanInLine, { desc = "swap boolean" })
-map("n", "<up>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
-map("n", "<down>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
+map("n", "<M-y>", u.swapBooleanInLine, { desc = "swap boolean" })
+-- map("n", "<up>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
+-- map("n", "<down>", "<cmd>lua vim.cmd('norm! 4')<cr>", { desc = "enhance jk" })
 map("n", "<C-c>", "<cmd>normal! ciw<cr>i")
 -- stylua: ignore end
 -- map(
@@ -89,9 +89,9 @@ map("i", "<C-l>", "<C-x><C-l>") -- Complete line -- didn't work
 -- map({ "n", "i",     "!", "v" }, "§", "<esc>")
 -- stylua: ignore end
 
--- HACK: this is to insert the fukking hashtag sign in neovim in conjunction
+-- HACK: this is to insert the fukking bound sign in neovim in conjunction
 -- with this keymap in wezterm { key = "1", mods = "OPT", action = act.SendKey({ key = "1", mods = "ALT" }) }
-map({ "i", "c" }, "<A-1>", "#")
+map({ "i", "c" }, "<A-3>", "#")
 
 -- ── Clear search with <esc> ───────────────────────────────────────────
 map("n", "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
@@ -118,37 +118,11 @@ map( "n", "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
 map( "n", "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
 -- stylua: ignore end
 
--- -- ── Resize window using <ctrl> arrow keys ─────────────────────────────
-local function setupResizeKeymap(key, direction)
-  map("n", key, function()
-    local currentWin = vim.fn.winnr()
-    local adjacentWin = vim.fn.winnr(direction)
-    if currentWin ~= adjacentWin then
-      if direction == "l" or direction == "h" then
-        vim.cmd("vertical resize -2")
-      else
-        vim.cmd("resize -2")
-      end
-    else
-      if direction == "l" or direction == "h" then
-        vim.cmd("vertical resize +2")
-      else
-        vim.cmd("resize +2")
-      end
-    end
-  end, { desc = "Resize window " .. direction })
-end
-
--- setupResizeKeymap("<C-Left>", "l")
--- setupResizeKeymap("<C-Right>", "h")
--- setupResizeKeymap("<C-Up>", "j")
--- setupResizeKeymap("<C-Down>", "k")
-
 ----------------------- TJ did this, so I need to try
 -- So I did all the function above and below did it naturally
 map("n", "<C-left>", "<C-w>5<")
 map("n", "<C-right>", "<C-w>5>")
-map("n", "<M-t>", "<C-w>+")
+map("n", "<C-t>", "<C-w>+")
 map("n", "<M-s>", "<C-w>-")
 map("n", "<leader>x", "<cmd>.lua<cr>", { desc = "source the current line" })
 
@@ -197,6 +171,7 @@ map("i", ";", ";<c-g>u")
 -- 	vim.api.nvim_put({ "", "" }, "c", false, false)
 -- end, { silent = true, noremap = true })
 
+-- TODO: let it work with visual mode as well
 map(
   "n",
   "<leader>K",
@@ -226,33 +201,37 @@ map(
 -- └                                                         ┘
 
 -- stylua: ignore start
-map("n",  "<leader>ff",      "<cmd>Pick frecency<cr>",                        { desc = "Find [F]iles" })
-map("n",  "<leader>fn",      "<cmd>Pick config<cr>",                          { desc = "Find [N]vim config" })
-map("n",  "<leader>fp",      "<cmd>Pick registry<cr>",                        { desc = "Find [P]icker" })
-map("n",  "<leader>/",       "<cmd>Pick grep_live<cr>",                       { desc = "Find [G]rep_live" })
-map( "n", "<leader>fG",      "<cmd>Pick grep pattern='<cword>'<cr>",          { desc = "Find [C]urrent word" })
-map("n",  "<leader>fo",      "<cmd>Pick oldfiles<cr>",                        { desc = "Find [O]ld files" })
-map("n",  "<leader>fr",      "<cmd>Pick resume<cr>",                          { desc = "Find [R]esume" })
-map("n",  "<leader>fl",      "<cmd>Pick help<cr>",                            { desc = "Find he[L]p" })
-map("n",  "<leader>fk",      "<cmd>Pick keymaps<cr>",                         { desc = "Find [K]eymaps" })
-map("n",  "<leader>b",       "<cmd>Pick buffers<cr>",                         { desc = "Find [B]uffers" })
-map("n",  "<leader>fk",      "<cmd>Pick keymaps<cr>",                         { desc = "Find [K]eymaps" })
-map( "n", "<leader>fh",      "<cmd>Pick hl_groups<cr>",                       { desc = "Find [H]ighlights" })
-map( "n", "<leader>fc",      "<cmd>Pick history scope=':'<cr>",               { desc = "Find [C]ommands" })
-map( "n", "<leader>fs",      "<cmd>Pick history scope='/'<cr>",               { desc = "Find [S]earch" })
-map( "n", "<leader>fv",      "<cmd>Pick visit_paths cwd=''<cr>",              { desc = "Visit paths (all)" })
-map( "n", "<leader>fV",      "<cmd>Pick visit_paths<cr>",                     { desc = "Visit paths (cwd)" })
-map("n",  "<leader>gk",      "<cmd>Pick git_hunks<cr>",                       { desc = "Git Hun[k]s" })
+map( "n", "<leader>ff", "<cmd>Pick frecency<cr>",               { desc = "Find [F]iles" })
+map( "n", "<leader>fn", "<cmd>Pick config<cr>",                 { desc = "Find [N]vim config" })
+map( "n", "<leader>fp", "<cmd>Pick registry<cr>",               { desc = "Find [P]icker" })
+map( "n", "<leader>/",  "<cmd>Pick grep_live<cr>",              { desc = "Find [G]rep_live" })
+map( "n", "<leader>fG", "<cmd>Pick grep pattern='<cword>'<cr>", { desc = "Find [C]urrent word" })
+map( "n", "<leader>fo", "<cmd>Pick oldfiles<cr>",               { desc = "Find [O]ld files" })
+map( "n", "<leader>fr", "<cmd>Pick resume<cr>",                 { desc = "Find [R]esume" })
+map( "n", "<leader>fl", "<cmd>Pick help<cr>",                   { desc = "Find he[L]p" })
+map( "n", "<leader>fk", "<cmd>Pick keymaps<cr>",                { desc = "Find [K]eymaps" })
+map( "n", "<leader>b",  "<cmd>Pick buffers<cr>",                { desc = "Find [B]uffers" })
+map( "n", "<leader>fk", "<cmd>Pick keymaps<cr>",                { desc = "Find [K]eymaps" })
+map( "n", "<leader>fh", "<cmd>Pick hl_groups<cr>",              { desc = "Find [H]ighlights" })
+map( "n", "<leader>fc", "<cmd>Pick history scope=':'<cr>",      { desc = "Find [C]ommands" })
+map( "n", "<leader>fs", "<cmd>Pick history scope='/'<cr>",      { desc = "Find [S]earch" })
+map( "n", "<leader>fv", "<cmd>Pick visit_paths cwd=''<cr>",     { desc = "Visit paths (all)" })
+map( "n", "<leader>fV", "<cmd>Pick visit_paths<cr>",            { desc = "Visit paths (cwd)" })
+map( "n", "<leader>gk", "<cmd>Pick git_hunks<cr>",              { desc = "Git Hun[k]s" })
+map( "n", "<leader><space>", "<cmd>Pick files<cr>",                           { desc = "Find [F]iles" })
 map( "n", "<leader>gs",      "<cmd>Pick git_hunks scope='staged'<cr>",        { desc = "Git [S]taged" })
 map( "n", "<leader>gK",      "<cmd>Pick git_hunks path='%'<cr>",              { desc = "Git Hun[k]s (current)" })
 map( "n", "<leader>cs",      "<cmd>Pick lsp scope='document_symbol'<cr>",     { desc = "Symbols buffer (LSP)" })
 map( "n", "<leader>cS",      "<cmd>Pick lsp scope='workspace_symbol'<cr>",    { desc = "Symbols workspace (LSP)" })
 map( "n", "<leader>cd",      "<cmd>Pick diagnostic scope='all'<cr>",          { desc = "Diagnostic workspace" })
 map( "n", "<leader>cD",      "<cmd>Pick diagnostic scope='current'<cr>",      { desc = "Diagnostic buffer" })
-map("n",  "<leader><space>", "<cmd>Pick files<cr>",                           { desc = "Find [F]iles" })
 map( "n", "<localleader>mn", "<cmd>15sp | lua MiniNotify.show_history()<cr>", { desc = "Diagnostic buffer" })
 -- stylus: ignore end
-
+vim.keymap.set("n", "<leader>q", function()
+  require("quicker").toggle({ height = 100, focus = true, min_height = 10})
+end, {
+  desc = "Toggle quickfix",
+})
 -- I got this from reedit - wow, look how simple it is
 M.mini_files_key = {
   {
@@ -302,29 +281,17 @@ map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 map("t", "<C-k>", "<C-\\><C-n><C-w><C-k>", { desc = "out of terminal to top" })
 map("t", "<C-h>", "<C-\\><C-n><C-w><C-h>", { desc = "Out of terminal to left" })
 
-function M.term()
-  local term = require("nvterm.terminal")
-  -- stylua: ignore start
-  -- map({ "n", "t" }, "<M-t>", function() require("nvterm.terminal").toggle("horizontal") end, { desc = "New horizontal term" })
-  -- map({ "n", "t" }, "<M-v>", function() require("nvterm.terminal").toggle("vertical") end,   { desc = "New vertical term" })
-  -- map({ "n", "t" }, "<M-f>", function() require("nvterm.terminal").toggle("float") end,      { desc = "New tab term" })
-  -- map("n", "<leader>th", function() term.new("horizontal") end, { desc = "New horizontal term" })
-  -- map("n", "<leader>tv", function() term.new("vertical") end,   { desc = "New vertical term" })
-  -- map("n", "<leader>tf", function() term.new("float") end,      { desc = "New tab term" })
-  -- stylua: ignore end
-end
-
 -- Toggling terminals
 map({ "n", "t" }, "<M-f>", function()
-  require("nvterminal").toggle({ pos = "float", id = "floatTerm" })
+  require("localModules.nvterminal").toggle({ pos = "float", id = "floatTerm" })
 end, { desc = "Terminal Toggle Floating term" })
 
 map({ "n", "t" }, "<M-v>", function()
-  require("nvterminal").toggle({ pos = "vsp", id = "verticalTerm" })
+  require("localModules.nvterminal").toggle({ pos = "vsp", id = "verticalTerm", width = 0.8 })
 end, { desc = "Terminal Toggle Vertical term" })
 
 map({ "n", "t" }, "<M-p>", function()
-  require("nvterminal").toggle({ pos = "sp", id = "horizontalTerm" })
+  require("localModules.nvterminal").toggle({ pos = "sp", id = "horizontalTerm" })
 end, { desc = "Terminal Toggle Horizontal term" })
 
 -- Creating new terminals
@@ -347,12 +314,7 @@ map(
   [[<cmd>lua require("nvterminal").runner{ cmd = function() local file = vim.fn.expand("%"); local ext = vim.fn.fnamemodify(file, ":e"); if ext == "go" then return "go run ".. file else return "python3 ".. file end end }<CR>]],
   { noremap = true, silent = true, desc = "Execute Current File (Go/Python)" }
 )
-
 -- ── clean registers ───────────────────────────────────────────────────
-map("n", "<leader>p", "<Plug>(miniyank-startput)")
-map("n", "<leader>P", "<Plug>(miniyank-startPut)")
-map("n", "<leader>n", "<Plug>(miniyank-cycle)")
-map("n", "<leader>N", "<Plug>(miniyank-cycleback)")
 local function clear_registers()
   local registers =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-"'
@@ -382,24 +344,7 @@ map("n", "<leader>cl", "<cmd>w | so %<cr>", { desc = "[C]ode [R]un in Term" })
 
 -- ── Ai ───────────────────────────────────────────────────────────
 -- map("n", "<leader>ac", "<cmd>CodyChat<cr>", { desc = "[A]i [C]hat - cody" })
-map("n", "<leader>tc", "<cmd>CodyChat<cr>", { desc = "[T]oggle [C]odi chat" })
-map("n", "<leader>ad", "<cmd>CodyDo<cr>", { desc = "[A]i Cody Do" })
-map("n", "<leader>ac", function()
-  vim.cmd("Lazy load codeium.vim")
-  vim.schedule_wrap(function()
-    vim.g.codeium_enabled = true
-    return vim.fn["codeium#Chat"]()
-  end)
-end)
 
-map({ "n", "v" }, "<leader>at", "<cmd>CodyTask<cr>", { desc = "[A]i Cody Go" })
-map({ "n", "v" }, "<leader>aa", "<cmd>CodyAsk<cr>", { desc = "[A]i Cody Ask" })
-map(
-  { "n", "v" },
-  "<leader>ae",
-  "<cmd>CodyExplain<cr>",
-  { desc = "[A]i Cody Explain" }
-)
 
 -- ── Arrow ───────────────────────────────────────────────────────────
 map("n", "<C-s>", function() -- Select first file
@@ -411,7 +356,7 @@ map("n", "<C-s>", function() -- Select first file
   end
 end, { desc = "Select first file", silent = true })
 
-map("n", "<C-x>", function() -- Select second file
+map("n", "<C-;>", function() -- Select second file
   local _ = pcall(require, "arrow")
   local arrow_files = vim.g.arrow_filenames
 
@@ -419,6 +364,29 @@ map("n", "<C-x>", function() -- Select second file
     vim.cmd("edit " .. arrow_files[2])
   end
 end, { desc = "Select second file", silent = true })
+
+map("n", "<localleader>\\", function() -- Select third file
+  local _, arrow = pcall(require, "arrow.commands")
+  return arrow.commands.toggle_current_line_for_buffer()
+end, { desc = "set buffer bookmark", silent = true })
+
+-- map("n", "<C-'>", function() -- Select third file
+--   local _ = pcall(require, "arrow")
+-- local arrow_table = require("arrow.buffer_persist").get_bookmarks_by()
+--   if #arrow_table > 0 then
+--     -- vim.cmd(tostring(arrow_table[1].line))
+--     return vim.api.nvim_win_set_cursor(0, { arrow_table[1].line, arrow_table[1].col })
+--   end
+-- end, { desc = "Select first file", silent = true })
+
+-- map("n", "<C-'>", function() -- Select third file
+--   local _ = pcall(require, "arrow")
+-- local arrow_table = require("arrow.buffer_persist").get_bookmarks_by()
+--   if #arrow_table > 1 then
+--     -- vim.cmd(tostring(arrow_table[1].line))
+--     return vim.api.nvim_win_set_cursor(0, { arrow_table[2].line, arrow_table[2].col })
+--   end
+-- end, { desc = "Select first file", silent = true })
 
 -- ── Marks ───────────────────────────────────────────────────────────
 local function deleteMarks()
@@ -435,8 +403,8 @@ if vim.g.neovide then
   map({ "n", "v" }, "<C-0>", ":lua vim.g.neovide_scale_factor = 1<CR>")
   map("c", "<D-v>", "<C-R>+") -- Paste command mode
   map("i", "<D-v>", "<ESC>pli") -- Paste insert mode
-  map("n", "<D-n>", "<cmd>silent exec '!neovide'<cr>")
-  map("n", "<D-t>", "<cmd>!cd ~ &&neovide<cr>")
+  map("n", "<D-n>", "<cmd>silent exec 'neovide --title-hidden --fork'<cr>")
+  map("n", "<D-t>", "<cmd>!cd ~ &&neovide --title-hidden --fork<cr>")
   -- stylua: ignore end
 end
 

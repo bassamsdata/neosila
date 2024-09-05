@@ -102,15 +102,34 @@ return {
         desc = "Toggle mini.diff overlay",
       },
     },
-    opts = {
-      view = {
-        style = "sign",
-        signs = {
-          add = "▎",
-          change = "▎",
-          delete = "",
+    config = function(_, opts)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("MiniDiffSigns", { clear = true }),
+        callback = function()
+          require("utils.hi").blend_highlight_groups(
+            { "MiniDiffSignAdd", "MiniDiffSignChange", "MiniDiffSignDelete" },
+            "Normal",
+            "bg",
+            0.5
+          )
+        end,
+      })
+      require("mini.diff").setup({
+        view = {
+          style = "sign",
+          signs = {
+            add = "▎",
+            change = "▎",
+            delete = "",
+          },
         },
-      },
-    },
+      })
+      require("utils.hi").blend_highlight_groups(
+        { "MiniDiffSignAdd", "MiniDiffSignChange", "MiniDiffSignDelete" },
+        "Normal",
+        "bg",
+        0.5
+      )
+    end,
   },
 }

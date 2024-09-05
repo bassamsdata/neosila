@@ -1,43 +1,16 @@
 ---@diagnostic disable: deprecated
 local M = {}
 
-function M.custom_notify(message, level)
-  local levels = {
-    DEBUG = 1,
-    ERROR = 4,
-    INFO = 2,
-    OFF = 5,
-    TRACE = 0,
-    WARN = 3,
-  }
-  local highlight = {
-    [levels.ERROR] = "ErrorMsg",
-    [levels.WARN] = "WarningMsg",
-    [levels.INFO] = "None",
-    [levels.DEBUG] = "Comment",
-  }
-  local style = {
-    [levels.ERROR] = "✗",
-    [levels.WARN] = "⚠",
-    [levels.INFO] = "ℹ",
-    [levels.DEBUG] = "☰",
-  }
-  -- Check if level is a string or a number
-  local levelValue = type(level) == "number" and level or levels[level]
-  local icon = style[levelValue] or "ℹ"
-  local hl = highlight[levelValue] or "None"
-  vim.notify(icon .. ": " .. message, levelValue, { highlight = hl })
-end
-
 local swap_pairs = {
   { "true", "false" },
-  { "1", "0" },
   { "foo", "bar" },
   { "TRUE", "FALSE" },
   { "True", "False" },
   { "fg", "bg" },
   { "open", "close" },
   { "always", "never" },
+  { "yes", "no" },
+  { "on", "off" },
 }
 
 function M.swapBooleanInLine()
@@ -191,7 +164,7 @@ function M.grepandopen()
     if pattern ~= nil then
       vim.cmd("silent grep! " .. pattern)
       vim.cmd("copen")
-      vim.fn.matchadd("Search", pattern)
+      -- vim.fn.matchadd("Search", pattern)
     end
   end)
 end
@@ -405,22 +378,74 @@ end
 --- @return string
 function M.get_mode_hl()
   local mode_hls = {
-    n = "NormalMode" and "NormalMode" or "CursorLineNr",
-    i = "InsertMode" and "InsertMode" or "TermCursor",
-    v = "VisualMode",
-    V = "VisualMode",
+    -- stylua: ignore start 
+    n       = "NormalMode" and "NormalMode" or "CursorLineNr",
+    i       = "InsertMode" and "InsertMode" or "TermCursor",
+    v       = "VisualMode",
+    V       = "VisualMode",
     ["\22"] = "VisualMode",
-    c = "CommandMode",
-    s = "SelectMode",
-    S = "SelectMode",
+    c       = "CommandMode",
+    s       = "SelectMode",
+    S       = "SelectMode",
     ["\19"] = "SelectMode",
-    R = "ControlMode",
-    r = "ControlMode",
-    ["!"] = "NormalMode",
-    t = "TerminalMode",
+    R       = "ControlMode",
+    r       = "ControlMode",
+    ["!"]   = "NormalMode",
+    t       = "TerminalMode",
+    -- stylua: ignore end
   }
 
   return mode_hls[vim.api.nvim_get_mode().mode]
+end
+
+--- Closes all buffers except the current one and the alternate one
+--- NEXT: make one that closes all abuffers that not in arrow list
+---@return nil
+function M.close_other_buffers()
+  local current = vim.fn.bufnr("%")
+  local alternate = vim.fn.bufnr("#")
+  local buffers = vim.api.nvim_list_bufs()
+  vim.notify("Closing other buffers", vim.log.levels.INFO)
+
+  for _, buf in ipairs(buffers) do
+    if
+      vim.api.nvim_buf_is_loaded(buf)
+      and vim.api.nvim_buf_is_valid(buf)
+      and buf ~= current
+      and buf ~= alternate
+    then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+  end
+end
+
+-- TODO: Open all arrow files as well
+---@return nil
+function M.keepOnlyArrowFiles()
+  local cwd = vim.uv.cwd()
+  local arrow_filenames = vim.g.arrow_filenames
+  local arrow_fullpaths = {}
+  if arrow_filenames == nil then
+    return
+  end
+
+  -- Convert relative paths to full paths
+  for _, filename in ipairs(arrow_filenames) do
+    table.insert(arrow_fullpaths, cwd .. "/" .. filename)
+  end
+
+  -- Iterate over all open buffers
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      local buf_name = vim.api.nvim_buf_get_name(buf)
+
+      -- Check if the buffer is not in the arrow_fullpaths list
+      if not vim.tbl_contains(arrow_fullpaths, buf_name) and buf_name ~= "" then
+        -- If not, close the buffer
+        require("mini.bufremove").delete(buf)
+      end
+    end
+  end
 end
 
 return M

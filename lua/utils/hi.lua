@@ -15,71 +15,230 @@ function M.apply_highlight(target_group, attributes)
   vim.api.nvim_set_hl(0, target_group, props)
 end
 
--- https://github.com/EmmanuelOga/columns/blob/master/utils/color.lua
+function M.highlight(table)
+  for group, config in pairs(table) do
+    vim.api.nvim_set_hl(0, group, config)
+  end
+end
+
+function M.is_none(string)
+  return string == "NONE" or string == "none"
+end
+
+function M.none()
+  return "NONE"
+end
+
+-- https://github.com/EmmanuelOga/columns/blob/mas", "#fca5a5", 0.5ter/utils/color.lua
 --- Converts an HSL color value to RGB. Conversion formula
 --- adapted from http://en.wikipedia.org/wiki/HSL_color_space.
 --- Assumes h, s, and l are contained in the set [0, 1] and
 --- returns r, g, and b in the set [0, 255].
 ---
---- @param h number      The hue
---- @param s number      The saturation
---- @param l number      The lightness
---- @return number, number, number     # The RGB representation
-function M.hslToRgb(h, s, l)
-  --- @type number, number, number
+---@param table1 table
+---@param table2 table
+---@return table
+function M.merge(table1, table2)
+  if table1 == table2 == nil then
+    return {}
+  end
+  if table1 == nil then
+    return table2
+  elseif table2 == nil then
+    return table1
+  end
+  return vim.tbl_deep_extend("force", table1, table2)
+end
+
+function M.hexToRgb(str)
+  str = string.lower(str)
+  return tonumber(str:sub(2, 3), 16),
+    tonumber(str:sub(4, 5), 16),
+    tonumber(str:sub(6, 7), 16)
+end
+
+function M.rgbToHex(r, g, b)
+  return "#"
+    .. string.format("%x", r)
+    .. string.format("%x", g)
+    .. string.format("%x", b)
+end
+
+---@param r number
+---@param g number
+---@param b number
+---@return number, number, number
+function M.rgb_to_hsv(r, g, b)
+  r, g, b = r / 255, g / 255, b / 255
+  local max, min = math.max(r, g, b), math.min(r, g, b)
+
+  local h, s, v
+  v = max
+
+  local d = max - min
+  if max == 0 then
+    s = 0
+  else
+    s = d / max
+  end
+
+  if max == min then
+    h = 0
+  else
+    if max == r then
+      h = (g - b) / d
+      if g < b then
+        h = h + 6
+      end
+    elseif max == g then
+      h = (b - r) / d + 2
+    elseif max == b then
+      h = (r - g) / d + 4
+    end
+    h = h / 6
+  end
+
+  return h, s, v
+end
+
+---@param h number
+---@param s number
+---@param v number
+---@return number, number, number
+function M.hsvToRgb(h, s, v)
   local r, g, b
 
-  if s == 0 then
-    r, g, b = l, l, l -- achromatic
-  else
-    --- @param p number
-    --- @param q number
-    --- @param t number
-    local function hue2rgb(p, q, t)
-      if t < 0 then
-        t = t + 1
-      end
-      if t > 1 then
-        t = t - 1
-      end
-      if t < 1 / 6 then
-        return p + (q - p) * 6 * t
-      end
-      if t < 1 / 2 then
-        return q
-      end
-      if t < 2 / 3 then
-        return p + (q - p) * (2 / 3 - t) * 6
-      end
-      return p
-    end
+  local i = math.floor(h * 6)
+  local f = h * 6 - i
+  local p = v * (1 - s)
+  local q = v * (1 - f * s)
+  local t = v * (1 - (1 - f) * s)
 
-    --- @type number
-    local q
-    if l < 0.5 then
-      q = l * (1 + s)
-    else
-      q = l + s - l * s
-    end
-    local p = 2 * l - q
+  i = i % 6
 
-    r = hue2rgb(p, q, h + 1 / 3)
-    g = hue2rgb(p, q, h)
-    b = hue2rgb(p, q, h - 1 / 3)
+  if i == 0 then
+    r, g, b = v, t, p
+  elseif i == 1 then
+    r, g, b = q, v, p
+  elseif i == 2 then
+    r, g, b = p, v, t
+  elseif i == 3 then
+    r, g, b = p, q, v
+  elseif i == 4 then
+    r, g, b = t, p, v
+  elseif i == 5 then
+    r, g, b = v, p, q
   end
 
   return r * 255, g * 255, b * 255
 end
 
---- Converts an HSL color value to RGB in Hex representation.
---- @param  h number   The hue
---- @param  s number   The saturation
---- @param  l number   The lightness
---- @return   string   # The hex representation
-function M.hslToHex(h, s, l)
-  local r, g, b = M.hslToRgb(h / 360, s / 100, l / 100)
+---@param hex string
+---@param amount number
+---@return string
+function M.darken(hex, amount)
+  local r, g, b = M.hexToRgb(hex)
+  local h, s, v = M.rgb_to_hsv(r, g, b)
+  v = v * ((1 - amount) / 1)
+  r, g, b = M.hsvToRgb(h, s, v)
+  return M.rgbToHex(r, g, b)
+end
 
-  return string.format("#%02x%02x%02x", r, g, b)
+---@param hex string
+---@param amount number
+---@return string
+function M.lighten(hex, amount)
+  local r, g, b = M.hexToRgb(hex)
+  local h, s, v = M.rgb_to_hsv(r, g, b)
+  v = v * (1 + amount)
+  r, g, b = M.hsvToRgb(h, s, v)
+  return M.rgbToHex(r, g, b)
+end
+
+---Adapted from @folke/tokyonight.nvim.
+---@param foreground string
+---@param background string
+---@param alpha number
+---@return string
+function M.blend(foreground, background, alpha)
+  if M.is_none(foreground) or M.is_none(background) then
+    return M.none()
+  end
+
+  local fg = { M.hexToRgb(foreground) }
+  local bg = { M.hexToRgb(background) }
+
+  local blend_channel = function(c_fg, c_bg)
+    local ret = (alpha * c_fg + ((1 - alpha) * c_bg))
+    return math.floor(math.min(math.max(0, ret), 255) + 0.5)
+  end
+
+  return M.rgbToHex(
+    blend_channel(fg[1], bg[1]),
+    blend_channel(fg[2], bg[2]),
+    blend_channel(fg[3], bg[3])
+  )
+end
+
+function M.getHexColor(coloGroup, color_type)
+  local hl = vim.api.nvim_get_hl(0, { name = coloGroup })
+  if hl.link then
+    hl = vim.api.nvim_get_hl(0, { name = hl.link })
+  end
+  if color_type == "fg" then
+    local fg = ("#%06x"):format(hl.fg) or "#000000"
+    return fg
+  end
+  if color_type == "bg" then
+    local bg = ("#%06x"):format(hl.bg) or "#ffffff"
+    return bg
+  end
+end
+
+---@param groups_to_set string|table
+---@param blend_with string
+---@param blend_attr "fg"|"bg"
+---@param alpha number
+---TODO: return the highlight group as is
+function M.blend_highlight_groups(groups_to_set, blend_with, blend_attr, alpha)
+  local function get_color(group, attr)
+    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+    if hl[attr] then
+      return ("#%06x"):format(hl[attr])
+    elseif hl.link then
+      return get_color(hl.link, attr)
+    end
+    return nil
+  end
+
+  local blend_color = get_color(blend_with, blend_attr)
+  if not blend_color then
+    -- FIX: return default value and notify only or Normal highlight.
+    print("Error: Could not get color for blend_with group")
+    return
+  end
+
+  if type(groups_to_set) == "string" then
+    groups_to_set = { groups_to_set }
+  end
+
+  for _, group in ipairs(groups_to_set) do
+    local original_hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+    local original_color = get_color(group, "fg")
+    if original_color then
+      local blended_color = M.blend(original_color, blend_color, alpha)
+      -- Preserve all original attributes except the blended one
+      local new_hl = vim.tbl_extend("force", original_hl, {
+        fg = blended_color,
+      })
+      new_hl.link = nil -- Remove the 'link' key if it exists
+      vim.api.nvim_set_hl(0, group, new_hl)
+    else
+      -- FIX: return default value and notify only outside the loop instead.
+      print("Error: Could not get foreground color for group " .. group)
+      return
+    end
+  end
 end
 
 return M

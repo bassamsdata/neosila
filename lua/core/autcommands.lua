@@ -7,6 +7,24 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("sila_" .. name, { clear = true })
 end
 
+-- local excluded_ft = { "lazy", "netrw", "man", "intro", "help" }
+-- if not vim.tbl_contains(excluded_ft, vim.bo.ft) then
+-- autocmd("FileType", {
+--   pattern = "lua",
+--   group = augroup("help"),
+--   callback = function()
+--     local separator = vim.g.neovide and " │ " or " ┃ "
+-- -- stylua: ignore start
+--   vim.opt.statuscolumn =
+--       '%s%=%#LineNr4#%{(v:relnum >= 4)?v:relnum.\"' .. separator .. '\":\"\"}' ..
+--       '%#LineNr3#%{    (v:relnum == 3)?v:relnum.\"' .. separator .. '\":\"\"}' ..
+--       '%#LineNr2#%{    (v:relnum == 2)?v:relnum.\"' .. separator .. '\":\"\"}' ..
+--       '%#LineNr1#%{    (v:relnum == 1)?v:relnum.\"' .. separator .. '\":\"\"}' ..
+--       '%#LineNr0#%{    (v:relnum == 0)?v:lnum.\"  ' .. separator .. '\":\"\"}'
+--     -- stylua: ignore end
+--   end,
+-- })
+
 -- Thanks to this post https://www.reddit.com/r/neovim/comments/15c7rk3/quickfix_editing_tips_worth_resharing/
 autocmd("BufWinEnter", {
   group = augroup("quickfix"),
@@ -63,6 +81,26 @@ autocmd({ "BufLeave", "WinLeave", "FocusLost" }, {
     end
   end,
 })
+
+-- function to save file based on update instead of w if the cmdline == w
+-- local function saveFile()
+--   if vim.fn.getcmdtype() == "w" then
+--     vim.cmd.update({
+--       mods = { emsg_silent = true },
+--     })
+--   else
+--     vim.cmd.w()
+--   end
+-- end
+--
+-- vim.keymap.set("c", "w", saveFile)
+
+vim.api.nvim_create_user_command("W", function()
+  vim.cmd.update({
+    mods = { emsg_silent = true },
+  })
+end, {})
+
 autocmd("BufReadPre", {
   group = augroup("largefilesettings"),
   desc = "Set settings for large files.",
@@ -70,7 +108,7 @@ autocmd("BufReadPre", {
     vim.b.bigfile = false
     ---@diagnostic disable-next-line: undefined-field
     local stat = vim.uv.fs_stat(info.match)
-    if stat and stat.size > 52420 then
+    if stat and stat.size > 524200 then
       vim.b.bigfile = true
       vim.opt_local.spell = false
       vim.opt_local.swapfile = false
@@ -124,7 +162,7 @@ autocmd({ "TermOpen", "BufEnter" }, {
   pattern = { "*" },
   callback = function()
     if vim.opt.buftype:get() == "terminal" then
-      vim.cmd(":startinsert")
+      vim.cmd.startinsert()
     end
   end,
 })
@@ -142,7 +180,9 @@ autocmd({ "DirChanged", "FileChangedShellPost" }, {
 })
 -- Call this function when the buffer is opened in a window
 autocmd("BufWinEnter", {
-  callback = git.update_git_branch,
+  callback = function(data)
+    git.update_git_branch(data, vim.fn.getcwd())
+  end,
 })
 
 autocmd({ "BufWinLeave", "BufWritePost" }, {
@@ -246,7 +286,6 @@ autocmd("BufReadPost", {
   end,
 })
 
--- Change the current line number depend on neovim mode
 -- similar to modicator.nvim plugin
 autocmd({ "ModeChanged" }, {
   group = augroup("modechange"),
@@ -293,6 +332,7 @@ autocmd("FileType", {
     "mininotify-history",
     "git",
     "grug-far",
+    "vim",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
@@ -318,10 +358,39 @@ autocmd({ "BufWritePre" }, {
   end,
 })
 
-autocmd("BufReadPost", {
-  once = true,
-  group = augroup("Globalfunction"),
-  callback = function()
-    require("utils.vimFunctions")
-  end,
-})
+-- autocmd("BufReadPost", {
+--   once = true,
+--   group = augroup("Globalfunction"),
+--   callback = function()
+--     require("utils.vimFunctions")
+--   end,
+-- })
+
+-- Tahnks to @MariaSolOs https://github.com/MariaSolOs/dotfiles
+-- local line_numbers_group =
+--   vim.api.nvim_create_augroup("toggle_line_numbers", {})
+-- autocmd({ "InsertLeave", "CmdlineLeave" }, {
+--   group = line_numbers_group,
+--   desc = "Toggle relative line numbers on",
+--   callback = function()
+--     if
+--       vim.wo.nu
+--       and vim.wo.relativenumber == false
+--       and not vim.startswith(vim.api.nvim_get_mode().mode, "i")
+--     then
+--       vim.wo.relativenumber = true
+--     end
+--   end,
+-- })
+-- autocmd({ "InsertEnter", "CmdlineEnter" }, {
+--   group = line_numbers_group,
+--   desc = "Toggle relative line numbers off",
+--   callback = function(args)
+--     if vim.wo.nu and vim.wo.relativenumber then
+--       vim.wo.relativenumber = false
+--       if args.event == "CmdlineEnter" then
+--         vim.cmd.redraw()
+--       end
+--     end
+--   end,
+-- })

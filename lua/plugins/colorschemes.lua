@@ -1,3 +1,6 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 return {
   {
     "EdenEast/nightfox.nvim",
@@ -16,6 +19,9 @@ return {
       groups = {
         all = {
           NormalFloat = { link = "Normal" },
+          RenderMarkdownCode = { link = "Visual" },
+          RenderMarkdownCodeInline = { link = "Visual" },
+          -- Cursor = { fg = "#fca5a5", bg = "#cecacd" },
         },
         -- orignial colors
         -- hi Normal guifg=#cdcecf guibg=#2e3440
@@ -38,7 +44,7 @@ return {
       end
     end,
   },
-  { "catppuccin/nvim", name = "catppuccin", event = "VeryLazy" },
+  { "catppuccin/nvim", name = "catppuccin", opts = {} },
   {
     "sho-87/kanagawa-paper.nvim",
     lazy = false,

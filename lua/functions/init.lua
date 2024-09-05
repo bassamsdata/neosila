@@ -16,11 +16,18 @@ local fts = {
 M.run_file_term = function(option, term_height)
   local cmd = fts[vim.bo.ft]
   local height = term_height or 15
-  vim.cmd(
-    cmd and ("w | " .. (option or "") .. height .. "sp | term " .. cmd)
+  vim.api.nvim_command(
+    cmd and ("w | " .. (option or "") .. height .. "sp | terminal")
       or "echo 'No command for this filetype'"
   )
-  vim.cmd("startinsert")
+  if cmd then
+    vim.defer_fn(function()
+      vim.api.nvim_command(
+        "call jobsend(b:terminal_job_id, '" .. cmd .. "\\n')"
+      )
+      vim.cmd.startinsert()
+    end, 100) -- 100ms delay
+  end
 end
 -- This is what you need
 M.run_file = function(option)
@@ -119,13 +126,14 @@ end
 
 ------------------------------------------
 
+---@return nil
 function M.change_directory()
   local buf = vim.api.nvim_get_current_buf()
   local root =
     vim.fs.root(buf, { ".git", "main.R", "data/", "main.py", "main.qmd" })
   if root then
     vim.uv.chdir(root)
-    -- handle error
+    vim.notify("CWD is now " .. root, vim.log.levels.INFO)
     if vim.v.shell_error ~= 0 then
       vim.notify("Failed to change directory to " .. root, vim.log.levels.ERROR)
     end
@@ -133,13 +141,5 @@ function M.change_directory()
     vim.notify("No suitable root directory found", vim.log.levels.WARN)
   end
 end
-
--- Map the function to a key (e.g., <leader>cd)
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>cd",
-  ":lua change_directory()<CR>",
-  { noremap = true, silent = true }
-)
 
 return M

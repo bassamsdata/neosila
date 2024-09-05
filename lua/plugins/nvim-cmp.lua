@@ -14,7 +14,7 @@ return {
       return not vim.b.bigfile
     end,
     event = { "CmdlineEnter", "InsertEnter" },
-    dependencies = "hrsh7th/nvim-cmp",
+    dependencies = { "yioneko/nvim-cmp", branch = "perf" },
   },
   {
     "hrsh7th/cmp-nvim-lsp",
@@ -29,10 +29,11 @@ return {
       return not vim.b.bigfile
     end,
     event = "CmdlineEnter",
-    dependencies = "hrsh7th/nvim-cmp",
+    dependencies = { "yioneko/nvim-cmp", branch = "perf" },
   },
   {
-    "hrsh7th/nvim-cmp",
+    "yioneko/nvim-cmp",
+    branch = "perf",
     enabled = function()
       return not vim.b.bigfile
     end,
@@ -89,7 +90,7 @@ return {
           end),
           ["<C-l>"] = cmp.mapping.close(),
           ["<C-y>"] = cmp.mapping.confirm({ select = true }),
-          ["<C-m>"] = cmp.mapping(function(fallback)
+          ["<C-k>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.confirm({ select = true })
             else
@@ -118,9 +119,9 @@ return {
           { name = "supermaven", group_index = 1, priority = 100 },
           { name = "codeium", group_index = 2, priority = 50 },
           { name = "cody", group_index = 3, priority = 25 },
-          { name = "otter" },
+          { name = "otter", max_item_count = 20 },
           { name = "cmp_r" },
-          { name = "nvim_lsp" },
+          { name = "nvim_lsp", max_item_count = 50 },
           {
             name = "buffer",
             max_item_count = 8,
@@ -181,7 +182,7 @@ return {
           documentation = {
             max_width = 80,
             max_height = 20,
-            border = "solid",
+            border = "rounded",
           },
           -- documentation = {
           --   border = "rounded",
@@ -191,7 +192,7 @@ return {
           -- },
         },
         -- experimental = {
-        -- 	ghost_text = { hl_group = "LspCodeLens" },
+        -- ghost_text = { hl_group = "LspCodeLens" },
         -- },
       })
       cmp.setup.cmdline({ "/", "?" }, {

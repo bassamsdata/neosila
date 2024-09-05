@@ -107,7 +107,7 @@ return {
         },
         window = {
           -- Delay before showing clue window
-          delay = 500, -- FIX: return to 200 when this gets merged https://github.com/neovim/neovim/pull/28235
+          delay = 200,
           config = function(bufnr)
             local max_width = 0
             for _, line in

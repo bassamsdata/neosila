@@ -11,7 +11,6 @@ vim.cmd([[
 
   endfunction
 ]])
-
 -- lua version
 -- local function textobjectall()
 --   vim.g.restore_position = vim.fn.winsaveview()

@@ -126,8 +126,7 @@ return {
           vim.diagnostic.enable(not vim.diagnostic.is_enabled())
         end, opts)
         map("n", "<leader>ui", function()
-          ---@diagnostic disable-next-line
-          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+          vim.lsp.inlay_hint.enable(true)
         end, { desc = "Toggle inlay hints" })
         map("n", "<leader>d", vim.diagnostic.open_float) -- show diagnostics for line
         map("n", "K", vim.lsp.buf.hover) -- show documentation for what is under cursor
@@ -173,7 +172,7 @@ return {
       -- 	settings = {
       -- 		disableLanguageServices = true,
       -- 	},
-      -- 	-- TODO: add this and modify it
+      -- TODO: add this and modify it
       -- 	-- before_init = function(_, config)
       -- 	-- 	local default_venv_path =
       -- 	-- 		path.join(vim.env.HOME, "virtualenvs", "nvim-venv", "bin", "python")
@@ -266,11 +265,20 @@ return {
         capabilities = capabilities,
         on_attach = on_attach,
       })
+      -- lspconfig["harper_ls"].setup({
+      --   capabilities = capabilities,
+      --   on_attach = on_attach,
+      -- })
 
       -- configure lua server (with special settings)
       lspconfig["lua_ls"].setup({
         capabilities = capabilities,
         on_attach = on_attach,
+        root_dir = function(fname)
+          return require("lspconfig.util").find_git_ancestor(fname)
+            or require("lspconfig.util").path.dirname(fname)
+        end,
+        ---@param client vim.lsp.Client
         on_init = function(client)
           local path = client.workspace_folders
             and client.workspace_folders[1]
@@ -278,10 +286,8 @@ return {
           if
             not path
             or not (
-                            ---@diagnostic disable-next-line: undefined-field
-(vim.uv or vim.loop).fs_stat(path .. "/.luarc.lua")
-              ---@diagnostic disable-next-line: undefined-field
-              or (vim.uv or vim.loop).fs_stat(path .. "/.luarc")
+              vim.uv.fs_stat(path .. "/.luarc.json")
+              or vim.uv.fs_stat(path .. "/.luarc.jsonc")
             )
           then
             client.config.settings =
@@ -293,6 +299,7 @@ return {
                   workspace = {
                     checkThirdParty = false,
                     library = {
+                      vim.fn.stdpath("config"),
                       vim.env.VIMRUNTIME,
                       "${3rd}/luv/library",
                     },
@@ -324,11 +331,12 @@ return {
               globals = { "vim" },
             },
             workspace = {
-              -- make language server aware of runtime files
               library = {
-                [vim.fn.stdpath("config") .. "/lua"] = true,
-                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                vim.fn.expand("$VIMRUNTIME/lua"),
+                vim.fn.stdpath("config") .. "/lua",
               },
+              maxPreload = 1000,
+              preloadFileSize = 10000,
             },
           },
         },

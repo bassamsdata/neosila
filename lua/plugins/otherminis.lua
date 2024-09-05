@@ -9,10 +9,38 @@ return {
     ft = { "lua", "go", "r", "py", "quarto", "v" },
     cond = not vim.g.vscode,
     enabled = function()
-      return not vim.b.bigfile
+      return not vim.b.bigfile or vim.bo.buftype == "markdown"
     end,
     config = function()
+      local f = function(args)
+        vim.b[args.buf].miniindentscope_disable = true
+      end
+      -- FIXME: remove this indentscop from terminals
+      vim.api.nvim_create_autocmd(
+        "Filetype",
+        { pattern = { "markdown", "help", "Avante" }, callback = f }
+      )
       local indentscope = require("mini.indentscope")
+      -- require("utils.hi").blend_highlight_groups(
+      --   { "MiniIndentscopeSymbol" },
+      --   "Normal",
+      --   "bg",
+      --   0.7
+      -- )
+      -- vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+      --   group = vim.api.nvim_create_augroup(
+      --     "MiniIndentscope",
+      --     { clear = true }
+      --   ),
+      --   callback = function()
+      --     require("utils.hi").blend_highlight_groups(
+      --       { "MiniIndentscopeSymbol" },
+      --       "Normal",
+      --       "bg",
+      --       0.7
+      --     )
+      --   end,
+      -- })
       indentscope.setup({
         draw = {
           delay = 100,
@@ -65,38 +93,58 @@ return {
               .. "zv<Cmd>lua MiniMap.refresh({}, { lines = false, scrollbar = false })<CR>"
           )
         end
-        local autocmd = vim.api.nvim_create_autocmd
-        -- vim.api.nvim_set_hl(0, "MiniMapSymbolLine", { fg = "#f38ba9" })
 
+        require("utils.hi").blend_highlight_groups(
+          { "MiniMapSymbolView", "MiniMapSymbolLine" },
+          "Normal",
+          "bg",
+          0.6
+        )
+        local autocmd = vim.api.nvim_create_autocmd
+        local f = function(args)
+          vim.schedule(function()
+            map.open()
+          end)
+          if vim.fn.line("$") < 50 then
+            vim.b[args.buf].minimap_disable = true
+            map.close()
+          end
+          local excluded_ft =
+            { "lazy", "netrw", "man", "help", "intro", "", "nofile" }
+          if vim.tbl_contains(excluded_ft, vim.bo.ft) then
+            map.close()
+          end
+        end
+
+        -- autocmd({ "FileType" }, {
+        --   group = vim.api.nvim_create_augroup("MiniMap", { clear = true }),
+        --   pattern = "*",
+        --   callback = f,
+        -- })
         autocmd({ "FileType" }, {
           pattern = ft,
           callback = function()
             vim.schedule(function()
               map.open()
             end)
-            if vim.bo.buftype == "nofile" or vim.bo.buftype == "" then
+            local excluded_ft =
+              { "lazy", "netrw", "man", "help", "intro", "", "nofile" }
+            if vim.tbl_contains(excluded_ft, vim.bo.ft) then
               map.close()
             end
           end,
         })
         --
-        -- autocmd({ "WinScrolled", "WinResized" }, {
-        --  callback = function()
-        --    vim.schedule(function()
-        --      map.open()
-        --    end)
-        --  end,
-        -- })
-        -- autocmd("CursorHold", {
-        --  callback = function()
-        --    -- Delay map.close by 1000 ms
-        --    vim.schedule(function()
-        --      vim.defer_fn(function()
-        --        map.close()
-        --      end, 1500)
-        --    end)
-        --  end,
-        -- })
+        autocmd({ "ColorScheme" }, {
+          callback = function()
+            require("utils.hi").blend_highlight_groups(
+              { "MiniMapSymbolView", "MiniMapSymbolLine" },
+              "Normal",
+              "bg",
+              0.6
+            )
+          end,
+        })
       end
     end,
   },
@@ -108,14 +156,6 @@ return {
     config = function()
       local mini_notify = require("mini.notify")
       vim.notify = mini_notify.make_notify()
-      -- FIX: convert the output to strings so it can appear in notify
-      -- print = mini_notify.make_notify()
-      -- vim.api.nvim_echo = mini_notify.make_notify()
-      local cus_format = function(notif)
-        local time = vim.fn.strftime("%H:%M:%S", math.floor(notif.ts_update))
-        local icon = "\nNotification ❰❰"
-        return string.format("%s │ %s %s", time, notif.msg, icon)
-      end
       local row = function()
         local has_statusline = vim.o.laststatus > 0
         local bottom_space = vim.o.cmdheight + (has_statusline and 1 or 0)
@@ -143,18 +183,19 @@ return {
     "echasnovski/mini.misc",
     opts = {},
     keys = {
-      { "<leader>mm", "<cmd>lua MiniMisc.zoom()<cr>", desc = "Zoom" },
       {
-        "<leader>ur",
+        "<leader>mm",
         function()
-          require("mini.misc").setup_auto_root()
+          if not vim.g.neovide then
+            require("mini.misc").zoom()
+          else
+            vim.notify("Not supported in neovide", vim.log.levels.WARN)
+          end
         end,
-        desc = "[U]I [Root]",
+        { desc = "Zoom" },
       },
     },
   },
-
-  { "echasnovski/mini.sessions", lazy = true, opts = {} },
 
   {
     "echasnovski/mini.align",
@@ -164,91 +205,6 @@ return {
     },
     opts = {},
   },
-
-  {
-    "folke/todo-comments.nvim",
-    event = "BufReadPost",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "TodoTrouble", "TodoQuickFix" },
-    opts = {
-      keywords = {
-        -- stylua: ignore start 
-        FIX = { icon = " ", color = "error", alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, },
-        TODO = { icon = " ", color = "info" },
-        HACK = { icon = " ", color = "warning" },
-        WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-        PERF = { icon = "󰓅 ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-        NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
-        TEST = { icon = "󰙨", color = "test", alt = { "TESTING", "PASSED", "FAILED" }, },
-        DEL = { icon = " ", color = "error", alt = { "DELETE" } },
-        SUG = { icon = "󰭙 ", color = "info", alt = { "SUGGEST" } },
-        SCHE = { icon = "󱫌 ", color = "sche", alt = { "SCHEDULE", "SCHED" } },
-        -- stylua: ignore end
-      },
-      colors = {
-        error = { "DiagnosticError", "ErrorMsg", "#DC2626" },
-        warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" },
-        info = { "DiagnosticInfo", "#2563EB" },
-        hint = { "DiagnosticHint", "#10B981" },
-        default = { "Identifier", "#7C3AED" },
-        test = { "Identifier", "#FF00FF" },
-        sche = { "DiagnosticOk", "WarningMsg", "#fca5a5" },
-      },
-    },
-  },
-  -- {
-  --  --- apply one highlight for bg and another for fg
-  --  "echasnovski/mini.hipatterns",
-  --  cond = function()
-  --    return not vim.b.large_file
-  --  end,
-  --  event = "BufReadPost",
-  --  config = function()
-  --    local mini_hipatterns = require("mini.hipatterns")
-  --
-  --    if mini_hipatterns then
-  --      local keywords = { "NOTE", "BUG", "LOVE", "TODO", "FIX" }
-  --      local icons = { "󰎞 ", "󰃤 ", "󰩖 ", "󰸞 ", "󰁨 " }
-  --      local highlighters = {
-  --        hex_color = mini_hipatterns.gen_highlighter.hex_color(),
-  --        hsl_color = { -- thanks to https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
-  --          pattern = "hsl%(%d+,? %d+%%?,? %d+%%?%)",
-  --          group = function(_, match)
-  --            local utils = require("utils.hi")
-  --            --- @type string, string, string
-  --            local nh, ns, nl =
-  --              match:match("hsl%((%d+),? (%d+)%%?,? (%d+)%%?%)")
-  --            --- @type number?, number?, number?
-  --            local h, s, l = tonumber(nh), tonumber(ns), tonumber(nl)
-  --            --- @type string
-  --            local hex_color = utils.hslToHex(h, s, l)
-  --            return mini_hipatterns.compute_hex_color_group(hex_color, "bg")
-  --          end,
-  --        },
-  --      }
-  --      for _, keyword in ipairs(keywords) do
-  --        -- this is how we get attributes `fg = vim.api.nvim_get_hl(0, { name = 'NonText' }).fg,`
-  --        local lowerKeyword = string.lower(keyword)
-  --        -- local highlightGroup = string.format("HiPatterns%s", keyword)
-  --        -- local fg = vim.api.nvim_get_hl(0, { name = highlightGroup }).fg
-  --        highlighters[lowerKeyword] = {
-  --          pattern = string.format("%s:", keyword),
-  --          group = "IncSearch",
-  --          extmark_opts = {
-  --            sign_text = icons[_],
-  --            sign_hl_group = "IncSearch",
-  --          },
-  --        }
-  --        highlighters[string.format("%s_trail", lowerKeyword)] = {
-  --          pattern = string.format("%s: ()%%S+.*()", keyword),
-  --          group = "IncSearch",
-  --        }
-  --      end
-  --
-  --      mini_hipatterns.setup({ highlighters = highlighters })
-  --    end
-  --  end,
-  -- },
 
   {
     "echasnovski/mini.bufremove",

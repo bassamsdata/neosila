@@ -52,7 +52,7 @@ intro.splash_screen = vim.schedule_wrap(function()
     }
     vim.api.nvim_put(intro.center(header), "l", true, true)
     vim.cmd( -- set local: nonumber norelativenumber nosign-column ocursorcolumn
-      [[silent! setl nonu nornu nobl nolist nocul ft=dashboard bh=wipe bt=nofile]]
+      [[silent! setl nonu nornu nobl nolist nocul ft=intro bh=wipe bt=nofile]]
     ) -- buffer-history, backtrace
 
     vim.api.nvim_win_set_cursor(0, { 1, 1 })

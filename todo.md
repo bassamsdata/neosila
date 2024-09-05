@@ -3,8 +3,11 @@
 - check wich plugin makes the crolling bad
 - average age for managers in each year and see how it changes over time
 
+## add these highlioghts to all the colorschemes I use:
+- Arrow highlights
 
 # make this modules:
+- [ ] yanking plugin
 - [ ] usage time
 - [ ] snowflakes
 - [x] Auto save if diagnostics.count() is nil. (see n-macro for this)

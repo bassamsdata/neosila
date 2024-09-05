@@ -1,15 +1,77 @@
-if vim.env.NVIM_TESTING then
-  return {}
-end
 return {
-  { "folke/trouble.nvim", opts = {} },
+  { "fcancelinha/nordern.nvim", event = "VeryLazy", opts = {} },
+  {
+    "shmerl/neogotham",
+    event = "VeryLazy",
+    opts = {},
+  },
+  {
+    "frankroeder/parrot.nvim",
+    cmd = { "PrtChatToggle", "PrtRewrite", "PrtAsk", "PrtAsk" },
+    tag = "v0.3.9",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    -- optionally include "rcarriga/nvim-notify" for beautiful notifications
+    config = function()
+      require("parrot").setup({
+        -- Providers must be explicitly added to make them available.
+        providers = {
+          pplx = {
+            api_key = os.getenv("PERPLEXITY_API_KEY"),
+            -- OPTIONAL
+            -- gpg command
+            -- api_key = { "gpg", "--decrypt", vim.fn.expand("$HOME") .. "/pplx_api_key.txt.gpg"  },
+            -- macOS security tool
+            -- api_key = { "/usr/bin/security", "find-generic-password", "-s pplx-api-key", "-w" },
+          },
+          openai = {
+            api_key = os.getenv("OPENAI_API_KEY"),
+          },
+          anthropic = {
+            api_key = os.getenv("ANTHROPIC_API_KEY"),
+          },
+          mistral = {
+            api_key = os.getenv("MISTRAL_API_KEY"),
+          },
+          gemini = {
+            api_key = os.getenv("GEMINI_API_KEY"),
+          },
+          ollama = {}, -- provide an empty list to make provider available
+        },
+      })
+    end,
+  },
+
+  {
+    "rose-pine/neovim",
+    event = "VeryLazy",
+    name = "rose-pine",
+    opts = {
+      enable = {
+        terminal = true,
+        legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
+        migrations = true, -- Handle deprecated options automatically
+      },
+
+      styles = {
+        bold = true,
+        italic = true,
+        transparency = false,
+      },
+
+      highlight_groups = {
+        -- Comment = { fg = "foam" },
+        -- VertSplit = { fg = "muted", bg = "muted" },
+        ["@variable"] = { fg = "text", italic = false },
+      },
+    },
+  },
   {
     "AlexvZyl/nordic.nvim",
-    lazy = false,
+    event = "VeryLazy",
     -- priority = 1000,
     config = function()
       local palette = require("nordic.colors")
-      require("nordic").load()
+      -- require("nordic").load()
       require("nordic").setup({
         override = {
           MatchParen = {
@@ -31,76 +93,19 @@ return {
             underline = false,
             undercurl = false,
           },
+          MiniMapNormal = { link = "Normal" },
+          TermCursor = { link = "Substitute" },
+          MiniIndentscopeSymbol = { link = "Delimiter" },
+          LineNr4 = { fg = "#3B4261" },
+          LineNr3 = { fg = "#4d71a0" },
+          LineNr2 = { fg = "#6fc1cf" },
+          LineNr1 = { fg = "#eeffee" },
+          LineNr0 = { fg = "#FFFFFF", bg = "NONE", bold = true },
+          NormalFloat = { link = "Normal" },
+          FloatBorder = { fg = palette.gray5, bg = "NONE" },
+          -- TODO: add Statusline Hoighlights
         },
       })
-    end,
-  },
-
-  {
-    "vague2k/vague.nvim",
-    config = function()
-      require("vague").setup({
-        -- optional configuration here
-      })
-    end,
-  },
-
-  {
-    "stevearc/oil.nvim",
-    cmd = "Oil",
-    keys = {
-      {
-        "<leader>-",
-        function()
-          require("oil").open()
-        end,
-        desc = "Open parent directory",
-      },
-    },
-    opts = {},
-    -- Optional dependencies
-    dependencies = { "echasnovski/mini.icons" },
-    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
-  },
-  {
-    "echasnovski/mini.ai",
-    enabled = function()
-      return not vim.b.bigfile
-    end,
-
-    event = "BufReadPost",
-    opts = function()
-      local ai = require("mini.ai")
-      local gen_ai_spec = require("mini.extra").gen_ai_spec
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter({ -- code block
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-          }),
-          f = ai.gen_spec.treesitter({
-            a = "@function.outer",
-            i = "@function.inner",
-          }), -- function
-          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }), -- class
-          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" }, -- tags
-          d = { "%f[%d]%d+" }, -- digits
-          e = { -- Word with case
-            {
-              "%u[%l%d]+%f[^%l%d]",
-              "%f[%S][%l%d]+%f[^%l%d]",
-              "%f[%P][%l%d]+%f[^%l%d]",
-              "^[%l%d]+%f[^%l%d]",
-            },
-            "^().*()$",
-          },
-          i = gen_ai_spec.indent(),
-          g = gen_ai_spec.buffer(),
-          u = ai.gen_spec.function_call(), -- u for "Usage"
-          U = ai.gen_spec.function_call({ name_pattern = "[%w_]" }), -- without dot in function name
-        },
-      }
     end,
   },
   {
@@ -193,8 +198,8 @@ return {
       -- stylua: ignore start
       vim.keymap.set("n",  "K",  require("hover").hover,        { desc = "hover.nvim" })
       vim.keymap.set( "n", "gK", require("hover").hover_select, { desc = "hover.nvim (select)" })
-      vim.keymap.set("n",  "<C-p>", function() require("hover").hover_switch("previous") end, { desc = "hover.nvim (previous source)" })
-      vim.keymap.set("n",  "<C-n>", function() require("hover").hover_switch("next") end,     { desc = "hover.nvim (next source)" })
+      -- vim.keymap.set("n",  "<C-p>", function() require("hover").hover_switch("previous") end, { desc = "hover.nvim (previous source)" })
+      -- vim.keymap.set("n",  "<C-n>", function() require("hover").hover_switch("next") end,     { desc = "hover.nvim (next source)" })
       -- stylua: ignore end
 
       -- Mouse support
@@ -208,28 +213,18 @@ return {
     end,
   },
 
-  {
-    "glacambre/firenvim",
-    -- Lazy load firenvim
-    -- Explanation: https://github.com/folke/lazy.nvim/discussions/463#discussioncomment-4819297
-    lazy = not vim.g.started_by_firenvim,
-    build = function()
-      vim.fn["firenvim#install"](0)
-    end,
-  },
-
   { "lewis6991/whatthejump.nvim", keys = { "<C-o>", "<C-i>", "<Backspace>" } },
 
   {
     "wildfunctions/myeyeshurt",
     event = "VeryLazy",
     opts = {
-      initialFlakes = 5,
+      initialFlakes = 10,
       flakeOdds = 20,
       maxFlakes = 750,
       nextFrameDelay = 175,
       useDefaultKeymaps = false,
-      flake = { "*", "󰜗", "." },
+      flake = { "󰼪 ", "󰜗 ", "" },
       minutesUntilRest = 20,
     },
   },
@@ -257,42 +252,6 @@ return {
         },
       })
     end,
-  },
-
-  -- {
-  --  "b0o/incline.nvim",
-  --  cond = not vim.g.vscode or not vim.b.bigfile,
-  --  event = "BufReadPost",
-  --  -- lazy = true,
-  --  opts = {
-  --    hide = {
-  --      cursorline = "focused_win",
-  --      focused_win = false,
-  --      only_win = true,
-  --    },
-  --    render = function(props)
-  --      local filename =
-  --        vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
-  --      local modified = vim.bo[props.buf].modified
-  --      return {
-  --        filename,
-  --        modified and { " ", guifg = "#d67c8e", gui = "bold" } or "",
-  --        -- guibg = "#111111",
-  --        -- guifg = "#eeeeee",
-  --      }
-  --    end,
-  --  },
-  -- },
-
-  {
-    "bfredl/nvim-miniyank",
-    -- stylua: ignore start
-    keys = {
-      { "p", "<plug>(miniyank-autoput)", mode = "", desc = "autoput with miniyank", },
-      { "P", "<plug>(miniyank-autoPut)", mode = "", desc = "autoput with miniyank", },
-    },
-    -- stylua: ignore end
-    event = { "TextYankPost" },
   },
 
   {

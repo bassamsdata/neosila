@@ -60,29 +60,40 @@ return {
           copy_to_register = copy_to_register,
           scroll_up_a_bit = scroll_up,
           scroll_down_a_bit = scroll_down,
+          refine = "<M-r>",
         },
       })
       vim.ui.select = MiniPick.ui_select
       -- == Styles ==
       -- 1 - File picker configuration that follows cursor
       local cursor_win_config = {
-        border = "rounded",
+        -- stylua: ignore start 
+        border   = "rounded",
         relative = "cursor",
-        anchor = "NW",
-        row = 0,
-        col = 0,
-        width = 50,
-        height = 16,
+        anchor   = "NW",
+        row      = 0,
+        col      = 0,
+        width    = 50,
+        height   = 16,
+        -- stylua: ignore end
       }
       -- 2 - Right side picker configuration
+      local row = function()
+        local has_statusline = vim.o.laststatus > 0
+        local bottom_space = vim.o.cmdheight + (has_statusline and 1 or 0)
+        return vim.o.lines - bottom_space
+      end
       local right_win_config = {
-        border = "rounded",
+        -- stylua: ignore start 
+        border   = "rounded",
         relative = "editor",
-        anchor = "SE",
-        row = vim.o.lines,
-        col = vim.o.columns,
-        height = 16,
-        width = 50,
+        anchor   = "SE",
+        -- down in the right bottom
+        row      = row(),
+        col      = vim.o.columns - 1,
+        height   = 16,
+        width    = 50,
+        -- stylua: ignore end
       }
       -- 3 - Center small window
       local height = math.floor(0.40 * vim.o.lines)
@@ -235,7 +246,6 @@ return {
           return
         end
 
-        -- Prepare the source for MiniPick
         local source = {
           items = buffers,
           name = "Terminal Buffers",
@@ -248,7 +258,6 @@ return {
           end,
         }
 
-        -- Start MiniPick with the prepared source
         MiniPick.start({ source = source })
       end
     end,

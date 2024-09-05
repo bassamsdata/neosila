@@ -5,7 +5,7 @@ return {
   {
     "MeanderingProgrammer/markdown.nvim",
     opts = {
-      file_types = { "markdown", "rmd", "quarto" },
+      file_types = { "markdown", "rmd", "quarto", "Avante", "codecompanion" },
       code = {
         sign = false,
         width = "block",
@@ -17,7 +17,7 @@ return {
         icons = {},
       },
     },
-    ft = { "markdown", "rmd", "quarto" },
+    ft = { "markdown", "rmd", "quarto", "Avante", "codecompanion" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
       vim.keymap.set("n", "<leader>um", function()

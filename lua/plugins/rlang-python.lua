@@ -1,6 +1,7 @@
 if vim.env.NVIM_TESTING then
   return {}
 end
+
 return {
   {
     "R-nvim/R.nvim",
@@ -20,7 +21,7 @@ return {
                 vim.cmd( -- set local: nonumber norelativenumber nosign-column ocursorcolumn
                   [[silent! setl nonu nornu nobl nolist nocul ]]
                 ) -- buffer-history, backtrace
-                vim.cmd("startinsert")
+                vim.cmd.startinsert()
               end
             )
           end)
@@ -88,7 +89,7 @@ return {
           },
         },
       }, -- , dev = true },
-      "hrsh7th/nvim-cmp",
+      dependencies = { "yioneko/nvim-cmp", branch = "perf" },
       "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter",
     },

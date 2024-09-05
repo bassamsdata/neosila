@@ -1,115 +1,83 @@
 local opt = vim.opt
 
--- set leader key to space
-vim.g.mapleader = " "
--- Set <\> as the local leader key - it gives me a whole new set of letters.
+-- stylua: ignore start 
+vim.g.mapleader      = " " -- set leader key to space
 vim.g.maplocalleader = "\\" -- we need to escabe \ with another \
-
 -- Appearance
-opt.termguicolors = true
-opt.background = "dark"
-opt.signcolumn = "yes"
-
--- line numbers
-opt.relativenumber = true
-opt.number = true
-
--- Enable mouse mode.
-opt.mouse = "a"
-
+if vim.fn.has("nvim-0.10") == 1 then
+    vim.deprecate = function() end
+end
+opt.termguicolors    = true
+opt.background       = "dark"
+opt.signcolumn       = "yes"
+opt.relativenumber   = true
+opt.number           = true
+opt.mouse            = "a" -- Enable mouse mode.
 -- tabs & indentation
-opt.expandtab = true
-opt.tabstop = 2
-opt.shiftwidth = 2
-opt.smarttab = true
-
--- o.smartindent = true
--- o.softtabstop = 2
-opt.shiftround = true -- Round indent
--- opt.list = true
+opt.expandtab        = true
+opt.tabstop          = 2
+opt.shiftwidth       = 2
+opt.smarttab         = true
+opt.statuscolumn     = [[%!v:lua.require'utils'.statuscolumn()]]
+opt.shiftround       = true -- Round indent
 vim.opt.listchars:append({
-  trail = "·",
+  trail              = "·",
 })
 
--- tab = " ",
--- tab         = "   ",
--- leadmultispace = "│ ", -- this caused problems
--- multispace  = "│ ",
--- tab = "│ ",
--- space = "⋅",
-opt.statuscolumn = [[%!v:lua.require'utils'.statuscolumn()]]
-
 -- Save undo history.
-opt.undofile = true
-opt.undolevels = 10000
+opt.undofile         = true
+opt.undolevels       = 10000
 -- Cursor settings
-opt.cursorline = true
-
-opt.guicursor = {
+opt.cursorline       = true
+opt.guicursor        = {
   "n-v:block-Cursor/lCursor",
   "i-c-ci-ve:blinkoff500-blinkon1000-block-TermCursor",
 }
-if not vim.g.neovide then
-  -- it has a bug with
-  opt.inccommand = "split" -- split window for substitute - nice to have
-end
 -- view and session options
-opt.viewoptions = "cursor,folds"
-opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize"
--- clipoboard
-opt.clipboard:append("unnamedplus")
-opt.showbreak = "↪ "
+opt.viewoptions      = "cursor,folds"
+opt.sessionoptions   = "buffers,curdir,folds,help,tabpages,winsize"
+opt.clipboard:append("unnamedplus") -- clipoboard
+opt.showbreak        = "↪ "
 
 -- UI characters.
 opt.fillchars:append({
-  -- foldopen = "",
-  -- foldclose = "",
-  -- fold = "⸱",
-  -- fold = " ",
-  -- foldsep = " ",
-  diff = "╱",
-  eob = " ",
+  diff               = "╱",
+  eob                = " ",
 })
 
--- opt.splitkeep = "screen"
-opt.laststatus = 3
-opt.pumheight = 10 -- Maximum number of entries in a popup
--- opt.sidescrolloff = 4
+opt.laststatus       = 3
+opt.pumheight        = 10 -- Maximum number of entries in a popup
 --spli windows
-opt.splitright = true
-opt.splitbelow = true
+opt.splitright       = true
+opt.splitbelow       = true
 -- search settings
-opt.ignorecase = true
-opt.smartcase = true
+opt.ignorecase       = true
+opt.smartcase        = true
+
 if vim.env.VSCODE then
-  vim.g.vscode = true
+  vim.g.vscode       = true
+end
+if not vim.g.neovide then
+  -- it has a bug with
+  opt.inccommand     = "split" -- split window for substitute - nice to have
 end
 
--- Confirm to save changes before exiting modified buffer
-opt.confirm = true
---line wrapping
-opt.wrap = false
+opt.confirm          = true -- Confirm to save changes
+opt.wrap             = false --line wrapping
 -- yank to Capital case register with reserving lines
 opt.cpoptions:append(">")
--- completion
-vim.opt.wildignore:append({ ".DS_Store" })
--- opt.conceallevel = 2 -- Hide * markup for bold and italic
-opt.foldcolumn = "0"
-opt.foldenable = false
-opt.foldlevel = 999
-opt.foldmethod = "indent"
--- opt.foldtext = "v:lua.require'utils'.foldtext()"
-opt.smoothscroll = true
-opt.foldtext = 'v:lua.require("utils").simple_fold()'
-
--- backsapace
--- opt.backspace = "indent,eol,start"
-
--- format respect list
--- opt.formatoptions:append("n")
-opt.formatoptions = "jcqlnt" -- tcqj
+vim.opt.wildignore:append({ ".DS_Store" }) -- completion
+-- opt.conceallevel  = 2 -- Hide * markup for bold and italic
+opt.foldcolumn       = "0"
+opt.foldenable       = false
+opt.foldlevel        = 999
+opt.foldmethod       = "indent"
+-- opt.foldtext      = "v:lua.require'utils'.foldtext()"
+opt.smoothscroll     = true
+opt.foldtext         = 'v:lua.require("utils").simple_fold()'
+opt.formatoptions    = "jcqlnt" -- tcqj
 -- this drove me crzy - it controll how vertical movement behave when tab is used
-
+-- stylua: ignore end
 if not vim.g.vscode then
   opt.scrolloff = 4
   opt.showmode = false
@@ -121,39 +89,25 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
 if vim.g.neovide then
-  -- vim.o.guifont = "Iosevka Comfy:h15:w1" -- text below applies for VimScript
+  -- vim.o.guifont = "Iosevka Comfy:h15:w1"
   vim.g.neovide_transparency = 1
-  -- vim.g.neovide_window_blurred = true
+  -- vim.g.neovide_window_blurred                = true
   vim.g.neovide_input_macos_option_key_is_meta = "both"
   vim.g.neovide_cursor_animation_length = 0.1
-  -- vim.g.neovide_scroll_animation_length = 0.15
+  -- vim.g.neovide_scroll_animation_length = 015
   vim.g.neovide_cursor_trail_size = 0.2
   vim.g.neovide_cursor_antialiasing = false
   -- vim.g.neovide_cursor_animate_in_insert_mode = true
   vim.opt.linespace = 10 -- 8 was nice for commit font
   vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_floating_z_height = 0
+  vim.g.neovide_light_angle_degrees = 0
+  vim.g.neovide_light_radius = 0
   vim.g.neovide_padding_right = 0
   vim.g.neovide_padding_left = 0
 end
 
-vim.g.firenvim_config = {
-  localSettings = {
-    [ [[.*]] ] = {
-      cmdline = "firenvim",
-      priority = 0,
-      selector = "textarea",
-      takeover = "never",
-    },
-    [ [[.*notion\.so.*]] ] = {
-      priority = 9,
-      takeover = "never",
-    },
-    [ [[.*docs\.google\.com.*]] ] = {
-      priority = 9,
-      takeover = "never",
-    },
-  },
-}
 -- Thanks to Bekaboo for this https://github.com/Bekaboo/nvim
 ---Lazy-load runtime files
 local g = vim.g
@@ -174,11 +128,13 @@ local function _load(runtime, flag, event)
   end
 end
 
-_load("plugin/rplugin.vim", "loaded_remote_plugins", "FileType")
-_load("provider/python3.vim", "loaded_python3_provider", "FileType")
-_load("plugin/matchit.vim", "loaded_matchit", "FileType")
-_load("plugin/matchparen.vim", "loaded_matchparen", "FileType")
-_load("plugin/tohtml.lua", "loaded_tohtml", "FileType")
-_load("plugin/tutor.lua", "loaded_tutor_mode", "FileType")
-_load("plugin/man.lua", "loaded_man", "FileType")
-_load("plugin/spellfile.vim", "loaded_spellfile", "FileType")
+-- stylua: ignore start 
+_load("plugin/rplugin.vim",    "loaded_remote_plugins",   "FileType")
+_load("provider/python3.vim",  "loaded_python3_provider", "FileType")
+_load("plugin/matchit.vim",    "loaded_matchit",          "FileType")
+_load("plugin/matchparen.vim", "loaded_matchparen",       "FileType")
+_load("plugin/tohtml.lua",     "loaded_tohtml",           "FileType")
+_load("plugin/tutor.lua",      "loaded_tutor_mode",       "FileType")
+_load("plugin/man.lua",        "loaded_man",              "FileType")
+_load("plugin/spellfile.vim",  "loaded_spellfile",        "FileType")
+-- stylua: ignore end
