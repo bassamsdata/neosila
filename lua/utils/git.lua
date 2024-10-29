@@ -4,17 +4,11 @@ local M = {}
 ---@param buf_id number
 ---@return boolean
 local function is_valid_git_repo(buf_id)
-  -- Check if it's a valid buffer
   local path = vim.api.nvim_buf_get_name(buf_id)
-  if path == "" or vim.fn.filereadable(path) ~= 1 then
+  if path == "" or not vim.fn.filereadable(path) then
     return false
   end
-  -- Check if the current directory is a Git repository
-  if vim.fs.root(path, ".git") == 0 then
-    return false
-  end
-
-  return true
+  return vim.fs.root(path, ".git") ~= 0
 end
 
 local branch_cache = {}
@@ -45,8 +39,11 @@ M.update_git_branch = function(data, cwd)
   ---@see vim.system
   local function on_exit(content)
     if content.code == 0 then
-      vim.b.git_branch = content.stdout:gsub("\n", "") -- Remove newline character
-      branch_cache[data.buf] = vim.b.git_branch -- Cache the branch name
+      local new_branch = content.stdout:gsub("\n", "")
+      if new_branch ~= branch_cache[data.buf] then
+        vim.b.git_branch = new_branch
+        branch_cache[data.buf] = new_branch
+      end
     end
   end
   vim.system(

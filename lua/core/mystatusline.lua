@@ -74,17 +74,6 @@ function statusline.init()
   })
 end
 
-local mini_icons_loaded = false
-local MiniIcons = nil
-
-local function load_mini_icons()
-  if not mini_icons_loaded then
-    local ok
-    ok, MiniIcons = pcall(require, "mini.icons")
-    mini_icons_loaded = ok
-  end
-  return MiniIcons
-end
 
 -- Function to get the current mode text
 ---@return string
@@ -147,7 +136,7 @@ local function get_filename()
     return ""
   end
   local file = vim.fn.expand("%:p") -- Get the full path of the current file
----@diagnostic disable-next-line: undefined-field
+  ---@diagnostic disable-next-line: undefined-field
   local cwd = vim.uv.cwd()
   local modified = vim.bo.modified and "  " or ""
 
@@ -155,10 +144,15 @@ local function get_filename()
   local relative_path = file:gsub(cwd .. "/", "")
   vim.b.filename_statusline = relative_path
 
-  -- If the file is directly inside the CWD, show only the file name
-  if relative_path == file then
-    relative_path = vim.fn.expand("%:t")
+  local components = vim.split(relative_path, "/")
+  local num_components = #components
+
+  -- If there more than 3 components in the path,truncate to the last 3 
+  if num_components > 3 then
+    components = vim.list_slice(components, num_components - 2) -- yep this keeps 3
+    relative_path = ".../" .. table.concat(components, "/")
   end
+
   local _, MiniIcons = pcall(require, "mini.icons")
   local icon, hl, is_default = MiniIcons.get("file", tostring(relative_path))
   hl = statusline.define_highlight("Fileicon", hl)
@@ -174,10 +168,12 @@ local function get_filename()
       true), modified)
 end
 
+
+
 ---@return string
 local function get_git_status()
   local minidiff = vim.b.minidiff_summary
-  local branch_name = vim.b.git_branch and "  " .. vim.b.git_branch or ""
+  local branch_name = vim.b.git_branch and vim.b.git_branch or ""
   if not minidiff then
     return string.format(
       "%%#StatusLineGitBranch#%s ",
@@ -220,39 +216,125 @@ local function get_lsp_status()
   return ""
 end
 
-local function getDiffSource()
-  local buf_id = vim.api.nvim_get_current_buf()
-  local diff_source = vim.b[buf_id].diffCompGit
-  if not diff_source then
-    return ""
+local function python_env()
+  if vim.bo.filetype == "python" then
+    local venv = os.getenv("CONDA_DEFAULT_ENV") or os.getenv("VIRTUAL_ENV")
+    if venv then
+      -- Check if venv is in .virtualenvs directory
+      if string.match(venv, "/%.virtualenvs/") then
+        venv = vim.fn.fnamemodify(venv, ":t")
+      else
+        -- Get parent directory of .venv
+        venv = vim.fn.fnamemodify(venv, ":h:t")
+      end
+      return string.format("%%#StatusLineLSP# [󰩪 %s]", venv)
+    end
   end
-  return string.format("%%#StatusLineLSP#[%s]", diff_source)
+  return ""
 end
 
+local function getDiffSource()
+  local buf_id = vim.api.nvim_get_current_buf()
+  local diff_summary = vim.b[buf_id].minidiff_summary
+  if not diff_summary then
+    return ""
+  end
+
+  local diff_source = diff_summary.source_name
+
+  local diffIcon = {
+    git = " ",
+    codecompanion = " " -- 
+  }
+
+  return string.format("%%#StatusLineLSP#%s", diffIcon[diff_source] or "")
+end
+
+local model_patterns = {
+  {
+    match = "claude",
+    handle = function(model)
+      local variant = model:match("claude%-3%-5%-(%w+)") or model:match("claude%-3%-(%w+)")
+      return variant and variant:gsub("sonnet", "sonnet3.5"):gsub("haiku", "haiku3") or model
+    end
+  },
+  {
+    match = "llama",
+    handle = function(model)
+      local version, size = model:match("llama%-(%d+%.%d)%-(%w+)")
+      return version and string.format("llama-%s-%s", version, size) or model
+    end
+  },
+  {
+    match = "gpt%-4o",
+    handle = function(model)
+      return model == "gpt-4o-mini" and model or "gpt-4o"
+    end
+  },
+  {
+    match = "o1%-",
+    handle = function(model)
+      return model
+    end
+  }
+}
+
+local function truncate_model_name(model)
+  for _, pattern in ipairs(model_patterns) do
+    if model:match(pattern.match) then
+      return pattern.handle(model)
+    end
+  end
+  return model
+end
+
+
+-- Table to store LLM information for each buffer
+---@type table
+local llm_info = {}
+local processing = false
 -- Function to get the LLM status for CodeCompanion
--- TODO: add avante.nvim to it when it is ready
 ---@return string
-local function get_llm_name()
+local function get_codecompanion_status()
+  -- Create a single autocmd for both events
   vim.api.nvim_create_autocmd("User", {
-    pattern = "CodeCompanionChatAdapter",
+    pattern = {"CodeCompanionChatAdapter", "CodeCompanionChatModel", "CodeCompanionRequest*"},
     callback = function(args)
-      -- vim.print(args.data.adapter)
-      if args.data.adapter and not vim.tbl_isempty(args.data) then
-        vim.b[args.data.bufnr].llm_name = args.data.adapter.name
-        -- vim.b[args.data.bufnr].llm_model = args.data.adapter.schema.model.order
+      if args.match == "CodeCompanionRequestStarted" then
+        processing = true
+      elseif args.match == "CodeCompanionRequestFinished" then
+        processing = false
+      elseif not vim.tbl_isempty(args.data) then
+        local bufnr = args.data.bufnr
+        llm_info[bufnr] = llm_info[bufnr] or {}
+        if args.match == "CodeCompanionChatAdapter" and args.data.adapter then
+          llm_info[bufnr].name = args.data.adapter.name
+        elseif args.match == "CodeCompanionChatModel" and args.data.model then
+          llm_info[bufnr].model = truncate_model_name(args.data.model)
+        end
       end
     end,
   })
-
   local bufnr = vim.api.nvim_get_current_buf()
-  local llm_name = vim.b[bufnr].llm_name
-  -- local llm_model = vim.b[bufnr].llm_model
+  local info = llm_info[bufnr]
 
-  if not llm_name then
+  if not info or not info.name then
     return ""
   end
 
-  return vim.bo.filetype == "codecompanion" and string.format("%%#StatusLineLSP#[%s]", llm_name ) or ""
+  local icon, hl
+  if processing then
+    icon = "✨"
+    hl = statusline.define_highlight("CodeCompanionProcessing", "Special")
+  else
+    icon, hl = require("mini.icons").get("lsp", info.name)
+    hl = statusline.define_highlight("CodeCompanionLSP", hl)
+  end
+
+  local llm_name = string.format("%%#%s#%s%%*", hl, icon or info.name)
+  local model_info = info.model and ("- " .. info.model) or ""
+  local status = llm_name .. model_info
+  return vim.bo.filetype == "codecompanion" and string.format("%%#StatusLineLSP#|%s|", status) or ""
 end
 
 -- Function to get the line and column info
@@ -273,7 +355,6 @@ end
 
 
 -- Function to get diagnostics count with improved efficiency
--- TODO: use vim.diagnostic.count() when it is stable
 ---@return string
 local function get_diagnostics()
   if not vim.diagnostic.is_enabled() or vim.bo.filetype == "intro" then
@@ -291,7 +372,7 @@ local function get_diagnostics()
 
   for i, severity in ipairs(severities) do
 
-  local _, MiniIcons = pcall(require, "mini.icons")
+    local _, MiniIcons = pcall(require, "mini.icons")
     local icon, hl = MiniIcons.get("lsp", severity)
     hl = statusline.define_highlight(severity, hl)
     if counts[i] > 0 then
@@ -310,7 +391,6 @@ local function get_diagnostics()
   return table.concat(result, " ")
 end
 
--- TODO: add token when the markdown file is in this dir /Users/bassam/.local/share/nvim/parrot/chats
 -- Function to get word count for markdown files
 ---@return string
 local function get_word_count()
@@ -336,6 +416,7 @@ local function arrow_knot()
   if vim.g.arrow_enabled == nil then
     return ""
   end
+  local index_keys = { "a", "f", "g" }  -- Define the index keys
   -- local current_file = vim.fn.expand("%")
   local current_file = vim.b.filename_statusline
   local arrow_files = vim.g.arrow_filenames
@@ -348,6 +429,7 @@ local function arrow_knot()
     end
   end
 
+
   if not file_in_arrow then
     return ""
   end -- Only proceed if file is in the list
@@ -358,7 +440,7 @@ local function arrow_knot()
   end
 
   local icon = { "󱡁 " }
-  for index = 1, math.min(total_items, 3) do -- Iterate up to a maximum of 3 (whatever is less)
+  for index = 1, math.min(total_items, #index_keys) do -- Iterate up to a maximum of 3 (whatever is less)
     local hl
     if arrow_files[index] == current_file then
       hl = statusline.define_highlight("ArrowCurrentFile", "Error", nil, true)
@@ -366,7 +448,7 @@ local function arrow_knot()
       hl = "StatusLine"
     end
 
-    table.insert(icon, string.format("%%#%s#%d", hl, index))
+    table.insert(icon, string.format("%%#%s#%s", hl, index_keys[index]))
   end
 
   return table.concat(icon, "")
@@ -381,9 +463,8 @@ local function get_sep(sep, hl, func)
   local content = func()
   if content == "" then
     return ""
-  else
-    return string.format("%%#%s#%s", hl, sep)
   end
+  return string.format("%%#%s#%s", hl, sep)
 end
 
 -- Setup the statusline
@@ -391,6 +472,8 @@ function statusline.active()
   return table.concat({
     get_mode(),
     get_cwd(),
+    get_sep("| ", "StatusLineSeparator", getDiffSource),
+    getDiffSource(),
     get_git_status(),
     " %<",
     "%=",
@@ -399,9 +482,9 @@ function statusline.active()
     "%=",
     arrow_knot(),
     get_sep("|", "StatusLineSeparator", arrow_knot),
-    get_llm_name(),
-    getDiffSource(),
+    get_codecompanion_status(),
     get_diagnostics(),
+    python_env(),
     get_lsp_status(),
     get_line_info(),
     get_word_count(),

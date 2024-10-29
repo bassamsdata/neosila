@@ -1,4 +1,5 @@
 local M = {}
+local log = require("utils.log")
 
 function M.apply_highlight(target_group, attributes)
   local function get_hl_color(name, attr)
@@ -58,10 +59,7 @@ function M.hexToRgb(str)
 end
 
 function M.rgbToHex(r, g, b)
-  return "#"
-    .. string.format("%x", r)
-    .. string.format("%x", g)
-    .. string.format("%x", b)
+  return string.format("#%02x%02x%02x", r, g, b)
 end
 
 ---@param r number
@@ -159,7 +157,7 @@ end
 ---@param foreground string
 ---@param background string
 ---@param alpha number
----@return string
+---@return string|nil
 function M.blend(foreground, background, alpha)
   if M.is_none(foreground) or M.is_none(background) then
     return M.none()
@@ -168,17 +166,40 @@ function M.blend(foreground, background, alpha)
   local fg = { M.hexToRgb(foreground) }
   local bg = { M.hexToRgb(background) }
 
+  -- Add error checking for hexToRgb results
+  if #fg ~= 3 or #bg ~= 3 then
+    print("Error: Invalid RGB values from hexToRgb")
+    print("Foreground:", vim.inspect(fg))
+    print("Background:", vim.inspect(bg))
+    return nil
+  end
+
   local blend_channel = function(c_fg, c_bg)
     local ret = (alpha * c_fg + ((1 - alpha) * c_bg))
     return math.floor(math.min(math.max(0, ret), 255) + 0.5)
   end
 
-  return M.rgbToHex(
-    blend_channel(fg[1], bg[1]),
-    blend_channel(fg[2], bg[2]),
-    blend_channel(fg[3], bg[3])
-  )
+  local r = blend_channel(fg[1], bg[1])
+  local g = blend_channel(fg[2], bg[2])
+  local b = blend_channel(fg[3], bg[3])
+  local blended = M.rgbToHex(r, g, b)
+
+  -- Add error checking for rgbToHex result
+  if
+    type(blended) ~= "string"
+    or #blended ~= 7
+    or not blended:match("^#%x%x%x%x%x%x$")
+  then
+    print("Error: Invalid hex color from rgbToHex")
+    print("Blended color:", blended)
+    print("RGB values:", r, g, b)
+    return nil
+  end
+
+  return blended
 end
+
+-- new comment to use agaist git
 
 function M.getHexColor(coloGroup, color_type)
   local hl = vim.api.nvim_get_hl(0, { name = coloGroup })
@@ -199,7 +220,6 @@ end
 ---@param blend_with string
 ---@param blend_attr "fg"|"bg"
 ---@param alpha number
----TODO: return the highlight group as is
 function M.blend_highlight_groups(groups_to_set, blend_with, blend_attr, alpha)
   local function get_color(group, attr)
     local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
@@ -213,7 +233,6 @@ function M.blend_highlight_groups(groups_to_set, blend_with, blend_attr, alpha)
 
   local blend_color = get_color(blend_with, blend_attr)
   if not blend_color then
-    -- FIX: return default value and notify only or Normal highlight.
     print("Error: Could not get color for blend_with group")
     return
   end
@@ -227,6 +246,14 @@ function M.blend_highlight_groups(groups_to_set, blend_with, blend_attr, alpha)
     local original_color = get_color(group, "fg")
     if original_color then
       local blended_color = M.blend(original_color, blend_color, alpha)
+
+      if not blended_color then
+        log.info("Error: Failed to blend colors for group " .. group, "print")
+        log.info("Original color:" .. original_color, "print")
+        log.info("Blend color:" .. blend_color, "print")
+        return
+      end
+
       -- Preserve all original attributes except the blended one
       local new_hl = vim.tbl_extend("force", original_hl, {
         fg = blended_color,
@@ -234,7 +261,6 @@ function M.blend_highlight_groups(groups_to_set, blend_with, blend_attr, alpha)
       new_hl.link = nil -- Remove the 'link' key if it exists
       vim.api.nvim_set_hl(0, group, new_hl)
     else
-      -- FIX: return default value and notify only outside the loop instead.
       print("Error: Could not get foreground color for group " .. group)
       return
     end

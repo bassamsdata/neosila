@@ -22,7 +22,7 @@ return {
       vim.g.molten_output_win_max_width = 120
       -- vim.g.molten_tick_rate = 175
       vim.g.molten_auto_image_popup = true
-
+      vim.g.molten_virt_text_max_lines = 16
       local autocmd = vim.api.nvim_create_autocmd
       local map = vim.keymap.set
       -- stylua: ignore start 
@@ -34,8 +34,13 @@ return {
       map("n", "<localleader>ip", function()
         local venv = os.getenv("VIRTUAL_ENV")
         if venv ~= nil then
-          -- in the form of /home/benlubas/.virtualenvs/VENV_NAME
-          venv = string.match(venv, "/.+/(.+)")
+          -- Check if venv is in .virtualenvs directory
+          if string.match(venv, "/%.virtualenvs/") then
+            venv = vim.fn.fnamemodify(venv, ":t")
+          else
+            -- Get parent directory of .venv
+            venv = vim.fn.fnamemodify(venv, ":h:t")
+          end
           vim.cmd(("MoltenInit %s"):format(venv))
         else
           vim.cmd("MoltenInit python3")
@@ -68,10 +73,16 @@ return {
           map( "n", "<localleader>md", ":MoltenDelete<CR>",                { desc = "delete Molten cell",        silent = true })
           local open = false
           map("n", "<localleader>ot", function() open = not open vim.fn.MoltenUpdateOption("auto_open_output", open) end) -- stylua: ignore end
-					-- if we're in a python file, change the configuration a little
-					if vim.bo.filetype == "python" then
-					  vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
-					end
+          -- if we're in a python file, change the configuration a little
+          if vim.bo.filetype == "python" then
+            vim.fn.MoltenUpdateOption("molten_virt_lines_off_by_1", false)
+          end
+          -- Map <CR> to MoltenEvaluateOperator with motion support
+          map('n', '<CR>', function()
+            -- Start the MoltenEvaluateOperator command and simulate the 'ip' motion
+            vim.cmd('MoltenEvaluateOperator')
+            vim.fn.feedkeys(vim.api.nvim_replace_termcodes("ik", true, true, true))
+          end, { noremap = true, silent = true })
         end,
       })
 

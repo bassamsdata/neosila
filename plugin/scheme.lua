@@ -3,7 +3,7 @@
 vim.g.SCHEME = "original_cockatoo"
 
 vim.api.nvim_create_autocmd("VimEnter", {
-  -- nested = true,
+  nested = true,
   callback = function()
     pcall(vim.cmd.colorscheme, vim.g.SCHEME)
   end,

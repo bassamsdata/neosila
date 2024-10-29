@@ -17,3 +17,7 @@ end, {})
 vim.api.nvim_create_user_command("KeepOnlyArrowFiles", function()
   require("utils").keepOnlyArrowFiles()
 end, {})
+
+vim.api.nvim_create_user_command("Lg", function()
+  require("localModules.nvterminal").create_tool("lazygit", 0.9, 0.9)
+end, {})

@@ -89,7 +89,7 @@ return {
           },
         },
       }, -- , dev = true },
-      dependencies = { "yioneko/nvim-cmp", branch = "perf" },
+      { "iguanacucumber/magazine.nvim", name = "nvim-cmp" },
       "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter",
     },

@@ -1,9 +1,16 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
+
 return {
-  { "fcancelinha/nordern.nvim", event = "VeryLazy", opts = {} },
   {
-    "shmerl/neogotham",
-    event = "VeryLazy",
-    opts = {},
+    "nvchad/showkeys",
+    cmd = "ShowkeysToggle",
+    opts = {
+      timeout = 3,
+      maxkeys = 5,
+      position = "bottom-right",
+    },
   },
   {
     "frankroeder/parrot.nvim",
@@ -42,73 +49,6 @@ return {
   },
 
   {
-    "rose-pine/neovim",
-    event = "VeryLazy",
-    name = "rose-pine",
-    opts = {
-      enable = {
-        terminal = true,
-        legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
-        migrations = true, -- Handle deprecated options automatically
-      },
-
-      styles = {
-        bold = true,
-        italic = true,
-        transparency = false,
-      },
-
-      highlight_groups = {
-        -- Comment = { fg = "foam" },
-        -- VertSplit = { fg = "muted", bg = "muted" },
-        ["@variable"] = { fg = "text", italic = false },
-      },
-    },
-  },
-  {
-    "AlexvZyl/nordic.nvim",
-    event = "VeryLazy",
-    -- priority = 1000,
-    config = function()
-      local palette = require("nordic.colors")
-      -- require("nordic").load()
-      require("nordic").setup({
-        override = {
-          MatchParen = {
-            fg = palette.yellow.dim,
-            italic = false,
-            underline = false,
-            undercurl = false,
-          },
-          ["@parameter"] = {
-            fg = palette.white_alt,
-            italic = false,
-            underline = false,
-            undercurl = false,
-          },
-          Search = {
-            fg = palette.yellow.dim,
-            bg = palette.black0,
-            italic = false,
-            underline = false,
-            undercurl = false,
-          },
-          MiniMapNormal = { link = "Normal" },
-          TermCursor = { link = "Substitute" },
-          MiniIndentscopeSymbol = { link = "Delimiter" },
-          LineNr4 = { fg = "#3B4261" },
-          LineNr3 = { fg = "#4d71a0" },
-          LineNr2 = { fg = "#6fc1cf" },
-          LineNr1 = { fg = "#eeffee" },
-          LineNr0 = { fg = "#FFFFFF", bg = "NONE", bold = true },
-          NormalFloat = { link = "Normal" },
-          FloatBorder = { fg = palette.gray5, bg = "NONE" },
-          -- TODO: add Statusline Hoighlights
-        },
-      })
-    end,
-  },
-  {
 
     "max397574/better-escape.nvim",
     event = "InsertEnter",
@@ -145,10 +85,11 @@ return {
   {
     "2kabhishek/nerdy.nvim",
     dependencies = { "echasnovski/mini.pick" },
-
     cmd = "Nerdy",
   },
 
+  -- somewhere in your config:
+  -- { "RayenMnif/tgpt.nvim", opts = {} },
   {
     "andymass/vim-matchup",
     event = { "BufReadPost" },

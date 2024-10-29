@@ -1,3 +1,6 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 local M = {
   "williamboman/mason-lspconfig.nvim",
   event = { "BufReadPost", "BufNewFile" },

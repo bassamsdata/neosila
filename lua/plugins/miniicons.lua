@@ -1,6 +1,6 @@
--- if vim.env.NVIM_TESTING then
---   return {}
--- end
+if vim.env.NVIM_TESTING then
+  return {}
+end
 return {
   {
     "echasnovski/mini.icons",
@@ -9,17 +9,22 @@ return {
         lsp = {
           -- stylua: ignore start 
           ellipsis_char = { glyph = "… ", hl = "MiniIconsRed" },
-          copilot       = { glyph = "", hl  = "MiniIconsOrange" },
-          supermaven    = { glyph = "", hl  = "MiniIconsYellow" },
-          codeium       = { glyph = "", hl  = "MiniIconsGreen" },
+          copilot       = { glyph = "",  hl = "MiniIconsOrange" },
+          supermaven    = { glyph = "",  hl = "MiniIconsYellow" },
+          codeium       = { glyph = "",  hl = "MiniIconsGreen" },
           otter         = { glyph = " ", hl = "MiniIconsCyan" },
-          cody          = { glyph = "", hl  = "MiniIconsAzure" },
+          cody          = { glyph = "",  hl = "MiniIconsAzure" },
           cmp_r         = { glyph = "󰟔 ", hl = "MiniIconsBlue" },
-          ["function"]  = { glyph = "", hl  = "MiniIconsAzure" },
+          ["function"]  = { glyph = "",  hl = "MiniIconsAzure" },
           error         = { glyph = " ", hl = "MiniIconsRed" },
           warn          = { glyph = " ", hl = "MiniIconsOrange" },
           info          = { glyph = "󰙎 ", hl = "MiniIconsYellow" },
           hint          = { glyph = " ", hl = "MiniIconsGreen" },
+          anthropic     = { glyph = " ", hl = "MiniIconsOrange" },
+          openai        = { glyph = "󰊲 ", hl = "MiniIconsGrey" },
+          groq          = { glyph = " ", hl = "MiniIconsRed" },
+          gemini        = { glyph = "󰫤 ", hl = "MiniIconsBlue" },
+          xai           = { glyph = " ", hl = "MiniIconsAzure" },
           -- stylua: ignore end
         },
         -- file = {

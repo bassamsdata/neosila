@@ -1,6 +1,6 @@
-if vim.env.NV_NOMINI then
-  return {}
-end
+-- if vim.env.NV_NOMINI or vim.env.NVIM_TESTING then
+--   return {}
+-- end
 ---@diagnostic disable: undefined-field
 local autocmd = vim.api.nvim_create_autocmd
 return {
@@ -68,7 +68,7 @@ return {
           return
         end
         local rhs = function()
-          local window = MiniFiles.get_target_window()
+          local window = MiniFiles.get_explorer_state().target_window
           -- ensure doesn't make weired behaviour on directories
           if
             window == nil or MiniFiles.get_fs_entry().fs_type == "directory"

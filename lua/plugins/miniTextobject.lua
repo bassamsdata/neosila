@@ -1,3 +1,6 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 return {
   {
     "echasnovski/mini.ai",
@@ -12,9 +15,10 @@ return {
       return {
         n_lines = 500,
         custom_textobjects = {
-          o = ai.gen_spec.treesitter({ -- code block
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+          l = ai.gen_spec.treesitter({ a = "@block.outer", i = "@block.inner" }),
+          o = ai.gen_spec.treesitter({
+            a = { "@conditional.outer", "@loop.outer" },
+            i = { "@conditional.inner", "@loop.inner" },
           }),
           f = ai.gen_spec.treesitter({
             a = "@function.outer",
@@ -36,6 +40,9 @@ return {
           g = gen_ai_spec.buffer(),
           u = ai.gen_spec.function_call(), -- u for "Usage"
           U = ai.gen_spec.function_call({ name_pattern = "[%w_]" }), -- without dot in function name
+          k = { -- this for "# %%" blocks in python files
+            { "# %%.-\n().-().\n# %%", "^# %%.-().*\n()" },
+          },
         },
       }
     end,

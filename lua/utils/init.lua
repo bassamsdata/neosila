@@ -246,8 +246,6 @@ function M.icon(sign, len)
   return sign.texthl and ("%#" .. sign.texthl .. "#" .. text .. "%*") or text
 end
 
----FOLD FUNCTION --------------------
----@return string
 function M.foldtext()
   local start_line = vim.api.nvim_buf_get_lines(
     0,
@@ -258,13 +256,32 @@ function M.foldtext()
   local end_line =
     vim.api.nvim_buf_get_lines(0, vim.v.foldend - 1, vim.v.foldend, false)[1]
 
-  -- Replace tabs with spaces
   start_line = start_line:gsub("\t", string.rep(" ", vim.bo.tabstop))
-
-  -- Trim whitespace
   end_line = end_line:gsub("^%s*(.-)%s*$", "%1")
 
-  return start_line .. " ... " .. end_line
+  local fold_length = vim.v.foldend - vim.v.foldstart + 1
+  local indent = string.match(start_line, "^%s*")
+  local fold_icon = "▼ "
+  local fold_info = string.format(" [%d lines] ", fold_length)
+
+  local max_width = vim.api.nvim_win_get_width(0)
+    - #indent
+    - #fold_icon
+    - #fold_info
+    - 5
+  local truncated_start = string.sub(start_line, #indent + 1, max_width)
+  local truncated_end = string.sub(end_line, -20)
+
+  local fold_line = string.format(
+    "%s%s%s...%s%s",
+    indent,
+    fold_icon,
+    truncated_start,
+    truncated_end,
+    fold_info
+  )
+
+  return fold_line
 end
 
 function M.statuscolumn()

@@ -1,4 +1,4 @@
-if vim.env.NVIM_TESTING then
+if vim.env.NVIM_TESTING_HUE then
   return {}
 end
 local function get_bufnrs() -- this fn from Nv-macro, thanks
@@ -14,7 +14,7 @@ return {
       return not vim.b.bigfile
     end,
     event = { "CmdlineEnter", "InsertEnter" },
-    dependencies = { "yioneko/nvim-cmp", branch = "perf" },
+    dependencies = { "iguanacucumber/magazine.nvim", name = "nvim-cmp" },
   },
   {
     "hrsh7th/cmp-nvim-lsp",
@@ -29,16 +29,16 @@ return {
       return not vim.b.bigfile
     end,
     event = "CmdlineEnter",
-    dependencies = { "yioneko/nvim-cmp", branch = "perf" },
+    dependencies = { "iguanacucumber/magazine.nvim", name = "nvim-cmp" },
   },
   {
-    "yioneko/nvim-cmp",
-    branch = "perf",
+    "iguanacucumber/magazine.nvim",
+    name = "nvim-cmp", -- Otherwise highlighting gets messed up
     enabled = function()
       return not vim.b.bigfile
     end,
     cond = not vim.g.vscode,
-    event = { "LspAttach", "BufReadPost" },
+    event = { "LspAttach", "InsertEnter" },
     dependencies = {
       "hrsh7th/cmp-path",
     },
@@ -100,12 +100,12 @@ return {
           ["<Tab>"] = cmp.mapping(function(fallback)
             if neocodeium.visible() then
               neocodeium.accept()
-            elseif cmp.visible() then
-              cmp.select_next_item()
+            -- elseif cmp.visible() then
+            --   cmp.select_next_item()
             else
               fallback()
             end
-          end, { "i", "s", "c" }),
+          end, { "i", "s" }),
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
@@ -199,6 +199,11 @@ return {
         -- view = {
         -- 	entries = { name = "wildmenu", separator = "|" },
         -- },
+        mapping = cmp.mapping.preset.cmdline({
+          ["<Tab>"] = cmp.mapping(function()
+            cmp.select_next_item()
+          end, { "c" }),
+        }),
         sources = {
           {
             name = "buffer",
@@ -209,6 +214,11 @@ return {
         -- view = {
         -- 	entries = { name = "wildmenu", separator = "|" },
         -- },
+        mapping = cmp.mapping.preset.cmdline({
+          ["<Tab>"] = cmp.mapping(function()
+            cmp.select_next_item()
+          end, { "c" }),
+        }),
         sources = {
           { name = "path", group_index = 1 },
           {

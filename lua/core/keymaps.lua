@@ -122,16 +122,21 @@ map( "n", "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
 -- So I did all the function above and below did it naturally
 map("n", "<C-left>", "<C-w>5<")
 map("n", "<C-right>", "<C-w>5>")
-map("n", "<C-t>", "<C-w>+")
-map("n", "<M-s>", "<C-w>-")
+map("n", "<C-S-t>", "<C-w>+")
+map("n", "<C-S-s>", "<C-w>-")
 map("n", "<leader>x", "<cmd>.lua<cr>", { desc = "source the current line" })
 
 -- Buffers
-map("n", "L", "<cmd>bn<cr>") -- switch to next buffer
-map("n", "H", "<cmd>bp<cr>") -- switch to previous buffer
+map("n", "L", "<cmd>bn<cr>")
+map("n", "H", "<cmd>bp<cr>")
 map("n", "<leader>,", function()
   local cursor = vim.api.nvim_win_get_cursor(0)
-  vim.cmd("norm A,")
+  local line = vim.api.nvim_get_current_line()
+  if line:match(",$") then -- Check if line ends with comma
+    vim.api.nvim_set_current_line(line:sub(1, -2))
+  else
+    vim.cmd("norm A,")
+  end
   vim.api.nvim_win_set_cursor(0, cursor)
 end, { noremap = true, silent = true })
 map("n", "<leader>)", function()
@@ -141,7 +146,7 @@ map("n", "<leader>)", function()
 end, { noremap = true, silent = true })
 -- Jump backwards
 -- vim.keymap.del("n", "<BS>")
-vim.keymap.set("n", "<C-BS>", function()
+map("n", "<C-BS>", function()
   require("whatthejump").show_jumps(false)
   return "<C-o>"
 end, { expr = true })
@@ -227,7 +232,7 @@ map( "n", "<leader>cd",      "<cmd>Pick diagnostic scope='all'<cr>",          { 
 map( "n", "<leader>cD",      "<cmd>Pick diagnostic scope='current'<cr>",      { desc = "Diagnostic buffer" })
 map( "n", "<localleader>mn", "<cmd>15sp | lua MiniNotify.show_history()<cr>", { desc = "Diagnostic buffer" })
 -- stylus: ignore end
-vim.keymap.set("n", "<leader>q", function()
+map("n", "<leader>q", function()
   require("quicker").toggle({ height = 100, focus = true, min_height = 10})
 end, {
   desc = "Toggle quickfix",
@@ -245,6 +250,8 @@ M.mini_files_key = {
     { desc = "File explorer" },
   },
 }
+
+
 
 -- ── Spell ─────────────────────────────────────────────────────────────
 -- Thanks to Bugaboo, Correct misspelled word / mark as correct
@@ -282,15 +289,18 @@ map("t", "<C-k>", "<C-\\><C-n><C-w><C-k>", { desc = "out of terminal to top" })
 map("t", "<C-h>", "<C-\\><C-n><C-w><C-h>", { desc = "Out of terminal to left" })
 
 -- Toggling terminals
-map({ "n", "t" }, "<M-f>", function()
+map({ "n", "t" }, "<M-s>", function()
   require("localModules.nvterminal").toggle({ pos = "float", id = "floatTerm" })
 end, { desc = "Terminal Toggle Floating term" })
+
+map("n","<S-tab>","<cmd>tabNext<cr>",{desc = "Next tab"})
+map("n","<C-S-tab>","<cmd>tabprevious<cr>",{desc = "Previous tab"})
 
 map({ "n", "t" }, "<M-v>", function()
   require("localModules.nvterminal").toggle({ pos = "vsp", id = "verticalTerm", width = 0.8 })
 end, { desc = "Terminal Toggle Vertical term" })
 
-map({ "n", "t" }, "<M-p>", function()
+map({ "n", "t" }, "<C-S-h>", function()
   require("localModules.nvterminal").toggle({ pos = "sp", id = "horizontalTerm" })
 end, { desc = "Terminal Toggle Horizontal term" })
 
@@ -335,7 +345,7 @@ map("x", "<Space>dC", u.diff_with_clipboard2, { desc = "Diff with clipboard" })
 map("!a", "sis", "-- stylua: ignore start")
 map("!a", "sie", "-- stylua: ignore end")
 -- map("c", "lazy", "Lazy")
-vim.cmd([[cnoreabbrev laz Lazy]])
+vim.cmd([[cab ll Lazy]])
 
 -- ── run Stuff ─────────────────────────────────────────────────────
 map("n", "<leader>cg", f.run_file, { desc = "[C]ode [G]o mode" })
@@ -344,8 +354,25 @@ map("n", "<leader>cl", "<cmd>w | so %<cr>", { desc = "[C]ode [R]un in Term" })
 
 -- ── Ai ───────────────────────────────────────────────────────────
 -- map("n", "<leader>ac", "<cmd>CodyChat<cr>", { desc = "[A]i [C]hat - cody" })
+map("n", "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "[A]i [C]codeCompanion" })
+map("n", "<leader>as", "<cmd>CodeCompanionActions<cr>", { desc = "[A]i Ation[S]" })
+map({ "n", "v"  }, "<leader>ai", ":CodeCompanion<space>", { desc = "[A]i [I]nline" })
+map("v", "<leader>ad", "<cmd>CodeCompanionChat Add<cr>", { desc = "[A]i [A]dd" })
 
+vim.cmd([[cab cc CodeCompanion]])
+vim.cmd([[cab ch CodeCompanionChat]])
 
+local function set_codecompanion_keymaps()
+  if vim.bo.filetype == "codecompanion" then
+    map("n", "<tab>", "za" )
+    map("v", "<ga>", "<cmd>CodeCompanionChat Add", {desc = "CodeCompanion Add"})
+  end
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "codecompanion",
+  callback = set_codecompanion_keymaps
+})
 -- ── Arrow ───────────────────────────────────────────────────────────
 map("n", "<C-s>", function() -- Select first file
   local _ = pcall(require, "arrow")
@@ -369,6 +396,9 @@ map("n", "<localleader>\\", function() -- Select third file
   local _, arrow = pcall(require, "arrow.commands")
   return arrow.commands.toggle_current_line_for_buffer()
 end, { desc = "set buffer bookmark", silent = true })
+
+map("n", "]m", "<cmd>Arrow next_buffer_bookmark<cr>", { desc = "next buffer bookmark", silent = true })
+map("n", "[m", "<cmd>Arrow prev_buffer_bookmark<cr>", { desc = "set buffer bookmark", silent = true })
 
 -- map("n", "<C-'>", function() -- Select third file
 --   local _ = pcall(require, "arrow")
@@ -403,10 +433,11 @@ if vim.g.neovide then
   map({ "n", "v" }, "<C-0>", ":lua vim.g.neovide_scale_factor = 1<CR>")
   map("c", "<D-v>", "<C-R>+") -- Paste command mode
   map("i", "<D-v>", "<ESC>pli") -- Paste insert mode
-  map("n", "<D-n>", "<cmd>silent exec 'neovide --title-hidden --fork'<cr>")
-  map("n", "<D-t>", "<cmd>!cd ~ &&neovide --title-hidden --fork<cr>")
+  map("n", "<D-n>", "<cmd>silent exec 'neovide &'<cr>")
+  map("n", "<D-t>", "<cmd>!cd ~ &&neovide &<cr>")
   -- stylua: ignore end
 end
+
 
 map("n", "R", Gat("v:lua.Substitute"), { desc = "Substitute", silent = true })
 -- map("v", "T", Gat("v:lua.Substitute2"), { silent = true })

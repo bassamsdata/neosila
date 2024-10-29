@@ -107,7 +107,7 @@ return {
         },
         window = {
           -- Delay before showing clue window
-          delay = 200,
+          delay = 300,
           config = function(bufnr)
             local max_width = 0
             for _, line in

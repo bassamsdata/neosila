@@ -3,10 +3,10 @@ if vim.env.NVIM_TESTING then
 end
 return {
   "otavioschwanck/arrow.nvim",
-  event = "BufReadPost",
+  -- event = "BufReadPost",
   cmd = "Arrow open",
   keys = {
-    { "<C-,>" },
+    -- { "<C-,>" },
     { "m" },
     { "," },
   },
@@ -21,6 +21,7 @@ return {
       window = {
         border = "rounded",
       },
+      index_keys = "afgh123456789zxcbnmZXVBNM,jklAFGHJKLwrtyuiopWRTYUIOP", -- keys mapped to bookmark index, i.e. 1st bookmark will be accessible by 1, and 12th - by c
     })
   end,
 }

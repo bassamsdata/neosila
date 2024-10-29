@@ -1,11 +1,21 @@
--- if vim.env.NVIM_TESTING then
---   return {}
--- end
-local avantWdith = vim.g.neovide and 40 or 30
-
+if vim.env.NVIM_TESTING then
+  return {}
+end
+local avantWdith = vim.g.neovide and 41 or 41
+-- return {}
 return {
   {
     "yetone/avante.nvim",
+    build = "make",
+    -- commit = "054695c",
+    -- pin = true,
+    dependencies = {
+      "echasnovski/mini.icons",
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "MeanderingProgrammer/markdown.nvim",
+      "stevearc/dressing.nvim",
+    },
     keys = {
       -- stylua: ignore start
       { "<leader>aa", function() require("avante.api").ask() end, desc = "avante: ask", mode = { "n", "v" } },
@@ -99,14 +109,6 @@ return {
           end,
         },
       },
-    },
-    build = "make",
-    dependencies = {
-      "echasnovski/mini.icons",
-      "MunifTanjim/nui.nvim",
-      "nvim-lua/plenary.nvim",
-      "MeanderingProgrammer/markdown.nvim",
-      "stevearc/dressing.nvim",
     },
   },
 }

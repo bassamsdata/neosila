@@ -3,8 +3,204 @@ if vim.env.NVIM_TESTING then
 end
 return {
   {
+    "echasnovski/mini.hues",
+    lazy = true,
+    opts = {
+      background = "#0c1014",
+      foreground = "#99d1ce",
+      n_hues = 8,
+      saturation = "medium",
+      -- Accent color. One of: 'bg', 'fg', 'red', 'orange', 'yellow', 'green',
+      -- 'cyan', 'azure', 'blue', 'purple'
+      accent = "bg",
+      -- Also can be set per plugin (see |MiniHues.config|).
+      plugins = { default = true },
+    },
+  },
+  {
+    "ilof2/posterpole.nvim",
+    event = "VeryLazy",
+    -- priority = 1000,
+    opts = {
+      brightness = 4, -- negative numbers - darker, positive - lighter
+    },
+  },
+  {
+    "Shatur/neovim-ayu",
+    -- FIX: add molten highlights
+    name = "ayu",
+    -- priority = 1000,
+    opts = {
+      overrides = {
+        RenderMarkdownCode = { link = "Visual" },
+        RenderMarkdownCodeInline = { link = "Visual" },
+        -- TermCursor = { link = "Substitute" },
+      },
+    },
+  },
+  -- {
+  --   "olivercederborg/poimandres.nvim",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     require("poimandres").setup({})
+  --     vim.schedule(function()
+  --       -- stylua: ignore start
+  --       vim.api.nvim_set_hl(0,  "NormalFloat",       { link = "Normal" })
+  --       vim.api.nvim_set_hl(0,  "Function",          { fg = "#5FB3A1" })
+  --       vim.api.nvim_set_hl(0,  "LspReferenceText",  { bg = "#303340" })
+  --       vim.api.nvim_set_hl( 0, "LspReferenceRead",  { link = "LspReferenceText" })
+  --       vim.api.nvim_set_hl( 0, "LspReferenceWrite", { link = "LspReferenceText" })
+  --       -- stylua: ignore end
+  --     end)
+  --   end,
+  -- },
+  {
+    "fcancelinha/nordern.nvim",
+    event = "VeryLazy",
+    opts = {
+      brighter_comments = false,
+      brighter_conditionals = false, -- changes the color of booleans, enums and readonly to aurora yellow from light blue.
+      italic_comments = true,
+      transparent = false,
+    },
+  },
+  {
+    "shmerl/neogotham",
+    -- lazy = false,
+    event = "VeryLazy",
+    config = function()
+      require("neogotham").setup({})
+      vim.schedule(function()
+        -- TODO: make neogotham a colorscheme with base16
+        if vim.g.colors_name == "neogotham" then
+          -- stylua: ignore start 
+          vim.api.nvim_set_hl(0, "LineNr", { fg = "#195466", bg = "#0c1014" })
+          vim.api.nvim_set_hl(0, "Comment", { fg = "#195466", italic = true })
+          vim.api.nvim_set_hl(0, "SignColumn", { bg = "#0c1014" })
+          vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
+          vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#091f2e" })
+          -- stylua: ignore end
+        end
+        -- RenderMarkdownCodeInline = { bg = c.line },
+        -- RenderMarkdownCode = { bg = c.line },
+      end)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("neogotham", { clear = true }),
+        pattern = "neogotham",
+        callback = function()
+          vim.api.nvim_set_hl(0, "LineNr", { fg = "#195466", bg = "#0c1014" })
+          vim.api.nvim_set_hl(0, "SignColumn", { bg = "#0c1014" })
+          vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
+          vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#091f2e" })
+        end,
+      })
+    end,
+  },
+  {
+    "folke/tokyonight.nvim",
+    -- lazy = false,
+    event = "VeryLazy",
+    opts = {
+      plugins = {
+        -- enable all plugins when not using lazy.nvim
+        -- set to false to manually enable/disable plugins
+        -- all = package.loaded.lazy == nil,
+        -- uses your plugin manager to automatically enable needed plugins
+        -- currently only lazy.nvim is supported
+        auto = false,
+        -- add any plugins here that you want to enable
+        -- for all possible plugins, see:
+        --   * https://github.com/folke/tokyonight.nvim/tree/main/lua/tokyonight/groups
+        -- telescope = true,
+        cmp = true,
+        treesitter = true,
+        indent_blankline = true,
+        -- notify = true,
+        grugfar = true,
+        indentmini = true,
+        mini_clue = true,
+        mini_diff = true,
+        mini_files = true,
+        mini_pick = true,
+        mini_icons = true,
+        mini_map = true,
+        mini_surround = true,
+        mini_notify = true,
+        neogit = true,
+      },
+    },
+  },
+  {
+    "rose-pine/neovim",
+    -- event = "VeryLazy",
+    name = "rose-pine",
+    opts = {
+      enable = {
+        terminal = true,
+        legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
+        migrations = true, -- Handle deprecated options automatically
+      },
+
+      styles = {
+        bold = true,
+        italic = false,
+        transparency = false,
+      },
+
+      highlight_groups = {
+        -- Comment = { fg = "foam" },
+        -- VertSplit = { fg = "muted", bg = "muted" },
+        ["@variable"] = { fg = "text", italic = false },
+      },
+    },
+  },
+  {
+    "AlexvZyl/nordic.nvim",
+    event = "VeryLazy",
+    -- priority = 1000,
+    config = function()
+      -- local palette = require("nordic.colors")
+      -- require("nordic").load()
+      require("nordic").setup({
+        on_highlight = function(highlights, palette)
+          highlights.MatchParen = {
+            fg = palette.yellow.dim,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          }
+          highlights["@parameter"] = {
+            fg = palette.white_alt,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          }
+          highlights.Search = {
+            fg = palette.yellow.dim,
+            bg = palette.black0,
+            italic = false,
+            underline = false,
+            undercurl = false,
+          }
+          highlights.MiniMapNormal = { link = "Normal" }
+          highlights.TermCursor = { link = "Substitute" }
+          highlights.MiniIndentscopeSymbol = { link = "Delimiter" }
+          highlights.LineNr4 = { fg = "#3B4261" }
+          highlights.LineNr3 = { fg = "#4d71a0" }
+          highlights.LineNr2 = { fg = "#6fc1cf" }
+          highlights.LineNr1 = { fg = "#eeffee" }
+          highlights.LineNr0 = { fg = "#FFFFFF", bg = "NONE", bold = true }
+          highlights.NormalFloat = { link = "Normal" }
+          highlights.FloatBorder = { fg = palette.gray5, bg = "NONE" }
+          -- TODO: add Statusline Hoighlights
+        end,
+      })
+    end,
+  },
+  {
     "EdenEast/nightfox.nvim",
-    lazy = false,
+    -- lazy = false,
+    event = "VeryLazy",
     -- priority = 1000,
     opts = {
       options = {
@@ -44,11 +240,25 @@ return {
       end
     end,
   },
-  { "catppuccin/nvim", name = "catppuccin", opts = {} },
+  { "catppuccin/nvim", name = "catppuccin", opts = {}, lazy = true },
   {
     "sho-87/kanagawa-paper.nvim",
-    lazy = false,
+    -- lazy = false,
+    -- event = "VeryLazy",
     -- priority = 500,
-    opts = {},
+    opts = {
+      dimInactive = false,
+      typeStyle = { italic = false },
+      overrides = function() -- override highlight groups
+        return {
+          NormalFloat = { link = "Normal" },
+          RenderMarkdownCode = { link = "ColorColumn" },
+          RenderMarkdownCodeInline = { link = "ColorColumn" },
+          LspReferenceRead = { bg = "#3e4452" },
+          -- LspReferenceText = { bg = "#3e4452" },
+          -- LspReferenceWrite = { bg = "#3e4452" },
+        }
+      end,
+    },
   },
 }

@@ -1,8 +1,20 @@
 if vim.env.NVIM_TESTING then
   return {}
 end
-local ft =
-  { "lua", "norg", "quarto", "py", "go", "markdown", "R", "v", "yaml", "toml" }
+local ft = {
+  "lua",
+  "python",
+  "norg",
+  "quarto",
+  "py",
+  "go",
+  "markdown",
+  "R",
+  "v",
+  "yaml",
+  "toml",
+  "codecompanion",
+}
 return {
   {
     "echasnovski/mini.indentscope",
@@ -94,6 +106,7 @@ return {
           )
         end
 
+        vim.api.nvim_set_hl(0, "MiniMapNormal", { link = "Normal" })
         require("utils.hi").blend_highlight_groups(
           { "MiniMapSymbolView", "MiniMapSymbolLine" },
           "Normal",
@@ -121,6 +134,15 @@ return {
         --   pattern = "*",
         --   callback = f,
         -- })
+        -- isse when resizing with the window manager and terminal is open,
+        -- the minimap stays in place in the middle of screen :)
+        autocmd({ "VimResized" }, {
+          callback = function()
+            if map.current then
+              map.refresh()
+            end
+          end,
+        })
         autocmd({ "FileType" }, {
           pattern = ft,
           callback = function()
@@ -137,6 +159,7 @@ return {
         --
         autocmd({ "ColorScheme" }, {
           callback = function()
+            vim.api.nvim_set_hl(0, "MiniMapNormal", { link = "Normal" })
             require("utils.hi").blend_highlight_groups(
               { "MiniMapSymbolView", "MiniMapSymbolLine" },
               "Normal",

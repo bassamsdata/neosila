@@ -4,7 +4,7 @@ local opt = vim.opt
 vim.g.mapleader      = " " -- set leader key to space
 vim.g.maplocalleader = "\\" -- we need to escabe \ with another \
 -- Appearance
-if vim.fn.has("nvim-0.10") == 1 then
+if vim.fn.has("nvim-0.11") == 1 then
     vim.deprecate = function() end
 end
 opt.termguicolors    = true
@@ -71,10 +71,10 @@ vim.opt.wildignore:append({ ".DS_Store" }) -- completion
 opt.foldcolumn       = "0"
 opt.foldenable       = false
 opt.foldlevel        = 999
-opt.foldmethod       = "indent"
+-- opt.foldmethod       = "indent"
 -- opt.foldtext      = "v:lua.require'utils'.foldtext()"
 opt.smoothscroll     = true
-opt.foldtext         = 'v:lua.require("utils").simple_fold()'
+-- opt.foldtext         = 'v:lua.require("utils").foldtext()'
 opt.formatoptions    = "jcqlnt" -- tcqj
 -- this drove me crzy - it controll how vertical movement behave when tab is used
 -- stylua: ignore end
@@ -135,6 +135,6 @@ _load("plugin/matchit.vim",    "loaded_matchit",          "FileType")
 _load("plugin/matchparen.vim", "loaded_matchparen",       "FileType")
 _load("plugin/tohtml.lua",     "loaded_tohtml",           "FileType")
 _load("plugin/tutor.lua",      "loaded_tutor_mode",       "FileType")
-_load("plugin/man.lua",        "loaded_man",              "FileType")
+-- _load("plugin/man.lua",        "loaded_man",              "FileType")
 _load("plugin/spellfile.vim",  "loaded_spellfile",        "FileType")
 -- stylua: ignore end

@@ -1,3 +1,6 @@
+if vim.env.NVIM_TESTING then
+  return {}
+end
 return {
   {
     "dnlhc/glance.nvim",

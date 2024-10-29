@@ -69,7 +69,9 @@ autocmd({ "BufLeave", "WinLeave", "FocusLost" }, {
   nested = true,
   desc = "Autosave on focus change.",
   callback = function(info)
-    if vim.bo[info.buf].bt ~= "" then
+    -- python black formatting is slow and will affect moving around
+    local excluded_ft = { "qf", "python", "", "quarto" }
+    if vim.tbl_contains(excluded_ft, vim.bo[info.buf].ft) then
       return
     end
     local diagnostics = vim.diagnostic.count(info.buf)
@@ -179,7 +181,7 @@ autocmd({ "DirChanged", "FileChangedShellPost" }, {
   callback = git.clear_git_branch_cache,
 })
 -- Call this function when the buffer is opened in a window
-autocmd("BufWinEnter", {
+autocmd({ "BufWinEnter", "FileChangedShellPost" }, {
   callback = function(data)
     git.update_git_branch(data, vim.fn.getcwd())
   end,
@@ -272,11 +274,11 @@ autocmd("BufReadPost", {
     local buf = event.buf
     if
       vim.tbl_contains(exclude, vim.bo[buf].filetype)
-      or vim.b[buf].lazyvim_last_loc
+      or vim.b[buf].last_loc
     then
       return
     end
-    vim.b[buf].lazyvim_last_loc = true
+    vim.b[buf].last_loc = true
     local mark = vim.api.nvim_buf_get_mark(buf, '"')
     local lcount = vim.api.nvim_buf_line_count(buf)
     if mark[1] > 0 and mark[1] <= lcount then
@@ -296,7 +298,6 @@ autocmd({ "ModeChanged" }, {
     vim.schedule(function()
       vim.api.nvim_set_hl(0, "CursorLineNr", {
         fg = hl.fg,
-        -- bg = curline_hl.bg
       })
     end)
   end,
@@ -333,6 +334,7 @@ autocmd("FileType", {
     "git",
     "grug-far",
     "vim",
+    "molten_output",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
