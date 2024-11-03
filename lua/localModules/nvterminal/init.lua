@@ -1,3 +1,5 @@
+-- Modified version of @Nvchad's nvterm --thanks a lot
+-- https://github.com/NvChad/ui/blob/v3.0/lua/nvchad/term/init.lua
 local api = vim.api
 local g = vim.g
 local M = {}
@@ -10,18 +12,30 @@ local pos_data = {
   vsp = { resize = "width", area = "columns" },
 }
 
+local function calculate_float_dims(height_percent, width_percent)
+  -- Use default values if not provided
+  height_percent = height_percent or 0.4 -- keeps your original default
+  width_percent = width_percent or 0.6 -- keeps your original default
+
+  local height = math.floor(height_percent * vim.o.lines)
+  local width = math.floor(width_percent * vim.o.columns)
+
+  return {
+    border = "rounded",
+    anchor = "NW",
+    height = height,
+    width = width,
+    row = math.floor((vim.o.lines - height) / 2),
+    col = math.floor((vim.o.columns - width) / 2),
+    relative = "editor",
+    zindex = 300,
+  }
+end
+
 local config = {
   hl = "Normal:term,WinSeparator:WinSeparator",
   sizes = { sp = 0.3, vsp = 0.3 },
-  float = {
-    relative = "editor",
-    border = "single",
-    anchor = "NW",
-    height = 0.5,
-    width = 0.6,
-    row = 4,
-    col = 5,
-  },
+  float = calculate_float_dims(),
 }
 
 -- used for initially resizing terms
@@ -44,13 +58,8 @@ local function opts_to_id(id)
 end
 
 local function create_float(buffer, float_opts)
-  local opts = vim.tbl_deep_extend("force", config.float, float_opts or {})
-
-  opts.width = math.ceil(opts.width * vim.o.columns)
-  opts.height = math.ceil(opts.height * vim.o.lines)
-  opts.row = math.ceil(opts.row * vim.o.lines)
-  opts.col = math.ceil(opts.col * vim.o.columns)
-
+  local base_opts = calculate_float_dims()
+  local opts = vim.tbl_deep_extend("force", base_opts, float_opts or {})
   vim.api.nvim_open_win(buffer, true, opts)
 end
 
@@ -98,6 +107,7 @@ local function create(opts)
 
   -- handle cmd opt
   local shell = vim.o.shell
+  ---@type string|table
   local cmd = shell
 
   if opts.cmd and opts.buf then
@@ -163,10 +173,59 @@ M.runner = function(opts)
   end
 end
 
+function M.create_tool(cmd, height_percent, width_percent)
+  local float_dims = calculate_float_dims(height_percent, width_percent)
+
+  local tool_opts = {
+    id = cmd,
+    pos = "float",
+    cmd = cmd,
+    float_opts = float_dims,
+  }
+
+  M.toggle(tool_opts)
+
+  -- Set buffer to be wiped when hidden
+  vim.bo[tool_opts.buf].bufhidden = "wipe"
+  --
+  -- -- Add autocmd to close window when terminal process exits
+  vim.api.nvim_create_autocmd("TermClose", {
+    buffer = tool_opts.buf,
+    callback = function()
+      vim.schedule(function()
+        vim.api.nvim_win_close(0, true)
+      end)
+    end,
+    once = true,
+  })
+  vim.keymap.set("n", "q", function()
+    local job_id = vim.b[tool_opts.buf].terminal_job_id
+    if job_id then
+      vim.api.nvim_chan_send(job_id, "\x03")
+      vim.api.nvim_chan_send(job_id, "exit\n")
+    end
+  end, { buffer = tool_opts.buf, noremap = true, silent = true })
+end
+
 --------------------------- autocmds -------------------------------
 api.nvim_create_autocmd("TermClose", {
   callback = function(args)
     save_term_info(args.buf, nil)
+  end,
+})
+
+vim.api.nvim_create_autocmd("VimResized", {
+  callback = function()
+    -- Find and update any visible floating terminals
+    for _, opts in pairs(vim.g.nvchad_terms or {}) do
+      if opts.pos == "float" then
+        local win_id = vim.fn.bufwinid(opts.buf)
+        if win_id ~= -1 then
+          local new_opts = calculate_float_dims()
+          vim.api.nvim_win_set_config(win_id, new_opts)
+        end
+      end
+    end
   end,
 })
 

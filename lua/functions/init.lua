@@ -13,22 +13,25 @@ local fts = {
   rmd = "R -e 'rmarkdown::render(\"%\")'",
   markdown = "pandoc % -o %:r.html",
 }
-M.run_file_term = function(option, term_height)
+function M.run_file_term(option, term_height)
   local cmd = fts[vim.bo.ft]
   local height = term_height or 15
-  vim.api.nvim_command(
-    cmd and ("w | " .. (option or "") .. height .. "sp | terminal")
-      or "echo 'No command for this filetype'"
-  )
-  if cmd then
-    vim.defer_fn(function()
-      vim.api.nvim_command(
-        "call jobsend(b:terminal_job_id, '" .. cmd .. "\\n')"
-      )
-      vim.cmd.startinsert()
-    end, 100) -- 100ms delay
+
+  if not cmd then
+    vim.notify("No command for this filetype", vim.log.levels.WARN)
+    return
   end
+
+  vim.cmd("w")
+  vim.cmd(string.format("%s%ssp | terminal", option or "", height))
+
+  vim.defer_fn(function()
+    local job_id = vim.b.terminal_job_id
+    vim.fn.jobsend(job_id, cmd .. "\n")
+    vim.cmd("startinsert")
+  end, 100)
 end
+
 -- This is what you need
 M.run_file = function(option)
   local cmd = fts[vim.bo.ft]
@@ -129,8 +132,10 @@ end
 ---@return nil
 function M.change_directory()
   local buf = vim.api.nvim_get_current_buf()
-  local root =
-    vim.fs.root(buf, { ".git", "main.R", "data/", "main.py", "main.qmd" })
+  local root = vim.fs.root(
+    buf,
+    { ".git", "main.R", "data/", "main.py", "main.qmd", "README.md" }
+  )
   if root then
     vim.uv.chdir(root)
     vim.notify("CWD is now " .. root, vim.log.levels.INFO)
