@@ -1,4 +1,3 @@
--- Statusline setup
 _G.statusline = {}
 
 ---Total rewrite of highlight function. Thanks to @MariaSolOs for the original idea.
@@ -74,12 +73,11 @@ function statusline.init()
   })
 end
 
-
 -- Function to get the current mode text
 ---@return string
--- stylua: ignore start
 local function get_mode()
   local modes = {
+    -- stylua: ignore start
     ["n"]      = "NO",
     ["no"]     = "OP",
     ["nov"]    = "OC",
@@ -109,8 +107,8 @@ local function get_mode()
     ["r?"]     = "P?",
     ["!"]      = "SH",
     ["t"]      = "TE",
+    -- stylua: ignore end
   }
-  -- stylua: ignore end 
   local hl = vim.bo.mod and "TermCursor" or "Statusline"
   return string.format(
     "%%#%s# %s",
@@ -147,7 +145,7 @@ local function get_filename()
   local components = vim.split(relative_path, "/")
   local num_components = #components
 
-  -- If there more than 3 components in the path,truncate to the last 3 
+  -- If there more than 3 components in the path,truncate to the last 3
   if num_components > 3 then
     components = vim.list_slice(components, num_components - 2) -- yep this keeps 3
     relative_path = ".../" .. table.concat(components, "/")
@@ -159,39 +157,45 @@ local function get_filename()
   -- hl = require("utils.hi").blend_highlight_groups(hl, "StatusLine", "bg", 0.7)
   icon = is_default and "" or icon
 
-  return string.format("%%#%s#%s %%#%s#%s%%#%s#%s ",
+  return string.format(
+    "%%#%s#%s %%#%s#%s%%#%s#%s ",
     hl,
     icon,
     "StatusLine",
     relative_path,
-    statusline.define_highlight("Modified", "Special", nil,
-      true), modified)
+    statusline.define_highlight("Modified", "Substitute", "bg", true),
+    modified
+  )
 end
-
-
 
 ---@return string
 local function get_git_status()
   local minidiff = vim.b.minidiff_summary
   local branch_name = vim.b.git_branch and vim.b.git_branch or ""
   if not minidiff then
-    return string.format(
-      "%%#StatusLineGitBranch#%s ",
-      branch_name
-    )
+    return string.format("%%#StatusLineGitBranch#%s ", branch_name)
   end
   -- this is a modfified logic from NvChad statusline ui (thank you) to show only if > 0.
   -- Define custom highlight groups for git status
-  -- stylua: ignore start
 
-  local added_hl   = statusline.define_highlight("GitAdded",   "MiniDiffSignAdd")
-  local changed_hl = statusline.define_highlight("GitChanged", "MiniDiffSignChange")
-  local removed_hl = statusline.define_highlight("GitRemoved", "MiniDiffSignDelete")
+  local added_hl = statusline.define_highlight("GitAdded", "MiniDiffSignAdd")
+  local changed_hl =
+    statusline.define_highlight("GitChanged", "MiniDiffSignChange")
+  local removed_hl =
+    statusline.define_highlight("GitRemoved", "MiniDiffSignDelete")
   -- Use the new highlight groups
-  local added   = minidiff.add and minidiff.add       ~= 0 and string.format("%%#%s# +%d", added_hl,   minidiff.add) or ""
-  local changed = minidiff.change and minidiff.change ~= 0 and string.format("%%#%s# ~%d", changed_hl, minidiff.change) or ""
-  local removed = minidiff.delete and minidiff.delete ~= 0 and string.format("%%#%s# -%d", removed_hl, minidiff.delete) or ""
-  -- stylua: ignore end
+  local added = minidiff.add
+      and minidiff.add ~= 0
+      and string.format("%%#%s# +%d", added_hl, minidiff.add)
+    or ""
+  local changed = minidiff.change
+      and minidiff.change ~= 0
+      and string.format("%%#%s# ~%d", changed_hl, minidiff.change)
+    or ""
+  local removed = minidiff.delete
+      and minidiff.delete ~= 0
+      and string.format("%%#%s# -%d", removed_hl, minidiff.delete)
+    or ""
   return string.format(
     "%%#StatusLineGitBranch#%s %s%s%s",
     branch_name,
@@ -200,7 +204,6 @@ local function get_git_status()
     removed
   )
 end
-
 
 -- Function to get the LSP status
 ---@return string
@@ -244,7 +247,7 @@ local function getDiffSource()
 
   local diffIcon = {
     git = " ",
-    codecompanion = " " -- 
+    codecompanion = " ", -- 
   }
 
   return string.format("%%#StatusLineLSP#%s", diffIcon[diff_source] or "")
@@ -254,29 +257,32 @@ local model_patterns = {
   {
     match = "claude",
     handle = function(model)
-      local variant = model:match("claude%-3%-5%-(%w+)") or model:match("claude%-3%-(%w+)")
-      return variant and variant:gsub("sonnet", "sonnet3.5"):gsub("haiku", "haiku3") or model
-    end
+      local variant = model:match("claude%-3%-5%-(%w+)")
+        or model:match("claude%-3%-(%w+)")
+      return variant
+          and variant:gsub("sonnet", "sonnet3.5"):gsub("haiku", "haiku3")
+        or model
+    end,
   },
   {
     match = "llama",
     handle = function(model)
       local version, size = model:match("llama%-(%d+%.%d)%-(%w+)")
       return version and string.format("llama-%s-%s", version, size) or model
-    end
+    end,
   },
   {
     match = "gpt%-4o",
     handle = function(model)
       return model == "gpt-4o-mini" and model or "gpt-4o"
-    end
+    end,
   },
   {
     match = "o1%-",
     handle = function(model)
       return model
-    end
-  }
+    end,
+  },
 }
 
 local function truncate_model_name(model)
@@ -288,7 +294,6 @@ local function truncate_model_name(model)
   return model
 end
 
-
 -- Table to store LLM information for each buffer
 ---@type table
 local llm_info = {}
@@ -298,7 +303,11 @@ local processing = false
 local function get_codecompanion_status()
   -- Create a single autocmd for both events
   vim.api.nvim_create_autocmd("User", {
-    pattern = {"CodeCompanionChatAdapter", "CodeCompanionChatModel", "CodeCompanionRequest*"},
+    pattern = {
+      "CodeCompanionChatAdapter",
+      "CodeCompanionChatModel",
+      "CodeCompanionRequest*",
+    },
     callback = function(args)
       if args.match == "CodeCompanionRequestStarted" then
         processing = true
@@ -327,32 +336,21 @@ local function get_codecompanion_status()
     icon = "✨"
     hl = statusline.define_highlight("CodeCompanionProcessing", "Special")
   else
-    icon, hl = require("mini.icons").get("lsp", info.name)
+    local _, mini_icons = pcall(require, "mini.icons")
+    if not mini_icons then
+      return ""
+    end
+    icon, hl = mini_icons.get("lsp", info.name)
     hl = statusline.define_highlight("CodeCompanionLSP", hl)
   end
 
   local llm_name = string.format("%%#%s#%s%%*", hl, icon or info.name)
   local model_info = info.model and ("- " .. info.model) or ""
   local status = llm_name .. model_info
-  return vim.bo.filetype == "codecompanion" and string.format("%%#StatusLineLSP#|%s|", status) or ""
+  return vim.bo.filetype == "codecompanion"
+      and string.format("%%#StatusLineLSP#|%s|", status)
+    or ""
 end
-
--- Function to get the line and column info
----@return string
-local function get_line_info()
-  -- local line = vim.fn.line(".")
-  local column = vim.fn.col(".")
-  local total_lines = vim.fn.line("$")
-  -- local percent = math.floor((line / total_lines) * 100) .. tostring("%%")
-  return string.format(
-    " %%#StatusLinePosition#%02d/%d ",
-    column,
-    -- line,
-    total_lines
-    -- percent
-  )
-end
-
 
 -- Function to get diagnostics count with improved efficiency
 ---@return string
@@ -360,31 +358,24 @@ local function get_diagnostics()
   if not vim.diagnostic.is_enabled() or vim.bo.filetype == "intro" then
     return ""
   end
-  local diagnostics = vim.diagnostic.get(0)
-  local counts = { 0, 0, 0, 0 }
+  ---@type table, table, table, table
+  local diagnostics, counts, result, severities
+  diagnostics = vim.diagnostic.get(0)
+  counts = { 0, 0, 0, 0 }
 
   for _, d in ipairs(diagnostics) do
     counts[d.severity] = (counts[d.severity] or 0) + 1
   end
 
-  local result = {}
-  local severities = { "Error", "Warn", "Info", "Hint" }
+  result = {}
+  severities = { "Error", "Warn", "Info", "Hint" }
 
   for i, severity in ipairs(severities) do
-
     local _, MiniIcons = pcall(require, "mini.icons")
     local icon, hl = MiniIcons.get("lsp", severity)
     hl = statusline.define_highlight(severity, hl)
     if counts[i] > 0 then
-      table.insert(
-        result,
-        string.format(
-          "%%#%s#%s%d",
-          hl,
-          icon,
-          counts[i]
-        )
-      )
+      table.insert(result, string.format("%%#%s#%s%d", hl, icon, counts[i]))
     end
   end
 
@@ -395,12 +386,21 @@ end
 ---@return string
 local function get_word_count()
   if vim.bo.filetype == "markdown" or vim.bo.filetype == "codecompanion" then
-    if vim.fn.expand("%:p:h") == vim.fn.expand("$HOME/.local/share/nvim/parrot/chats") then
-      local word_count = vim.fn.wordcount().words
-      local line_count = vim.fn.line("$")
-      local char_count = vim.fn.line2byte(line_count + 1) - 1
-      local token_count = math.floor(char_count / 4)  -- approximate token count, assuming 4 characters per token
-      return string.format(" %%#StatusLineWordCount#%d words, %d tokens ", word_count, token_count)
+    if
+      vim.fn.expand("%:p:h")
+      == vim.fn.expand("$HOME/.local/share/nvim/parrot/chats")
+    then
+      ---@type number, integer, integer, integer
+      local word_count, line_count, char_count, token_count
+      word_count = vim.fn.wordcount().words
+      line_count = vim.fn.line("$")
+      char_count = vim.fn.line2byte(line_count + 1) - 1
+      token_count = math.floor(char_count / 4) -- approximate token count, assuming 4 characters per token
+      return string.format(
+        " %%#StatusLineWordCount#%d words, %d tokens ",
+        word_count,
+        token_count
+      )
     else
       local word_count = vim.fn.wordcount().words
       return string.format(" %%#StatusLineWordCount#%d words ", word_count)
@@ -416,19 +416,19 @@ local function arrow_knot()
   if vim.g.arrow_enabled == nil then
     return ""
   end
-  local index_keys = { "a", "f", "g" }  -- Define the index keys
-  -- local current_file = vim.fn.expand("%")
-  local current_file = vim.b.filename_statusline
-  local arrow_files = vim.g.arrow_filenames
+  ---@type table, string, table, boolean
+  local index_keys, current_file, arrow_files, file_in_arrow
+  index_keys = { "a", "f", "g" } -- Define the index keys
+  current_file = vim.b.filename_statusline
+  arrow_files = vim.g.arrow_filenames
   -- Check if current file is in the Arrow list
-  local file_in_arrow = false
+  file_in_arrow = false
   for _, filename in ipairs(arrow_files) do
     if filename == current_file then
       file_in_arrow = true
       break -- Found it, no need to continue the loop
     end
   end
-
 
   if not file_in_arrow then
     return ""
@@ -467,6 +467,33 @@ local function get_sep(sep, hl, func)
   return string.format("%%#%s#%s", hl, sep)
 end
 
+-- Function to get the line and column info
+---@return string
+local function get_line_info()
+  -- local cur_line = vim.api.nvim_win_get_cursor(0)[1]
+  -- local lines = vim.api.nvim_buf_line_count(0)
+  ---@type integer, integer, integer, table, integer, string, string
+  local current_line, column, total_lines, sbar_chars, i, sbar, hl_scrollbar
+  current_line = vim.fn.line(".")
+  column = vim.fn.col(".")
+  total_lines = vim.fn.line("$")
+
+  sbar_chars = { "▔", "🮂", "🮃", "🮑", "🮒", "▃", "▂", "▁" }
+  i = math.floor((current_line - 1) / total_lines * #sbar_chars) + 1
+  sbar = string.rep(sbar_chars[i], 2)
+  hl_scrollbar =
+    statusline.define_highlight("Scrollbar", "Substitute", "bg", true)
+  -- local percent = math.floor((line / total_lines) * 100) .. tostring("%%")
+  return string.format(
+    " %%#%s#%02d/%d %%#%s#%s",
+    "StatusLinePosition",
+    column,
+    total_lines,
+    hl_scrollbar,
+    sbar
+  )
+end
+
 -- Setup the statusline
 function statusline.active()
   return table.concat({
@@ -486,8 +513,8 @@ function statusline.active()
     get_diagnostics(),
     python_env(),
     get_lsp_status(),
-    get_line_info(),
     get_word_count(),
+    get_line_info(),
   })
 end
 
